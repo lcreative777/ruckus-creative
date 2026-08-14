@@ -13,6 +13,8 @@ Rebuild ruckuscreative.com as a static Astro site that is **visually faithful to
 
 A visitor should not notice a design change. They should notice the site is fast.
 
+**Fidelity bar: close, not pixel-perfect.** Confirmed with the client on 2026-08-13. The target is that the rebuilt page reads as the same design — same layout, type, color, imagery, and hierarchy — not that it diffs to zero against the original. Minor differences in spacing, easing, and shadow rendering are acceptable and are not defects. This matters most for the WPBakery-built pages, where chasing exact reproduction of page-builder output would cost far more than it returns.
+
 ### Non-goals
 
 - No visual redesign. Layout, type, color, spacing, and imagery match the current site.
@@ -226,7 +228,7 @@ Nothing goes live until all of the following pass, and results are reported with
 
 1. `astro check` and the production build complete without errors.
 2. **URL parity** — an automated check that all 39 migrated URLs return 200 on the preview deployment, and every redirect resolves to its intended target.
-3. **Visual regression** — side-by-side screenshots of each page, new versus current, at 1440px and 390px. Reviewed by a human before cutover; this is the gate that catches fidelity drift.
+3. **Visual comparison** — side-by-side screenshots of each page, new versus current, at 1440px and 390px. Reviewed by a human before cutover. Judged against the "close, not pixel-perfect" bar: the gate is missing or misplaced *content* and broken layout, not sub-pixel spacing differences.
 4. **Lighthouse** against the preview deployment, mobile and desktop, on a representative sample: homepage, a portfolio item, a knowledge post, contact.
 5. **Form test** — an end-to-end submission that lands in the destination inbox, plus confirmation that a submission with an invalid Turnstile token is rejected.
 6. **Link check** — no internal 404s, no lingering absolute `https://ruckuscreative.com` URLs pointing at WordPress paths.
@@ -256,7 +258,7 @@ DNS cutover is a separate, explicitly approved step. The WordPress origin stays 
 | Risk | Mitigation |
 |---|---|
 | WPBakery pages don't extract cleanly | Expected. Rendered-DOM path plus hand-finishing; visual regression catches misses. |
-| Visual fidelity drift from rebuilt CSS | Screenshot comparison at two widths on every page, human-reviewed before cutover. |
+| Visual fidelity drift from rebuilt CSS | Screenshot comparison at two widths, human-reviewed. Bar is "close, not pixel-perfect", so minor spacing/easing differences are accepted rather than chased. |
 | `send_email` destination not verified | Checked in Phase 1, before form code is written. |
 | Ranking loss after cutover | Exact URL parity, verbatim metadata, complete 301 map. |
 | Full-res media unavailable via REST | Fall back to scraping `srcset` for the largest available candidate. |
