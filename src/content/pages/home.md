@@ -21,7 +21,7 @@ seo:
 	<div class="col no-extra-padding">
 		<div class="inner_row"><div class="row_col_wrap_12_inner col span_12 left">
 	<div class="col child_column no-extra-padding">
-		<a href="https://www.youtube.com/watch?v=NgliiMV4jzE" class="play_button large pp" target="_blank" rel="noopener"><span><span class="screen-reader-text">Play Video</span></span></a>
+		<a href="https://www.youtube.com/watch?v=NgliiMV4jzE" class="play_button large pp" target="_blank" rel="noopener"><span><span class="screen-reader-text">Play Video</span><span class="play"><span class="inner"><svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="600px" height="800px" x="0px" y="0px" viewBox="0 0 600 800" enable-background="new 0 0 600 800" xml:space="preserve"><path fill="none" d="M0-1.79v800L600,395L0-1.79z"></path> </svg></span></span></span></a>
 	</div> 
 </div></div>
 	</div> 
@@ -45,7 +45,9 @@ seo:
 	<div class="col padding-3-percent">
 		<div>
 				<div class="inner_row"><div class="row_col_wrap_12_inner col span_12 left">
-	 
+	<div class="col child_column no-extra-padding">
+		<i class="steadysets-icon-graph"></i>
+	</div> 
 
 	<div class="col child_column no-extra-padding">
 		<div>
@@ -54,7 +56,11 @@ seo:
 	</div>
 	</div> 
 </div></div><div class="inner_row"><div class="row_col_wrap_12_inner col span_12 left">
-	 
+	<div class="col child_column no-extra-padding">
+		<span class="im-icon-wrap"><span><svg role="presentation" version="1.1" xmlns="http://www.w3.org/2000/svg" width="50" height="50" viewBox="0 0 32 32">
+        <path d="M31.333 29.333h-30.667c-0.367 0-0.667-0.3-0.667-0.667v-25.333c0-0.367 0.3-0.667 0.667-0.667h30.667c0.367 0 0.667 0.3 0.667 0.667v25.333c0 0.367-0.3 0.667-0.667 0.667zM1.333 28h29.333v-24h-29.333v24zM30.667 9.333h-29.333c-0.367 0-0.667-0.3-0.667-0.667s0.3-0.667 0.667-0.667h29.333c0.367 0 0.667 0.3 0.667 0.667s-0.3 0.667-0.667 0.667zM22.751 25.997c-0.661 0-1.305-0.107-1.861-0.355-0.989-0.44-1.543-1.263-1.556-2.317-0.011-0.795 0.288-1.489 0.861-2.019 1.677-1.536 5.245-1.24 5.639-1.197 0.363 0.036 0.637 0.361 0.597 0.729-0.033 0.364-0.347 0.633-0.732 0.599-0.927-0.091-3.563-0.112-4.612 0.855-0.297 0.273-0.429 0.596-0.424 1.023 0.007 0.529 0.251 0.887 0.763 1.116 1.195 0.528 3.263 0.117 4.061-0.584 0.276-0.243 0.695-0.216 0.941 0.060 0.243 0.276 0.211 0.697-0.065 0.943-0.759 0.672-2.22 1.148-3.612 1.148zM5.484 26.617c-0.079 0-0.155-0.013-0.235-0.043-0.344-0.129-0.523-0.513-0.388-0.859l5.015-13.388c0.129-0.344 0.509-0.528 0.859-0.388 0.344 0.129 0.52 0.513 0.389 0.859l-5.015 13.387c-0.1 0.267-0.355 0.432-0.625 0.432zM15.893 26.617c-0.269 0-0.524-0.165-0.624-0.432l-5.017-13.387c-0.132-0.345 0.048-0.729 0.391-0.859 0.349-0.139 0.729 0.044 0.859 0.388l5.017 13.388c0.131 0.344-0.047 0.729-0.391 0.859-0.079 0.029-0.156 0.043-0.235 0.043zM13.333 20h-5.333c-0.367 0-0.667-0.3-0.667-0.667s0.3-0.667 0.667-0.667h5.333c0.367 0 0.667 0.3 0.667 0.667s-0.3 0.667-0.667 0.667zM26 26c-0.367 0-0.667-0.3-0.667-0.667v-6.472c-0.26-0.369-0.597-0.599-1.024-0.695-1.259-0.269-3.028 0.661-3.593 1.049-0.307 0.203-0.72 0.128-0.927-0.177-0.205-0.305-0.128-0.72 0.177-0.924 0.104-0.073 2.555-1.713 4.637-1.249 0.845 0.192 1.509 0.677 1.972 1.457 0.063 0.103 0.092 0.221 0.092 0.341v6.667c-0.001 0.369-0.301 0.669-0.668 0.669zM4 6c0 0.368-0.299 0.667-0.667 0.667s-0.667-0.299-0.667-0.667c0-0.368 0.299-0.667 0.667-0.667s0.667 0.299 0.667 0.667zM6.667 6c0 0.368-0.299 0.667-0.667 0.667s-0.667-0.299-0.667-0.667c0-0.368 0.299-0.667 0.667-0.667s0.667 0.299 0.667 0.667zM9.333 6c0 0.368-0.299 0.667-0.667 0.667s-0.667-0.299-0.667-0.667c0-0.368 0.299-0.667 0.667-0.667s0.667 0.299 0.667 0.667z"></path>
+        </svg></span></span>
+	</div> 
 
 	<div class="col child_column no-extra-padding">
 		<div>
@@ -63,7 +69,9 @@ seo:
 	</div>
 	</div> 
 </div></div><div class="inner_row"><div class="row_col_wrap_12_inner col span_12 left">
-	 
+	<div class="col child_column no-extra-padding">
+		<i class="steadysets-icon-uniE617"></i>
+	</div> 
 
 	<div class="col child_column no-extra-padding">
 		<div>
@@ -706,7 +714,11 @@ seo:
 		<div id="about" class="parallax_section"><div class="row_col_wrap_12 col span_12 dark left">
 	<div class="col no-extra-padding">
 		<div>
-				
+				<div class="inner_row"><div class="row_col_wrap_12_inner col span_12 left">
+	<div class="col child_column centered-text has-animation no-extra-padding">
+		<i class="icon-3x steadysets-icon-diamond extra-color-1"><i class="circle-border"></i></i>
+	</div> 
+</div></div>
 <div>
 		<h4>FOUNDATION: (+)</h4>
 <p>The internal view, “what we sell, and why people should buy it.” This starts with the Creative Brief to outline goals, parameters and response mechanism and moves through key executive meetings for synchronized client leadership, marcoms audit, marketing plan review, competitive landscape, and so forth.</p>
@@ -717,7 +729,11 @@ seo:
 
 	<div class="col no-extra-padding">
 		<div>
-				
+				<div class="inner_row"><div class="row_col_wrap_12_inner col span_12 left">
+	<div class="col child_column centered-text has-animation no-extra-padding">
+		<i class="icon-3x icon-tablet extra-color-1"><i class="circle-border"></i></i>
+	</div> 
+</div></div>
 <div>
 		<h4>VALIDATION: (+)</h4>
 <p>Now we know what you sell, what do your clients buy? Simple research is enacted to validate the brand / creative strategy and make sure it is aligned with your market’s mind.</p>
@@ -728,7 +744,11 @@ seo:
 
 	<div class="col no-extra-padding">
 		<div>
-				
+				<div class="inner_row"><div class="row_col_wrap_12_inner col span_12 left">
+	<div class="col child_column centered-text has-animation no-extra-padding">
+		<i class="icon-3x linecon-icon-display extra-color-1"><i class="circle-border"></i></i>
+	</div> 
+</div></div>
 <div>
 		<h4>INNOVATION: (+)</h4>
 <p>This the fun part – the creative process, this is the reason we get up in the morning. Where the message and brand are created and combined to solve the marketing objective. Key client concepts and corporate ID guidelines considered while developing new positioning, strategic message, core value, personality, and tone.</p>
@@ -739,7 +759,11 @@ seo:
 
 	<div class="col no-extra-padding">
 		<div>
-				
+				<div class="inner_row"><div class="row_col_wrap_12_inner col span_12 left">
+	<div class="col child_column centered-text has-animation no-extra-padding">
+		<i class="icon-3x iconsmind-Thunder extra-color-1"><i class="circle-border"></i></i>
+	</div> 
+</div></div>
 <div>
 		<h4>IMPLEMENTATION: (+)</h4>
 <p>Final creative and design is applied to marketing communications; brochures, catalogs, websites, ad campaigns, etc. Copywriting, photography, design and final production delivers what you need, when you need it.</p>
@@ -753,7 +777,11 @@ seo:
 
 	<div class="col no-extra-padding">
 		<div>
-				
+				<div class="inner_row"><div class="row_col_wrap_12_inner col span_12 left">
+	<div class="col child_column centered-text has-animation no-extra-padding">
+		<i class="icon-3x iconsmind-Statistic extra-color-1"><i class="circle-border"></i></i>
+	</div> 
+</div></div>
 <div>
 		<h4>EVALUATION: (+)</h4>
 <p>retrospect analysis to determine effectiveness and future considerations.</p>
@@ -819,13 +847,13 @@ seo:
 		<div><div class="row_col_wrap_12 col span_12 dark left">
 	<div class="col has-animation no-extra-padding">
 		<div>
-				<div class="iwithtext"><div class="iwt-text"> 
+				<div class="iwithtext"><div class="iwt-icon"> <i class="icon-default-style linecon-icon-world extra-color-1"></i> </div><div class="iwt-text"> 
 <h4>Online</h4>
 <p>– Websites<br>
 – Mobile sites<br>
 – Mircrosites<br>
 – MP3 download sites<br>
-– Sweeps Entry sites </p></div></div><div class="iwithtext"><div class="iwt-text"> 
+– Sweeps Entry sites </p></div></div><div class="iwithtext"><div class="iwt-icon"> <i class="icon-default-style linecon-icon-display extra-color-1"></i> </div><div class="iwt-text"> 
 <h4>Online Marketing</h4>
 <p>– Social Media set up and implement<br>
 – SEO<br>
@@ -835,14 +863,14 @@ seo:
 
 	<div class="col has-animation no-extra-padding">
 		<div>
-				<div class="iwithtext"><div class="iwt-text"> 
+				<div class="iwithtext"><div class="iwt-icon"> <i class="icon-default-style fa fa-print extra-color-1"></i> </div><div class="iwt-text"> 
 <h4>Print</h4>
 <p>– Advertising campaigns<br>
 – Corporate brochures<br>
 – Service brochures<br>
 – Sales Kits<br>
 – Direct marketing / mail<br>
-– Photography </p></div></div><div class="iwithtext"><div class="iwt-text"> 
+– Photography </p></div></div><div class="iwithtext"><div class="iwt-icon"> <i class="icon-default-style fa fa-youtube-play extra-color-1"></i> </div><div class="iwt-text"> 
 <h4>Presentations</h4>
 <p>– Video<br>
 – Custom PPT / Keynote presentations </p></div></div>
@@ -851,11 +879,11 @@ seo:
 
 	<div class="col has-animation no-extra-padding">
 		<div>
-				<div class="iwithtext"><div class="iwt-text"> 
+				<div class="iwithtext"><div class="iwt-icon"> <i class="icon-default-style steadysets-icon-atom extra-color-1"></i> </div><div class="iwt-text"> 
 <h4>Brand Development</h4>
 <p>– Brand strategy / positioning<br>
 – Naming – product / service<br>
-– Research – Voice of customer </p></div></div><div class="iwithtext"><div class="iwt-text"> 
+– Research – Voice of customer </p></div></div><div class="iwithtext"><div class="iwt-icon"> <i class="icon-default-style linecon-icon-calendar extra-color-1"></i> </div><div class="iwt-text"> 
 <h4>Event Marketing</h4>
 <p>– Promotional products<br>
 – Simplified registration<br>

@@ -161,3 +161,96 @@ h3 { font-size: var(--step-h3); }
   .prose #intro .col[class*="padding-"] { max-width: 34%; }
   .prose #intro.has-bg { background-position: center right; }
 }
+
+/* ---- Buttons -------------------------------------------------------------
+   Measured on the live site at 1440px: 15px/42px padding, square corners,
+   Open Sans 14px/600, 162x50. `extra-color-1` is the orange used in the intro,
+   `extra-color-3` the dark one on the red band. */
+.prose .n-sc-button,
+.prose a[class*="nectar-button"] {
+  display: inline-flex;
+  align-items: center;
+  gap: .5em;
+  padding: 15px 42px;
+  border-radius: 0;
+  font-family: var(--font-body);
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.4;
+  text-decoration: none;
+  background: var(--color-accent);
+  color: #fff;
+  transition: filter .2s ease;
+}
+.prose .n-sc-button:hover { filter: brightness(1.08); }
+.prose .n-sc-button.extra-color-1 { background: #f6653c; color: #fff; }
+.prose .n-sc-button.extra-color-3 { background: #333; color: #fff; }
+.prose .light .n-sc-button { color: #fff; text-decoration: none; }
+/* The arrow glyph came from Salient's icon font; draw it as a caret instead. */
+.prose .icon-button-arrow { width: .6em; height: .6em; border-top: 2px solid currentColor;
+  border-right: 2px solid currentColor; transform: rotate(45deg); display: inline-block; }
+
+/* ---- Feature icons -------------------------------------------------------
+   Salient drew these with the `steadysets` icon font, which we do not ship.
+   Close SVG substitutes are masked in so they inherit currentColor and stay
+   crisp at any size — no font, no extra request. */
+.prose [class*="steadysets-icon-"] {
+  display: inline-block;
+  width: 50px; height: 50px;
+  background-color: currentColor;
+  -webkit-mask-repeat: no-repeat; mask-repeat: no-repeat;
+  -webkit-mask-position: center;  mask-position: center;
+  -webkit-mask-size: contain;     mask-size: contain;
+}
+.prose .light [class*="steadysets-icon-"] { color: #fff; }
+
+/* rising bar chart — substitutes steadysets-icon-graph */
+.prose .steadysets-icon-graph {
+  -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cpath fill='none' stroke='%23000' stroke-width='2' d='M3 3v26h26M8 24v-7M14 24v-12M20 24v-8M26 24v-16'/%3E%3C/svg%3E");
+  mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cpath fill='none' stroke='%23000' stroke-width='2' d='M3 3v26h26M8 24v-7M14 24v-12M20 24v-8M26 24v-16'/%3E%3C/svg%3E");
+}
+/* document with lines — substitutes steadysets-icon-uniE617 */
+.prose .steadysets-icon-uniE617 {
+  -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cpath fill='none' stroke='%23000' stroke-width='2' d='M7 3h13l6 6v20H7zM20 3v6h6M11 15h11M11 20h11M11 25h7'/%3E%3C/svg%3E");
+  mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cpath fill='none' stroke='%23000' stroke-width='2' d='M7 3h13l6 6v20H7zM20 3v6h6M11 15h11M11 20h11M11 25h7'/%3E%3C/svg%3E");
+}
+/* diamond */
+.prose .steadysets-icon-diamond {
+  -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cpath fill='none' stroke='%23000' stroke-width='2' d='M16 3 29 13 16 29 3 13z M3 13h26M11 13 16 3M21 13 16 3'/%3E%3C/svg%3E");
+  mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cpath fill='none' stroke='%23000' stroke-width='2' d='M16 3 29 13 16 29 3 13z M3 13h26M11 13 16 3M21 13 16 3'/%3E%3C/svg%3E");
+}
+/* atom */
+.prose .steadysets-icon-atom {
+  -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cg fill='none' stroke='%23000' stroke-width='2'%3E%3Ccircle cx='16' cy='16' r='3'/%3E%3Cellipse cx='16' cy='16' rx='13' ry='6'/%3E%3Cellipse cx='16' cy='16' rx='13' ry='6' transform='rotate(60 16 16)'/%3E%3Cellipse cx='16' cy='16' rx='13' ry='6' transform='rotate(120 16 16)'/%3E%3C/g%3E%3C/svg%3E");
+  mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cg fill='none' stroke='%23000' stroke-width='2'%3E%3Ccircle cx='16' cy='16' r='3'/%3E%3Cellipse cx='16' cy='16' rx='13' ry='6'/%3E%3Cellipse cx='16' cy='16' rx='13' ry='6' transform='rotate(60 16 16)'/%3E%3Cellipse cx='16' cy='16' rx='13' ry='6' transform='rotate(120 16 16)'/%3E%3C/g%3E%3C/svg%3E");
+}
+/* The one icon that was already a real inline SVG keeps its own artwork. */
+.prose .im-icon-wrap svg { width: 50px; height: 50px; }
+.prose .light .im-icon-wrap svg { fill: #fff; stroke: #fff; }
+
+/* Each feature block is an icon column beside a text column — two sibling
+   .col.child_column elements inside .row_col_wrap_12_inner. Flexing .inner_row
+   instead squeezed the copy into a 65px ribbon. */
+@media (min-width: 700px) {
+  .prose [class*="row_col_wrap_12_inner"]:has(> .col ~ .col) {
+    display: flex; gap: var(--space-3); align-items: flex-start;
+  }
+  .prose [class*="row_col_wrap_12_inner"]:has(> .col ~ .col) > .col:first-child { flex: 0 0 60px; }
+  .prose [class*="row_col_wrap_12_inner"]:has(> .col ~ .col) > .col:last-child { flex: 1 1 auto; min-width: 0; }
+}
+/* The band's headings are h5 in the source but read as section labels. */
+.prose .light h5 { font-size: 1rem; margin-bottom: .35em; }
+
+/* The red band is two columns: the icon blocks left, the "Our job" statement
+   and its button right. These are sibling .col.padding-3-percent elements
+   inside the outer row_col_wrap_12 (not the _inner wrappers styled above). */
+@media (min-width: 900px) {
+  .prose [class*="row_col_wrap_12"]:not([class*="_inner"]):has(> .col ~ .col) {
+    display: flex; gap: var(--space-5); align-items: flex-start;
+  }
+  .prose [class*="row_col_wrap_12"]:not([class*="_inner"]):has(> .col ~ .col) > .col {
+    flex: 1 1 0; min-width: 0;
+  }
+}
+/* The right-hand statement is set noticeably larger than body copy. */
+.prose .light .overlay p { font-size: 1.5rem; line-height: 1.45; }

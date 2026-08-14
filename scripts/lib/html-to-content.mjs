@@ -44,6 +44,11 @@ export function stripShortcodes(text) {
 // therefore LAYOUT, not decoration, and are preserved and restyled.
 const LAYOUT_CLASS = /^(col|col_last|row|clear|span_\d+)$/;
 
+// Salient renders feature icons as icon-font glyphs (`steadysets-icon-*`).
+// The font is not shipped, so the class survives as a hook that CSS swaps for
+// a close SVG substitute. Without this the icons vanish entirely.
+const ICON_CLASS = /^(steadysets-|linecon-|iconsmind-|im-icon|icon-)/;
+
 const JUNK_CLASS = /^(vc_|wpb_|nectar-|nectar_|column_|full-width|inner-wrap|row-bg)/;
 
 // ids are kept so fragment navigation survives, but Salient emits generated
@@ -176,13 +181,16 @@ export function cleanHtml(rawHtml, { baseUrl, nameFor = plainBasename, resolvePa
   // Drop presentational attributes everywhere.
   $('*').each((_, el) => {
     if (!el.attribs) return;
+    // An <svg>'s attributes ARE the graphic — viewBox, d, fill. Stripping them
+    // to the HTML keep-list leaves an empty box where an icon should be.
+    if (el.name === 'svg' || $(el).closest('svg').length > 0) return;
     for (const name of Object.keys(el.attribs)) {
       if (name === 'id' && JUNK_ID.test(el.attribs.id)) { delete el.attribs.id; continue; }
       if (KEEP_ATTR.has(name)) continue;
       if (name === 'class') {
         const kept = (el.attribs.class || '')
           .split(/\s+/)
-          .filter(c => c && (LAYOUT_CLASS.test(c) || !JUNK_CLASS.test(c)));
+          .filter(c => c && (LAYOUT_CLASS.test(c) || ICON_CLASS.test(c) || !JUNK_CLASS.test(c)));
         if (kept.length) el.attribs.class = kept.join(' ');
         else delete el.attribs.class;
         continue;
@@ -237,7 +245,9 @@ export function cleanHtml(rawHtml, { baseUrl, nameFor = plainBasename, resolvePa
   $('div, p, span, section').each((_, el) => {
     const $el = $(el);
     if ($el.attr('data-bg') || $el.attr('data-band-color') || $el.attr('id')) return;
-    if (!$el.text().trim() && $el.find('img, br, hr, [data-bg], [data-band-color]').length === 0) $el.remove();
+    if (!$el.text().trim()
+        && $el.find('img, br, hr, svg, [data-bg], [data-band-color], i[class*="icon"], [class*="icon-"]').length === 0
+        && !/\bicon\b|icon-/.test($el.attr('class') ?? '')) $el.remove();
   });
 
   const html = $.html().replace(/\n{3,}/g, '\n\n').trim();
