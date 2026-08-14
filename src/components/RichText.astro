@@ -47,6 +47,12 @@ for (const tag of imgTags) {
   out = out.replace(whole, await pictureFor(src, `${before} ${after}`));
 }
 
+// data-bg-color="#b81e04" → a real background colour on the section band.
+const bgColours = [...out.matchAll(/data-band-color="([^"]+)"/g)];
+for (const [whole, colour] of bgColours) {
+  out = out.replace(whole, `class="has-bg-color" style="--bg-color: ${colour}"`);
+}
+
 // data-bg="@assets/media/x.jpg" → an inline custom property the CSS consumes.
 const bgTags = [...out.matchAll(/data-bg="([^"]+)"/g)];
 for (const [whole, ref] of bgTags) {
@@ -64,4 +70,5 @@ for (const [whole, ref] of bgTags) {
     background-size: cover;
     background-position: center;
   }
+  .has-bg-color { background-color: var(--bg-color); }
 </style>

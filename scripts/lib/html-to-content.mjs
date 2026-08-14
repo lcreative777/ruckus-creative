@@ -57,7 +57,7 @@ const JUNK_ID = /^(fws_|sidebar|project-meta|portfolio-nav|prev-link|next-link|a
 // `data-bg` carries background images rescued from inline styles (see below).
 const KEEP_ATTR = new Set([
   'href', 'src', 'alt', 'title', 'width', 'height', 'colspan', 'rowspan',
-  'id', 'data-bg', 'rel', 'target',
+  'id', 'data-bg', 'data-band-color', 'rel', 'target',
 ]);
 
 /** Pick the highest-resolution candidate from a srcset. */
@@ -118,10 +118,19 @@ export function cleanHtml(rawHtml, { baseUrl, nameFor = plainBasename, resolvePa
     $el.removeAttr('srcset').removeAttr('sizes').removeAttr('loading');
   });
 
-  // WPBakery and Salient put hero and row imagery in inline `background-image`
-  // styles rather than <img> tags. The style attribute is stripped below, so
-  // capture those URLs first and hand the sentinel forward on `data-bg` —
-  // otherwise the image is lost with no trace and no failing test.
+  // Salient paints a section's background on a `.row-bg` layer nested inside
+  // `.row-bg-wrap`, while the section's content sits as a SIBLING of that wrap.
+  // Setting the background on the layer itself paints an empty inner div, so
+  // hoist it to the section element that contains both.
+  const bgTarget = ($el) => {
+    const wrap = $el.closest('.row-bg-wrap');
+    if (wrap.length && wrap.parent().length) return wrap.parent();
+    return $el.parent().length ? $el.parent() : $el;
+  };
+
+  // Row and hero imagery lives in inline `background-image`, not <img>. The
+  // style attribute is stripped below, so capture the URL first and hand the
+  // sentinel forward on `data-bg` — otherwise the image is lost with no trace.
   $('[style*="url("]').each((_, el) => {
     const $el = $(el);
     const match = /url\(\s*["']?([^)"']+?)["']?\s*\)/i.exec($el.attr('style') ?? '');
@@ -130,7 +139,20 @@ export function cleanHtml(rawHtml, { baseUrl, nameFor = plainBasename, resolvePa
     try { abs = new URL(match[1], baseUrl).href; } catch { return; }
     if (!abs.includes('/wp-content/uploads/')) return;   // ignore theme sprites and gradients
     if (!images.includes(abs)) images.push(abs);
-    $el.attr('data-bg', `@assets/media/${nameFor(abs)}`);
+    bgTarget($el).attr('data-bg', `@assets/media/${nameFor(abs)}`);
+  });
+
+  // Section background colours live in the same layer. Losing them flattened
+  // the homepage: the "We Drive Growth" band is #b81e04 and rendered white.
+  $('[style*="background-color"]').each((_, el) => {
+    const $el = $(el);
+    const match = /background-color:\s*([^;"']+)/i.exec($el.attr('style') ?? '');
+    if (!match) return;
+    const colour = match[1].trim();
+    // #fff on a band is Salient's default, not a design choice — skip it so we
+    // do not paint white over the page's own background.
+    if (/^(#fff(fff)?|white|transparent|rgba\(0,\s*0,\s*0,\s*0\))$/i.test(colour)) return;
+    bgTarget($el).attr('data-band-color', colour);
   });
 
   // Internal absolute links become root-relative; external links are left alone.
@@ -202,7 +224,7 @@ export function cleanHtml(rawHtml, { baseUrl, nameFor = plainBasename, resolvePa
     changed = false;
     $('div').each((_, el) => {
       const $el = $(el);
-      if ($el.attr('class') || $el.attr('id') || $el.attr('data-bg')) return;
+      if ($el.attr('class') || $el.attr('id') || $el.attr('data-bg') || $el.attr('data-band-color')) return;
       if ($el.children().length !== 1) return;
       $el.replaceWith($el.children());
       changed = true;
@@ -214,8 +236,8 @@ export function cleanHtml(rawHtml, { baseUrl, nameFor = plainBasename, resolvePa
   // or the rescued hero sections get deleted right after being rescued.
   $('div, p, span, section').each((_, el) => {
     const $el = $(el);
-    if ($el.attr('data-bg') || $el.attr('id')) return;
-    if (!$el.text().trim() && $el.find('img, br, hr, [data-bg]').length === 0) $el.remove();
+    if ($el.attr('data-bg') || $el.attr('data-band-color') || $el.attr('id')) return;
+    if (!$el.text().trim() && $el.find('img, br, hr, [data-bg], [data-band-color]').length === 0) $el.remove();
   });
 
   const html = $.html().replace(/\n{3,}/g, '\n\n').trim();

@@ -11,9 +11,9 @@ seo:
 <div class="container main-content">
 		<div class="row">
 			
-		<div id="home" class="top-level">
+		<div id="home" class="top-level" data-bg="@assets/media/ruckus_vid-1.jpg">
 			
-							<div class="mobile-video-image" data-bg="@assets/media/ruckus_vid-1.jpg"></div>
+							
 			
 			
 
@@ -26,7 +26,7 @@ seo:
 </div></div>
 	</div> 
 </div></div>
-		<div id="intro"><div class="using-image"><div class="viewport-desktop using-image" data-bg="@assets/media/imac.jpg"></div></div><div class="row_col_wrap_12 col span_12 dark left">
+		<div id="intro" data-bg="@assets/media/imac.jpg"><div class="row_col_wrap_12 col span_12 dark left">
 	<div class="col has-animation padding-13-percent">
 		<div>
 		<blockquote>
@@ -41,7 +41,7 @@ seo:
 
 	 
 </div></div>
-		<div><div class="row_col_wrap_12 col span_12 light left">
+		<div data-band-color="#b81e04"><div class="row_col_wrap_12 col span_12 light left">
 	<div class="col padding-3-percent">
 		<div>
 				<div class="inner_row"><div class="row_col_wrap_12_inner col span_12 left">
@@ -774,7 +774,7 @@ seo:
 	</div> 
 
 	<div class="col padding-6-percent">
-		<div>
+		<div><div class="column-bg-overlay-wrap column-bg-layer" data-band-color="#020202"></div>
 			<div>
 		<p>We understand, that with customer attrition, increased competition, and other pressures, your business needs growth just to stay at its current level. But that’s not good enough for us. We want to create real momentum for you.</p>
 <p>We want to put a face on your brand and we want to create its voice. How does that voice sound, who is it talking to and what does it say? Our Brand Alignment process and Ignition-7 Keys to Strategic Creative ensure your brand message will inspire, connect and compel your market to respond. Let’s work together to create a brand that sells your products and services when your salesperson is not there to do it for you. Let’s create a brand that sells 24-7.</p>
@@ -785,7 +785,7 @@ seo:
 </div></div>
 		<div><div class="row_col_wrap_12 col span_12 light left">
 	<div class="col padding-4-percent">
-		<div>
+		<div><div class="column-bg-overlay-wrap column-bg-layer" data-band-color="#2949e8"></div>
 			<div>
 				<div> <div class="number default"><span>2460</span></div> <div class="subject">Pixels Pushed</div> </div>
 			</div> 
@@ -793,7 +793,7 @@ seo:
 	</div> 
 
 	<div class="col padding-4-percent">
-		<div>
+		<div><div class="column-bg-overlay-wrap column-bg-layer" data-band-color="rgba(60,88,232,0.93)"></div>
 			<div>
 				<div> <div class="number default"><span>2000</span></div> <div class="subject">Projects Completed</div> </div>
 			</div> 
@@ -801,7 +801,7 @@ seo:
 	</div> 
 
 	<div class="col padding-3-percent">
-		<div>
+		<div><div class="column-bg-overlay-wrap column-bg-layer" data-band-color="#444444"></div>
 			<div class="sharing-default-minimal"><div class="default"><div><a class="facebook-share" href="/" title="Share this">  <i class="fa fa-facebook"></i> <span class="social-text">Share</span> </a><a class="twitter-share" href="/" title="Share this"> <i class="fa icon-salient-x-twitter"></i> <span class="social-text">Share</span> </a><a class="linkedin-share" href="/" title="Share this"> <i class="fa fa-linkedin"></i> <span class="social-text">Share</span> </a><a class="pinterest-share" href="/" title="Pin this"> <i class="fa fa-pinterest"></i> <span class="social-text">Pin</span> </a></div></div></div> 
 		</div>
 	</div> 
@@ -866,7 +866,7 @@ seo:
 </div></div>
 		<div><div class="row_col_wrap_12 col span_12 light center">
 	<div class="col padding-3-percent">
-		<div><a class="column-link" target="_self" href="/#home"></a>
+		<div><a class="column-link" target="_self" href="/#home"></a><div class="column-bg-overlay-wrap column-bg-layer" data-band-color="#333333"></div>
 			<div>
 		<h1>Get ready to stand out</h1>
 <h5><i>We are here for you and ready to rock at any time: 714-514-1482.</i></h5>
@@ -874,9 +874,9 @@ seo:
 		</div>
 	</div> 
 </div></div>
-		<div id="contact"><div class="using-image"><div class="viewport-desktop using-image using-bg-color-excluded" data-bg="@assets/media/seasm.jpg"></div></div>
+		<div id="contact" data-bg="@assets/media/seasm.jpg" data-band-color="#313131">
 			
-							<div class="mobile-video-image" data-bg="@assets/media/seasm.jpg"></div>
+							
 			
 			
 

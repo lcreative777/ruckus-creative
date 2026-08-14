@@ -43,8 +43,11 @@ h3 { font-size: var(--step-h3); }
    `.col.span_N` children; span_12 is full width, span_6 a half, and so on.
    The live site sets span_6 to 49% with a gutter and stacks everything to
    100% on narrow screens. */
-.prose .row { display: flex; flex-wrap: wrap; gap: 2%; }
-.prose .row > .col { flex: 1 1 100%; min-width: 0; }
+/* Only a row that actually holds two or more columns becomes a flex container.
+   Salient uses `.row` as a structural wrapper throughout, and flexing all of
+   them collapsed nested non-column children to zero width on the homepage. */
+.prose .row:has(> .col ~ .col):not(.portfolio-items) { display: flex; flex-wrap: wrap; gap: 2%; }
+.prose .row:has(> .col ~ .col):not(.portfolio-items) > .col { flex: 1 1 100%; min-width: 0; }
 .prose .clear { flex-basis: 100%; height: 0; }
 @media (min-width: 690px) {
   .prose .row > .span_12 { flex-basis: 100%; }
@@ -123,3 +126,38 @@ h3 { font-size: var(--step-h3); }
 .prose .elastic-portfolio-item { padding: 0; margin: 0; min-width: 0; }
 .prose .elastic-portfolio-item img { width: 100%; height: 100%; object-fit: cover; display: block; }
 .prose .elastic-portfolio-item .work-item { position: relative; }
+
+/* Salient marks a band's text scheme with `light` (white copy on a dark or
+   coloured background) or `dark` (default copy on a light one). Without these
+   the red #b81e04 band renders dark grey text on red. */
+.prose .light, .prose .light :is(h1, h2, h3, h4, p, li, strong, em) { color: #fff; }
+.prose .light a { color: #fff; text-decoration: underline; }
+
+/* Coloured and image bands run the full width of the viewport, as they do on
+   the live site, rather than being boxed by the content container. */
+.prose .has-bg-color, .prose .has-bg {
+  margin-inline: calc(50% - 50vw);
+  width: 100vw;
+  padding-block: var(--space-5);
+}
+.prose .has-bg-color > *, .prose .has-bg > * {
+  width: min(100% - 2rem, var(--container-wide));
+  margin-inline: auto;
+}
+
+
+/* The migrated bodies carry Salient's own `.container.main-content` wrapper.
+   Our `.container` utility clamps that to 880px, which is right for the inner
+   pages but wrong for the homepage, whose bands run edge to edge. Release the
+   clamp wherever the body is rendered wide. */
+.prose.container-wide .container { width: 100%; max-width: none; padding-inline: 0; }
+
+/* The intro band sets its copy in a narrow left column with the iMac artwork
+   filling the right of the band. Measured on the live site at 1440px: the
+   paragraph is 448px wide. Salient sized this with a percentage-padding class
+   plus JS; this approximates it with a max-width and a right-anchored
+   background, which reads the same without the script. */
+@media (min-width: 900px) {
+  .prose #intro .col[class*="padding-"] { max-width: 34%; }
+  .prose #intro.has-bg { background-position: center right; }
+}
