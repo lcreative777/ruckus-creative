@@ -61,8 +61,12 @@ export async function fetchEntry(entry) {
       const raw = await getText(`${ORIGIN}/wp-json/wp/v2/${type}?slug=${encodeURIComponent(slug)}`);
       restJson = JSON.parse(raw);
     }
-  } catch {
-    restJson = null;   // REST unavailable for this type; DOM path handles it
+  } catch (err) {
+    // The DOM path handles this, but stay loud: a transient outage or a broken
+    // REST route is indistinguishable from the intentional shortcode fallback
+    // unless it is reported.
+    console.warn(`    (REST unavailable for ${entry.type} "${entry.slug}": ${err.message})`);
+    restJson = null;
   }
 
   const source = pickSource(restJson);

@@ -6,6 +6,47 @@ import { localNameFor } from '../scripts/lib/media.mjs';
 // Before nameFor existed, the cleaner always used the plain basename while the
 // downloader disambiguated collisions, so two images sharing a filename produced
 // MDX pointing at a file that was never written.
+// Regression: both of these were confirmed lost on the live homepage — 3 background
+// images (imac.jpg, seasm.jpg, ruckus_vid-1.jpg, the hero video poster) and the
+// one-page nav anchors (#home, #work, #about).
+describe('content that inline styles and ids carry', () => {
+  it('rescues background images from inline styles', () => {
+    const input = '<div class="row-bg" style="background-image: url(https://ruckuscreative.com/wp-content/uploads/2019/08/imac.jpg);"></div>';
+    const { html, images } = cleanHtml(input, { baseUrl: 'https://ruckuscreative.com' });
+    expect(images).toEqual(['https://ruckuscreative.com/wp-content/uploads/2019/08/imac.jpg']);
+    expect(html).toContain('data-bg="@assets/media/imac.jpg"');
+  });
+
+  it('does not delete an element whose only content is a background image', () => {
+    const input = '<div style="background-image:url(https://ruckuscreative.com/wp-content/uploads/a/hero.jpg)"></div>';
+    const { html } = cleanHtml(input, { baseUrl: 'https://ruckuscreative.com' });
+    expect(html).not.toBe('');
+    expect(html).toContain('data-bg=');
+  });
+
+  it('ignores gradients and non-upload url() values', () => {
+    const input = '<div style="background-image: linear-gradient(#000,#fff)"></div>'
+      + '<div style="background:url(/wp-content/themes/salient/img/sprite.png)">x</div>';
+    const { images } = cleanHtml(input, { baseUrl: 'https://ruckuscreative.com' });
+    expect(images).toEqual([]);
+  });
+
+  it('preserves ids so fragment navigation keeps working', () => {
+    const input = '<a href="https://ruckuscreative.com/#work">Work</a>'
+      + '<div class="wpb_row" id="work"><p>Portfolio</p></div>';
+    const { html } = cleanHtml(input, { baseUrl: 'https://ruckuscreative.com' });
+    expect(html).toContain('href="/#work"');
+    expect(html).toContain('id="work"');
+  });
+
+  it('keeps external link attributes', () => {
+    const input = '<a href="https://example.com" target="_blank" rel="noopener">Ext</a>';
+    const { html } = cleanHtml(input, { baseUrl: 'https://ruckuscreative.com' });
+    expect(html).toContain('target="_blank"');
+    expect(html).toContain('rel="noopener"');
+  });
+});
+
 describe('image naming agrees with the downloader', () => {
   it('gives colliding basenames distinct sentinel paths', () => {
     const a = 'https://ruckuscreative.com/wp-content/uploads/2019/08/collide.png';
