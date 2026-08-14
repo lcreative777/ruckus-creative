@@ -1,0 +1,34 @@
+{
+  "name": "ruckus-astro",
+  "version": "0.1.0",
+  "description": "",
+  "main": "index.js",
+  "directories": {
+    "doc": "docs"
+  },
+  "scripts": {
+    "test": "vitest run",
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "wrangler dev",
+    "check": "astro check",
+    "migrate": "node scripts/migrate.mjs",
+    "redirects": "node scripts/emit-redirects.mjs"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "module",
+  "private": true,
+  "dependencies": {
+    "@astrojs/cloudflare": "^14.2.1",
+    "@astrojs/mdx": "^7.0.5",
+    "@astrojs/sitemap": "^3.7.3",
+    "astro": "^7.2.2"
+  },
+  "devDependencies": {
+    "cheerio": "^1.2.0",
+    "typescript": "^5.9.3",
+    "vitest": "^3.2.7"
+  }
+}
