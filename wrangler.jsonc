@@ -4,5 +4,8 @@
   "main": "@astrojs/cloudflare/entrypoints/server",
   "compatibility_date": "2026-08-13",
   "compatibility_flags": ["nodejs_compat"],
-  "assets": { "directory": "./dist", "binding": "ASSETS" }
+  // The adapter splits its output into dist/client (static assets) and
+  // dist/server (the Worker). Assets must point at dist/client — pointing at
+  // dist/ serves the server bundle as if it were a static tree.
+  "assets": { "directory": "./dist/client", "binding": "ASSETS" }
 }
