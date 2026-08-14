@@ -57,3 +57,24 @@ export const REDIRECTS = [
 export function allEntries() {
   return [...PAGES, ...WORK, ...KNOWLEDGE];
 }
+
+const WORK_SLUGS = new Set(WORK.map(w => w.slug));
+
+// Hand-verified against the live site. /portfolio-ruckus/ is a stale page still
+// linking to the pre-rename /portfolio/* URLs; the live site 301s the ones that
+// survive and 404s the rest. The .html link is a dead reference to the PR article.
+const LEGACY_PATHS = new Map([
+  ['/knowledge-pr-for-lift.html', '/3-2-1-using-pr-for-lift-off-and-lift/'],
+]);
+
+/**
+ * Map a legacy internal path onto a route this site actually builds.
+ * @returns {string|null} the resolved path, or null when the target no longer
+ *   exists anywhere (the caller should unwrap the link rather than emit a 404).
+ */
+export function resolveInternalPath(path) {
+  if (LEGACY_PATHS.has(path)) return LEGACY_PATHS.get(path);
+  const portfolio = /^\/portfolio\/([a-z0-9-]+)\/$/.exec(path);
+  if (portfolio) return WORK_SLUGS.has(portfolio[1]) ? `/work/${portfolio[1]}/` : null;
+  return path;
+}

@@ -47,6 +47,32 @@ describe('content that inline styles and ids carry', () => {
   });
 });
 
+describe('legacy internal paths', () => {
+  const resolvePath = (p) => (p === '/portfolio/gone/' ? null : p.replace('/portfolio/', '/work/'));
+
+  it('remaps a legacy path to its current route', () => {
+    const { html } = cleanHtml('<a href="/portfolio/dos-equis/">Dos Equis</a>', {
+      baseUrl: 'https://ruckuscreative.com', resolvePath,
+    });
+    expect(html).toContain('href="/work/dos-equis/"');
+  });
+
+  it('unwraps a link whose target no longer exists, keeping the content', () => {
+    const { html } = cleanHtml('<a href="/portfolio/gone/"><img src="/x.jpg" alt="Gone"></a>', {
+      baseUrl: 'https://ruckuscreative.com', resolvePath,
+    });
+    expect(html).not.toContain('<a');
+    expect(html).toContain('alt="Gone"');
+  });
+
+  it('leaves external links untouched', () => {
+    const { html } = cleanHtml('<a href="https://example.com/portfolio/x/">Ext</a>', {
+      baseUrl: 'https://ruckuscreative.com', resolvePath,
+    });
+    expect(html).toContain('href="https://example.com/portfolio/x/"');
+  });
+});
+
 describe('image naming agrees with the downloader', () => {
   it('gives colliding basenames distinct sentinel paths', () => {
     const a = 'https://ruckuscreative.com/wp-content/uploads/2019/08/collide.png';
@@ -81,6 +107,48 @@ describe('stripShortcodes', () => {
   it('removes shortcodes carrying attributes', () => {
     const input = '[vc_row type="in_container" text_align="left"]Keep me[/vc_row]';
     expect(stripShortcodes(input).trim()).toBe('Keep me');
+  });
+
+  // Salient has its own shortcode set beyond WPBakery's [vc_*]. Found on the
+  // live /knowledge/ and /portfolio-ruckus/ pages.
+  it('removes salient theme shortcodes', () => {
+    expect(stripShortcodes('[blog category="15,16" posts_per_page="7"]').trim()).toBe('');
+  });
+
+  it('promotes a title attribute to a heading instead of deleting it', () => {
+    const input = '[text_box title="KNOWLEDGE BASE" icon=""]Intro copy.[/text_box]';
+    const out = stripShortcodes(input);
+    expect(out).toContain('<h2>KNOWLEDGE BASE</h2>');
+    expect(out).toContain('Intro copy.');
+    expect(out).not.toContain('[text_box');
+  });
+
+  it('handles the curly quotes wordpress writes into attributes', () => {
+    const input = '[text_box title=”Tips, Tricks and Free Advice” icon=””]Body[/text_box]';
+    const out = stripShortcodes(input);
+    expect(out).toContain('<h2>Tips, Tricks and Free Advice</h2>');
+    expect(out).not.toContain('[text_box');
+  });
+
+  // The REST API entity-encodes smart quotes while the rendered DOM does not.
+  // This exact form appears in the live /knowledge/ page's REST response.
+  it('handles entity-encoded quotes from the rest api', () => {
+    const input = '[text_box title=&#8221;KNOWLEDGE BASE: Tips, Tricks&#8221; icon=&#8221;&#8221;]Body[/text_box]';
+    const out = stripShortcodes(input);
+    expect(out).toContain('<h2>KNOWLEDGE BASE: Tips, Tricks</h2>');
+    expect(out).toContain('Body');
+    expect(out).not.toContain('[text_box');
+    expect(out).not.toContain('&#8221;');
+  });
+
+  it('converts hr and divider shortcodes to real rules', () => {
+    expect(stripShortcodes('[hr]').trim()).toBe('<hr>');
+    expect(stripShortcodes('[divider height="30"]').trim()).toBe('<hr>');
+  });
+
+  it('leaves ordinary bracketed prose alone', () => {
+    const input = 'Revenue grew [see appendix] by 40%.';
+    expect(stripShortcodes(input)).toBe(input);
   });
 });
 

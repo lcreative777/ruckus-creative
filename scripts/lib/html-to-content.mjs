@@ -1,9 +1,39 @@
 import { load } from 'cheerio';
 import { basename } from 'node:path';
 
-/** Remove WPBakery shortcodes, keeping any text between them. */
+// Salient ships its own shortcodes alongside WPBakery's [vc_*] set. Listed
+// explicitly rather than matched generically, so that ordinary bracketed prose
+// is never mistaken for markup.
+const THEME_SHORTCODES = [
+  'text_box', 'blog', 'hr', 'divider', 'button', 'toggle', 'tabs', 'tab',
+  'image_with_animation', 'clients', 'testimonial', 'milestone', 'split_line_heading',
+];
+
+// WordPress smart-quotes shortcode attributes, and the REST API returns them
+// entity-encoded (title=&#8221;...&#8221;) while the rendered DOM returns literal
+// characters. Match every form, or the title is dropped along with the tag.
+const QUOTE = '(?:["“”″]|&#8220;|&#8221;|&#8243;|&quot;)';
+
+/**
+ * Remove WPBakery and Salient shortcodes, keeping the content between them.
+ *
+ * Some shortcodes carry real content in their attributes — Salient's
+ * [text_box title="..."] holds the section heading — so those are promoted to
+ * real markup before the tag itself is discarded. Stripping blindly would
+ * silently delete copy.
+ */
 export function stripShortcodes(text) {
-  return text.replace(/\[\/?vc_[a-z_]*(?:\s[^\]]*)?\]/gi, '');
+  const names = THEME_SHORTCODES.join('|');
+
+  return text
+    // Promote a shortcode's title attribute to a real heading.
+    .replace(new RegExp(`\\[(?:${names})\\b[^\\]]*?\\stitle=${QUOTE}(.+?)${QUOTE}[^\\]]*\\]`, 'gi'),
+      (_, title) => (title.trim() ? `<h2>${title.trim()}</h2>` : ''))
+    // [hr] and [divider] are genuine horizontal rules.
+    .replace(/\[(?:hr|divider)\b[^\]]*\]/gi, '<hr>')
+    // Everything else: drop the tag, keep whatever sat between the pair.
+    .replace(/\[\/?vc_[a-z_]*(?:\s[^\]]*)?\]/gi, '')
+    .replace(new RegExp(`\\[\\/?(?:${names})\\b(?:\\s[^\\]]*)?\\]`, 'gi'), '');
 }
 
 // Wrapper classes that carry no meaning once the page builder is gone.
@@ -32,13 +62,17 @@ const plainBasename = (url) => basename(new URL(url).pathname);
 
 /**
  * @param {string} rawHtml
- * @param {{baseUrl: string, nameFor?: (url: string) => string}} opts
+ * @param {{baseUrl: string, nameFor?: (url: string) => string,
+ *          resolvePath?: (path: string) => string|null}} opts
  *   `nameFor` maps an absolute image URL to its local filename. It MUST be the
  *   same function the downloader uses, or the sentinel paths written here will
  *   not match the files written to disk. Pass `localNameFor` from ./media.mjs.
+ *   `resolvePath` maps an internal path onto a route this site builds; returning
+ *   null means the target is gone and the link should be unwrapped. Pass
+ *   `resolveInternalPath` from ./inventory.mjs.
  * @returns {{html: string, images: string[]}}
  */
-export function cleanHtml(rawHtml, { baseUrl, nameFor = plainBasename }) {
+export function cleanHtml(rawHtml, { baseUrl, nameFor = plainBasename, resolvePath = (p) => p }) {
   const $ = load(stripShortcodes(rawHtml), null, false);
   const images = [];
 
@@ -72,12 +106,21 @@ export function cleanHtml(rawHtml, { baseUrl, nameFor = plainBasename }) {
   });
 
   // Internal absolute links become root-relative; external links are left alone.
+  // Legacy paths are remapped, and links whose target no longer exists anywhere
+  // are unwrapped — keeping the text and image, dropping the dead anchor.
   $('a[href]').each((_, el) => {
-    const href = $(el).attr('href');
+    const $el = $(el);
+    const href = $el.attr('href');
+    let resolved;
     try {
       const u = new URL(href, baseUrl);
-      if (u.origin === new URL(baseUrl).origin) $(el).attr('href', u.pathname + u.search + u.hash);
-    } catch { /* mailto:, tel:, and fragments are left untouched */ }
+      if (u.origin !== new URL(baseUrl).origin) return;   // external, leave alone
+      resolved = resolvePath(u.pathname + u.search + u.hash);
+    } catch {
+      return;   // mailto:, tel:, and bare fragments are left untouched
+    }
+    if (resolved === null) $el.replaceWith($el.contents());
+    else $el.attr('href', resolved);
   });
 
   // Drop presentational attributes everywhere.
