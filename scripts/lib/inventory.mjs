@@ -78,3 +78,22 @@ export function resolveInternalPath(path) {
   if (portfolio) return WORK_SLUGS.has(portfolio[1]) ? `/work/${portfolio[1]}/` : null;
   return path;
 }
+
+/**
+ * Verbatim corrections applied to migrated body copy.
+ *
+ * The live site carries three different suite numbers (300-173 on the homepage,
+ * 100-173 on the contact page, 300-1733 in the footer). The client confirmed
+ * Suite 300-173 as correct on 2026-08-14, so the wrong variants are fixed at
+ * migration time rather than hand-edited — a hand edit would be clobbered by the
+ * next migrate run.
+ */
+export const CONTENT_CORRECTIONS = [
+  { find: /27525 Puerta Real,\s*Suite 100-173/g, replace: '27525 Puerta Real, Suite 300-173' },
+  { find: /27525 Puerta Real,\s*Suite 300-1733/g, replace: '27525 Puerta Real, Suite 300-173' },
+];
+
+/** Apply every correction to a block of cleaned HTML. */
+export function applyCorrections(html) {
+  return CONTENT_CORRECTIONS.reduce((acc, c) => acc.replace(c.find, c.replace), html);
+}

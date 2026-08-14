@@ -78,3 +78,25 @@ describe('migrated content', () => {
     }
   });
 });
+
+// The live site carries three conflicting suite numbers. Suite 300-173 is the
+// client-confirmed source of truth; the other two must never reach the build.
+describe('business address', () => {
+  it('uses only the confirmed suite number', () => {
+    for (const dir of ['pages', 'work', 'knowledge']) {
+      for (const f of list(dir)) {
+        const src = read(dir, f);
+        expect(src, `${dir}/${f} has a stale suite number`).not.toMatch(/Suite 100-173|Suite 300-1733/);
+      }
+    }
+  });
+
+  it('renders the address consistently wherever it appears', () => {
+    const files = ['pages/contact-ruckus-creative.mdx', 'pages/home.mdx'];
+    for (const rel of files) {
+      const [dir, f] = rel.split('/');
+      expect(read(dir, f), `${rel} missing the confirmed address`)
+        .toMatch(/27525 Puerta Real, Suite 300-173/);
+    }
+  });
+});

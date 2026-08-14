@@ -1,7 +1,7 @@
 // scripts/migrate.mjs
 import { mkdir, writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
-import { allEntries, ORIGIN, resolveInternalPath } from './lib/inventory.mjs';
+import { allEntries, ORIGIN, resolveInternalPath, applyCorrections } from './lib/inventory.mjs';
 import { fetchEntry } from './lib/wp-client.mjs';
 import { cleanHtml } from './lib/html-to-content.mjs';
 import { downloadMedia, localNameFor } from './lib/media.mjs';
@@ -52,7 +52,8 @@ for (const entry of allEntries()) {
     const rec = await fetchEntry(entry);
     // nameFor MUST be localNameFor so the sentinel paths written into the MDX
     // match the filenames downloadMedia writes to disk.
-    const { html, images } = cleanHtml(rec.html, { baseUrl: ORIGIN, nameFor: localNameFor, resolvePath: resolveInternalPath });
+    const { html: cleaned, images } = cleanHtml(rec.html, { baseUrl: ORIGIN, nameFor: localNameFor, resolvePath: resolveInternalPath });
+    const html = applyCorrections(cleaned);
     allImages.push(...images);
 
     const dir = join(CONTENT_DIR, DIR_FOR[entry.type]);
