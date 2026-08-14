@@ -95,14 +95,16 @@ git checkout -b feat/site-build
 import { downloadMedia } from './lib/media.mjs';
 
 const BASE = 'https://ruckuscreative.com/wp-content/uploads';
+// Verified 2026-08-14 against the live homepage: these sit at the uploads root,
+// not under a year/month folder like the content media does.
 const FILES = [
-  '2019/09/ruckus_logo_dark.png',
-  '2019/09/ruckus_logo_light.png',
-  '2019/09/footer-logo.jpg',
-  '2019/09/cropped-FAVICON-32x32.png',
-  '2019/09/cropped-FAVICON-180x180.png',
-  '2019/09/cropped-FAVICON-192x192.png',
-  '2019/09/cropped-FAVICON-270x270.png',
+  'ruckus_logo_dark.png',
+  'ruckus_logo_light.png',
+  'footer-logo.jpg',
+  'cropped-FAVICON-32x32.png',
+  'cropped-FAVICON-180x180.png',
+  'cropped-FAVICON-192x192.png',
+  'cropped-FAVICON-270x270.png',
 ];
 
 const dest = new URL('../src/assets/chrome/', import.meta.url).pathname;
@@ -118,13 +120,7 @@ node scripts/fetch-chrome.mjs
 ls -la src/assets/chrome/
 ```
 
-The upload-month path (`2019/09`) is a guess. If any file 404s, `downloadMedia` logs `! 404 <url>` and continues. Find the real path by grepping the saved homepage for the filename:
-
-```bash
-grep -oE 'https://ruckuscreative.com/wp-content/uploads/[^"]*ruckus_logo_dark[^"]*' /tmp/rc_home.html | head -1
-```
-
-Correct `FILES` and re-run. **Do not proceed until all 7 files are present and non-zero.**
+**Do not proceed until all 7 files are present and non-zero.** If any 404s, `downloadMedia` logs `! 404 <url>` and continues rather than failing, so check the directory listing rather than trusting the exit code.
 
 - [ ] **Step 4: Commit**
 
