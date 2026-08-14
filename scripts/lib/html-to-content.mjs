@@ -91,6 +91,21 @@ export function cleanHtml(rawHtml, { baseUrl, nameFor = plainBasename, resolvePa
 
   $('script, style, noscript, iframe[src*="gravity"], .gform_wrapper').remove();
 
+  // Salient stashes a video's URL in a bare <span> for its JS to read, then
+  // hides it. Without that JS the raw URL renders as visible text under the
+  // hero. It carries no content — the video id is passed to HeroVideo directly.
+  // Only when the span stands alone: inside an anchor the URL is the link's
+  // visible text, and removing it empties the anchor so the cleanup pass then
+  // deletes the link itself.
+  $('span').each((_, el) => {
+    const $el = $(el);
+    const text = $el.text().trim();
+    if (!/^https?:\/\/\S+$/.test(text)) return;
+    if ($el.children().length > 0) return;
+    if ($el.closest('a').length > 0) return;
+    $el.remove();
+  });
+
   // Resolve images to their largest source, record them, point at local assets.
   $('img').each((_, el) => {
     const $el = $(el);
@@ -166,6 +181,14 @@ export function cleanHtml(rawHtml, { baseUrl, nameFor = plainBasename, resolvePa
       run.push(next[0]);
       next = next.next();
     }
+    // Only a genuine multi-column group gets a row. Salient nests lone `col`
+    // wrappers many levels deep (row_col_wrap_12 > col > child_column), and
+    // wrapping each of those produced 41 nested flex containers on the
+    // homepage where the original has one. A real column carries a span_N.
+    const columns = run.filter(n => $(n).hasClass('col'));
+    if (columns.length < 2) return;
+    if (!columns.some(n => /\bspan_\d+/.test($(n).attr('class') ?? ''))) return;
+
     $(run[0]).before('<div class="row"></div>');
     const $row = $(run[0]).prev();
     run.forEach(node => $row.append(node));

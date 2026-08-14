@@ -104,3 +104,22 @@ h3 { font-size: var(--step-h3); }
                   letter-spacing: 0.04em; text-transform: uppercase;
                   color: var(--color-heading); text-decoration: none; }
 .post-sidebar a:hover { color: var(--color-accent); }
+
+
+/* The homepage work grid used Salient's "elastic" Isotope layout: full-bleed,
+   with item sizes computed in JS from image aspect ratios. Without Isotope the
+   items stacked one per row and made the page ~20,000px tall. A full-bleed CSS
+   grid gets the same dense look with no JavaScript. */
+.prose .portfolio-items {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0;
+  margin-inline: calc(50% - 50vw);
+  width: 100vw;
+}
+@media (min-width: 900px) {
+  .prose .portfolio-items { grid-template-columns: repeat(4, 1fr); }
+}
+.prose .elastic-portfolio-item { padding: 0; margin: 0; min-width: 0; }
+.prose .elastic-portfolio-item img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.prose .elastic-portfolio-item .work-item { position: relative; }

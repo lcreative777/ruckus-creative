@@ -81,6 +81,21 @@ describe('grid layout classes', () => {
     expect(html.match(/class="row"/g)).toHaveLength(1);
   });
 
+  it('leaves a lone nested column unwrapped', () => {
+    // Salient nests single `col` wrappers many levels deep. Wrapping each one
+    // produced 41 nested flex containers on the homepage.
+    const input = '<div class="col no-extra-padding"><p>only child</p></div>';
+    const { html } = cleanHtml(input, { baseUrl: 'https://ruckuscreative.com' });
+    expect(html).not.toContain('class="row"');
+  });
+
+  it('does not wrap columns that carry no span_ width', () => {
+    const input = '<div class="col elastic-portfolio-item"><p>a</p></div>'
+      + '<div class="col elastic-portfolio-item"><p>b</p></div>';
+    const { html } = cleanHtml(input, { baseUrl: 'https://ruckuscreative.com' });
+    expect(html).not.toContain('class="row"');
+  });
+
   it('does not wrap a column that is already inside a row', () => {
     const input = '<div class="row"><div class="col span_6"><p>x</p></div></div>';
     const { html } = cleanHtml(input, { baseUrl: 'https://ruckuscreative.com' });
@@ -249,5 +264,22 @@ describe('cleanHtml', () => {
     const { html } = cleanHtml(input, { baseUrl: 'https://ruckuscreative.com' });
     expect(html).toContain('<p>Real</p>');
     expect(html.match(/<p>\s*<\/p>/)).toBeNull();
+  });
+});
+
+// Salient stashes a video URL in a bare <span> for its JS to consume and hide.
+// Without that JS it renders as visible text under the hero.
+describe('stray media urls', () => {
+  it('removes a span holding nothing but a url', () => {
+    const input = '<div><span>https://www.youtube.com/watch?v=NgliiMV4jzE</span><p>Copy</p></div>';
+    const { html } = cleanHtml(input, { baseUrl: 'https://ruckuscreative.com' });
+    expect(html).not.toContain('youtube.com/watch');
+    expect(html).toContain('<p>Copy</p>');
+  });
+
+  it('keeps a span whose url is real link text', () => {
+    const input = '<p><a href="https://example.com"><span>https://example.com</span></a></p>';
+    const { html } = cleanHtml(input, { baseUrl: 'https://ruckuscreative.com' });
+    expect(html).toContain('href="https://example.com"');
   });
 });
