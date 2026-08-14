@@ -1148,6 +1148,15 @@ export const onRequest: MiddlewareHandler = (context, next) => {
 };
 ```
 
+> **Outcome (2026-08-14): middleware does not work here.** Verified against a real
+> `wrangler dev`: `GET /contact/` returned **404**, because the assets binding
+> serves or 404s a request before the Worker's middleware runs on a static build.
+> The 11 redirects were moved into `astro.config.mjs`'s `redirects` option, read
+> from the same `src/redirects.json` so the two cannot drift. Astro compiles them
+> into `dist/client/_redirects`, which Cloudflare serves natively. Re-verified:
+> `HTTP/1.1 301`, `Location: /contact-ruckus-creative/`. `src/middleware.ts` was
+> deleted rather than left as dead code.
+
 - [ ] **Step 2: Verify redirects are reachable**
 
 Static routes are served by the assets binding before middleware in some configurations. Confirm with a local build that `/contact/` actually 301s rather than 404ing:
