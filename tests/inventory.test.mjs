@@ -41,4 +41,17 @@ describe('inventory', () => {
     const live = new Set(allEntries().map(e => e.path));
     for (const r of REDIRECTS) expect(live.has(r.from)).toBe(false);
   });
+
+  // PAGES and KNOWLEDGE both occupy the flat /<slug>/ namespace — only WORK is
+  // prefixed. A duplicate slug across those two would silently produce two entries
+  // claiming one route, so assert uniqueness rather than discovering it at build time.
+  it('assigns every entry a unique path', () => {
+    const paths = allEntries().map(e => e.path);
+    expect(new Set(paths).size).toBe(paths.length);
+  });
+
+  it('never declares the same redirect source twice', () => {
+    const sources = REDIRECTS.map(r => r.from);
+    expect(new Set(sources).size).toBe(sources.length);
+  });
 });
