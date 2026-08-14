@@ -8,7 +8,8 @@
     "preview": "wrangler dev",
     "check": "astro check",
     "migrate": "node scripts/migrate.mjs",
-    "redirects": "node scripts/emit-redirects.mjs"
+    "redirects": "node scripts/emit-redirects.mjs",
+    "fidelity": "node scripts/compare-fidelity.mjs"
   },
   "license": "UNLICENSED",
   "type": "module",
