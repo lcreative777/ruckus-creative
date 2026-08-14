@@ -15,14 +15,14 @@ client: null
 			<div class="row">
 				
 				
-<div class="post-area col">
+<div class="post-area col span_9">
   
 	<img width="1920" height="907" src="@assets/media/portfolio-npc.jpg" class="attachment-full size-full wp-post-image" alt="" title="">  
 	  
   
 </div><!--/post-area-->
 
-<div class="col col_last">
+<div class="col span_3 col_last">
 		
   <div>
 	

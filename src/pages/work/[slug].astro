@@ -22,9 +22,15 @@ const d = entry.data;
        breadcrumbs={[{ name: 'Home', url: '/' }, { name: 'Work', url: '/portfolio-ruckus/' }, { name: d.title, url: d.path }]}
        schema={{ '@type': 'CreativeWork', name: d.title, url: new URL(d.path, site.url).href,
                  creator: { '@id': `${site.url}/#organization` } }} />
-  <article class="container section">
-    <h1>{d.title}</h1>
+  <div class="work-header"><div class="container"><h1>{d.title}</h1></div></div>
+  <article class="container section page-band">
     <RichText html={entry.body ?? ''} />
     <p><a href="/portfolio-ruckus/">← All work</a></p>
   </article>
 </Base>
+
+<style>
+  /* The live site puts the portfolio title in its own band above the content. */
+  .work-header { background: var(--color-bg-dark); color: #fff; padding-block: var(--space-4); }
+  .work-header :global(h1) { color: #fff; margin: 0; }
+</style>

@@ -38,8 +38,11 @@ const schema = isPost && 'pubDate' in d
        type={isPost ? 'article' : 'website'}
        publishedTime={isPost && 'pubDate' in d ? d.pubDate.toISOString() : undefined}
        breadcrumbs={breadcrumbs} schema={schema} />
-  <article class="container section">
-    <h1>{d.title}</h1>
+  <article class="container section page-band">
+    {/* The live site shows no heading on standalone pages, but does on posts.
+        Kept in the DOM either way so the h1 signal and screen-reader landmark
+        survive — the original having none is an SEO weakness, not a feature. */}
+    <h1 class={isPost ? undefined : 'visually-hidden'}>{d.title}</h1>
     {isPost && 'pubDate' in d && (
       <time datetime={d.pubDate.toISOString()}>
         {d.pubDate.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}

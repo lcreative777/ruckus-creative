@@ -56,6 +56,48 @@ describe('content that inline styles and ids carry', () => {
   });
 });
 
+// Regression: stripping Salient's grid classes collapsed every multi-column
+// page into one stacked column. The original /about/ is two span_6 columns.
+describe('grid layout classes', () => {
+  it('preserves col and span_N so multi-column layouts survive', () => {
+    const input = '<div class="row"><div class="col span_6"><p>Left</p></div>'
+      + '<div class="col span_6 col_last"><p>Right</p></div></div>';
+    const { html } = cleanHtml(input, { baseUrl: 'https://ruckuscreative.com' });
+    expect(html).toContain('class="row"');
+    expect(html.match(/span_6/g)).toHaveLength(2);
+    expect(html).toContain('col_last');
+    expect(html).toContain('<p>Left</p>');
+    expect(html).toContain('<p>Right</p>');
+  });
+
+  // Salient's .row wrapper lives in the theme template, not the page content,
+  // so REST returns bare sibling columns with nothing to lay them out against.
+  it('rebuilds the row wrapper around consecutive columns', () => {
+    const input = '<div class="col span_6"><p>Left</p></div>'
+      + '<div class="col span_6 col_last"><p>Right</p></div><div class="clear"></div>';
+    const { html } = cleanHtml(input, { baseUrl: 'https://ruckuscreative.com' });
+    expect(html).toContain('class="row"');
+    expect(html.indexOf('class="row"')).toBeLessThan(html.indexOf('span_6'));
+    expect(html.match(/class="row"/g)).toHaveLength(1);
+  });
+
+  it('does not wrap a column that is already inside a row', () => {
+    const input = '<div class="row"><div class="col span_6"><p>x</p></div></div>';
+    const { html } = cleanHtml(input, { baseUrl: 'https://ruckuscreative.com' });
+    expect(html.match(/class="row"/g)).toHaveLength(1);
+  });
+
+  it('still strips decorative page-builder classes alongside them', () => {
+    const input = '<div class="vc_row wpb_row row"><div class="col span_4 nectar-shadow"><p>x</p></div></div>';
+    const { html } = cleanHtml(input, { baseUrl: 'https://ruckuscreative.com' });
+    expect(html).toContain('span_4');
+    expect(html).toContain('class="row"');
+    expect(html).not.toContain('vc_row');
+    expect(html).not.toContain('wpb_row');
+    expect(html).not.toContain('nectar-shadow');
+  });
+});
+
 describe('legacy internal paths', () => {
   const resolvePath = (p) => (p === '/portfolio/gone/' ? null : p.replace('/portfolio/', '/work/'));
 

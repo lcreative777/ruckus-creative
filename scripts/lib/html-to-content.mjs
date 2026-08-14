@@ -37,7 +37,14 @@ export function stripShortcodes(text) {
 }
 
 // Wrapper classes that carry no meaning once the page builder is gone.
-const JUNK_CLASS = /^(vc_|wpb_|nectar-|nectar_|span_|col |column_|full-width|inner-wrap|row-bg)/;
+// Salient lays pages out on a 12-column grid: `col span_6` is a half-width
+// column, `span_4` a third, and so on. Stripping those collapsed every
+// multi-column page into a single stacked column — the original /about/ is two
+// columns and rebuilt as one. `col`, `span_N`, `row` and `col_last` are
+// therefore LAYOUT, not decoration, and are preserved and restyled.
+const LAYOUT_CLASS = /^(col|col_last|row|clear|span_\d+)$/;
+
+const JUNK_CLASS = /^(vc_|wpb_|nectar-|nectar_|column_|full-width|inner-wrap|row-bg)/;
 
 // ids are kept so fragment navigation survives, but Salient emits generated
 // (fws_<hash>) and structural (sidebar, portfolio-nav) ids that are meaningless
@@ -136,13 +143,32 @@ export function cleanHtml(rawHtml, { baseUrl, nameFor = plainBasename, resolvePa
       if (name === 'id' && JUNK_ID.test(el.attribs.id)) { delete el.attribs.id; continue; }
       if (KEEP_ATTR.has(name)) continue;
       if (name === 'class') {
-        const kept = (el.attribs.class || '').split(/\s+/).filter(c => c && !JUNK_CLASS.test(c));
+        const kept = (el.attribs.class || '')
+          .split(/\s+/)
+          .filter(c => c && (LAYOUT_CLASS.test(c) || !JUNK_CLASS.test(c)));
         if (kept.length) el.attribs.class = kept.join(' ');
         else delete el.attribs.class;
         continue;
       }
       delete el.attribs[name];
     }
+  });
+
+  // Salient's `.row` wrapper lives in the theme template, not in the page
+  // content, so columns arrive as bare siblings with nothing to lay them out
+  // against. Rebuild the wrapper around each run of consecutive columns.
+  $('.col').each((_, el) => {
+    const $el = $(el);
+    if ($el.parent().hasClass('row')) return;          // already wrapped
+    const run = [el];
+    let next = $el.next();
+    while (next.length && (next.hasClass('col') || next.hasClass('clear'))) {
+      run.push(next[0]);
+      next = next.next();
+    }
+    $(run[0]).before('<div class="row"></div>');
+    const $row = $(run[0]).prev();
+    run.forEach(node => $row.append(node));
   });
 
   // Unwrap divs that now hold nothing but a single child. Terminates because each

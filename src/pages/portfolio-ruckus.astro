@@ -14,8 +14,8 @@ const work = await getCollection('work');
        breadcrumbs={[{ name: 'Home', url: '/' }, { name: 'Work', url: '/portfolio-ruckus/' }]}
        schema={{ '@type': 'CollectionPage', name: d.title,
                  hasPart: work.map(w => ({ '@type': 'CreativeWork', name: w.data.title, url: new URL(w.data.path, Astro.site!).href })) }} />
-  <div class="container section">
-    <h1>{d.title}</h1>
+  <div class="container section page-band">
+    <h1 class="visually-hidden">{d.title}</h1>
     <PortfolioGrid />
   </div>
 </Base>
