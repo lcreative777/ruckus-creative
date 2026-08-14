@@ -1,0 +1,57 @@
+[
+  {
+    "from": "/contact/",
+    "to": "/contact-ruckus-creative/",
+    "status": 301
+  },
+  {
+    "from": "/category/news/",
+    "to": "/knowledge/",
+    "status": 301
+  },
+  {
+    "from": "/category/knowledge/",
+    "to": "/knowledge/",
+    "status": 301
+  },
+  {
+    "from": "/you-think-water-moves-fast/",
+    "to": "/knowledge/",
+    "status": 301
+  },
+  {
+    "from": "/airspeed-velocity-of-a-swallow/",
+    "to": "/knowledge/",
+    "status": 301
+  },
+  {
+    "from": "/when-do-spiders-sleep/",
+    "to": "/knowledge/",
+    "status": 301
+  },
+  {
+    "from": "/youre-the-expert-now/",
+    "to": "/knowledge/",
+    "status": 301
+  },
+  {
+    "from": "/a-matter-of-deductive-logic/",
+    "to": "/knowledge/",
+    "status": 301
+  },
+  {
+    "from": "/mauris-imperdiet-eros/",
+    "to": "/knowledge/",
+    "status": 301
+  },
+  {
+    "from": "/aliquam-at-dui-velit/",
+    "to": "/knowledge/",
+    "status": 301
+  },
+  {
+    "from": "/ut-placerat-egestas/",
+    "to": "/knowledge/",
+    "status": 301
+  }
+]
