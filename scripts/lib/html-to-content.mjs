@@ -39,6 +39,12 @@ export function stripShortcodes(text) {
 // Wrapper classes that carry no meaning once the page builder is gone.
 const JUNK_CLASS = /^(vc_|wpb_|nectar-|nectar_|span_|col |column_|full-width|inner-wrap|row-bg)/;
 
+// ids are kept so fragment navigation survives, but Salient emits generated
+// (fws_<hash>) and structural (sidebar, portfolio-nav) ids that are meaningless
+// once the theme is gone — and duplicating them across 20 portfolio pages would
+// produce invalid markup.
+const JUNK_ID = /^(fws_|sidebar|project-meta|portfolio-nav|prev-link|next-link|all-items|ajax-|header-|footer-)/;
+
 // `id` is kept because Salient one-page navs rely on fragment links (#home, #work,
 // #about on the homepage) — stripping it silently breaks in-page navigation.
 // `data-bg` carries background images rescued from inline styles (see below).
@@ -127,6 +133,7 @@ export function cleanHtml(rawHtml, { baseUrl, nameFor = plainBasename, resolvePa
   $('*').each((_, el) => {
     if (!el.attribs) return;
     for (const name of Object.keys(el.attribs)) {
+      if (name === 'id' && JUNK_ID.test(el.attribs.id)) { delete el.attribs.id; continue; }
       if (KEEP_ATTR.has(name)) continue;
       if (name === 'class') {
         const kept = (el.attribs.class || '').split(/\s+/).filter(c => c && !JUNK_CLASS.test(c));

@@ -39,6 +39,15 @@ describe('content that inline styles and ids carry', () => {
     expect(html).toContain('id="work"');
   });
 
+  it('drops generated and structural ids but keeps semantic anchors', () => {
+    const input = '<div id="fws_6a7e9c0567133"><div id="portfolio-nav">nav</div>'
+      + '<section id="work"><p>Work</p></section></div>';
+    const { html } = cleanHtml(input, { baseUrl: 'https://ruckuscreative.com' });
+    expect(html).not.toContain('fws_');
+    expect(html).not.toContain('portfolio-nav');
+    expect(html).toContain('id="work"');
+  });
+
   it('keeps external link attributes', () => {
     const input = '<a href="https://example.com" target="_blank" rel="noopener">Ext</a>';
     const { html } = cleanHtml(input, { baseUrl: 'https://ruckuscreative.com' });
