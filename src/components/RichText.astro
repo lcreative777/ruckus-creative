@@ -1,0 +1,67 @@
+---
+// src/components/RichText.astro
+// Collection bodies are semantic HTML strings (Plan 1 stripped the page-builder
+// markup). Rather than mapping MDX components, transform the string at build
+// time: every sentinel becomes a real <picture>, every data-bg becomes an
+// optimized background URL.
+import { getImage } from 'astro:assets';
+import { resolveMedia, SENTINEL } from '../lib/images';
+
+interface Props { html: string; class?: string }
+const { html, class: className = 'prose' } = Astro.props;
+
+const WIDTHS = [480, 768, 1024, 1440, 1920];
+
+async function pictureFor(src: string, attrs: string): Promise<string> {
+  const img = resolveMedia(src);
+  if (!img) {
+    console.warn(`[RichText] no migrated media for "${src}" — leaving markup untouched`);
+    return `<img src="${src}" ${attrs}>`;
+  }
+  const widths = WIDTHS.filter(w => w <= img.width);
+  if (widths.length === 0) widths.push(img.width);
+
+  const alt = /alt="([^"]*)"/.exec(attrs)?.[1] ?? '';
+  const [avif, webp, fallback] = await Promise.all([
+    getImage({ src: img, formats: ['avif'], widths, format: 'avif' }),
+    getImage({ src: img, formats: ['webp'], widths, format: 'webp' }),
+    getImage({ src: img, widths, format: 'jpeg' }),
+  ]);
+
+  return [
+    '<picture>',
+    `<source type="image/avif" srcset="${avif.srcSet.attribute}" sizes="(max-width: 900px) 100vw, 900px">`,
+    `<source type="image/webp" srcset="${webp.srcSet.attribute}" sizes="(max-width: 900px) 100vw, 900px">`,
+    `<img src="${fallback.src}" width="${img.width}" height="${img.height}"`,
+    ` alt="${alt}" loading="lazy" decoding="async">`,
+    '</picture>',
+  ].join('');
+}
+
+// <img src="@assets/media/x.jpg" ...> → <picture>
+let out = html;
+const imgTags = [...out.matchAll(/<img\s+([^>]*?)src="([^"]+)"([^>]*)>/g)];
+for (const tag of imgTags) {
+  const [whole, before, src, after] = tag;
+  if (!src.startsWith(SENTINEL)) continue;
+  out = out.replace(whole, await pictureFor(src, `${before} ${after}`));
+}
+
+// data-bg="@assets/media/x.jpg" → an inline custom property the CSS consumes.
+const bgTags = [...out.matchAll(/data-bg="([^"]+)"/g)];
+for (const [whole, ref] of bgTags) {
+  const img = resolveMedia(ref);
+  if (!img) { console.warn(`[RichText] no migrated media for background "${ref}"`); continue; }
+  const optimized = await getImage({ src: img, format: 'webp', width: Math.min(img.width, 1920) });
+  out = out.replace(whole, `class="has-bg" style="--bg: url('${optimized.src}')"`);
+}
+---
+<div class={className} set:html={out} />
+
+<style is:global>
+  .has-bg {
+    background-image: var(--bg);
+    background-size: cover;
+    background-position: center;
+  }
+</style>
