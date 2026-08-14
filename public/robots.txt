@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://ruckuscreative.com/sitemap-index.xml
