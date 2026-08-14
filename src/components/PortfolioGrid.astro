@@ -1,0 +1,42 @@
+---
+// Replaces Isotope + jQuery with CSS Grid.
+import { getCollection } from 'astro:content';
+import { getImage } from 'astro:assets';
+import { resolveMedia } from '../lib/images';
+
+const work = (await getCollection('work')).sort((a, b) => a.data.title.localeCompare(b.data.title));
+
+const items = await Promise.all(work.map(async (entry) => {
+  const first = /@assets\/media\/([^"']+)/.exec(entry.body ?? '')?.[1] ?? null;
+  const img = first ? resolveMedia(first) : null;
+  const thumb = img ? await getImage({ src: img, format: 'webp', widths: [400, 800] }) : null;
+  return { title: entry.data.title, path: entry.data.path, thumb, width: img?.width, height: img?.height };
+}));
+---
+<div class="portfolio">
+  <ul class="grid">
+    {items.map(item => (
+      <li>
+        <a href={item.path}>
+          {item.thumb
+            ? <img srcset={item.thumb.srcSet.attribute} sizes="(max-width: 700px) 100vw, 33vw"
+                   src={item.thumb.src} width={item.width} height={item.height}
+                   alt="" loading="lazy" decoding="async" />
+            : <div class="noimg" aria-hidden="true"></div>}
+          <span>{item.title}</span>
+        </a>
+      </li>
+    ))}
+  </ul>
+</div>
+
+<style>
+  .grid { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--space-2);
+          grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); }
+  .grid a { display: block; text-decoration: none; position: relative; }
+  .grid img { aspect-ratio: 3 / 2; object-fit: cover; width: 100%; }
+  .noimg { aspect-ratio: 3 / 2; background: var(--color-rule); }
+  .grid span { display: block; padding: var(--space-1) 0; font-family: var(--font-display);
+               text-transform: uppercase; letter-spacing: 0.04em; font-size: 0.85rem; color: var(--color-heading); }
+  .grid a:hover span { color: var(--color-accent); }
+</style>
