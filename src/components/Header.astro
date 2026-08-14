@@ -1,0 +1,54 @@
+---
+import { Image } from 'astro:assets';
+import { nav, site } from '../data/site';
+import logoDark from '../assets/chrome/ruckus_logo_dark.png';
+---
+<header class="site-header">
+  <div class="container-wide bar">
+    <a href="/#home" class="logo" aria-label={`${site.name} home`}>
+      <Image src={logoDark} alt={site.name} widths={[180, 360]} sizes="180px" loading="eager" />
+    </a>
+
+    <nav class="desktop-nav" aria-label="Main">
+      <ul>{nav.map(item => <li><a href={item.href}>{item.label}</a></li>)}</ul>
+    </nav>
+
+    <details class="menu">
+      <summary aria-label="Menu"><span class="bars" aria-hidden="true"></span></summary>
+      <div class="panel">
+        <nav aria-label="Menu">
+          <ul>{nav.map(item => <li><a href={item.href}>{item.label}</a></li>)}</ul>
+        </nav>
+        <div class="contact">
+          <p><a href={`mailto:${site.email}`}>{site.email}</a></p>
+          <p><a href={`tel:${site.phoneE164}`}>{site.phone}</a></p>
+          <p>{site.address.street}<br />{site.address.city}, {site.address.region} {site.address.postalCode}</p>
+        </div>
+      </div>
+    </details>
+  </div>
+</header>
+
+<style>
+  .site-header { position: sticky; top: 0; z-index: 50; background: var(--color-bg); border-bottom: 1px solid var(--color-rule); }
+  .bar { display: flex; align-items: center; justify-content: space-between; gap: var(--space-3); padding-block: var(--space-2); }
+  .logo img { width: 180px; height: auto; }
+  .desktop-nav ul, .panel ul { list-style: none; margin: 0; padding: 0; }
+  .desktop-nav ul { display: flex; gap: var(--space-3); }
+  .desktop-nav a { text-decoration: none; font-size: 0.9rem; letter-spacing: 0.04em; text-transform: uppercase; }
+  .desktop-nav a:hover { color: var(--color-accent); }
+  @media (max-width: 860px) { .desktop-nav { display: none; } }
+
+  .menu { position: relative; }
+  .menu summary { list-style: none; cursor: pointer; padding: var(--space-1); }
+  .menu summary::-webkit-details-marker { display: none; }
+  .bars, .bars::before, .bars::after { display: block; width: 24px; height: 2px; background: var(--color-heading); }
+  .bars { position: relative; }
+  .bars::before, .bars::after { content: ''; position: absolute; }
+  .bars::before { top: -7px; } .bars::after { top: 7px; }
+  .panel { position: absolute; right: 0; top: 100%; width: min(320px, calc(100vw - 2rem));
+           background: var(--color-bg); border: 1px solid var(--color-rule); padding: var(--space-3); }
+  .panel li + li { margin-top: var(--space-1); }
+  .panel a { text-decoration: none; }
+  .contact { margin-top: var(--space-3); border-top: 1px solid var(--color-rule); padding-top: var(--space-2); font-size: 0.9rem; }
+</style>

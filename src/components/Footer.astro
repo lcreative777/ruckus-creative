@@ -1,0 +1,26 @@
+---
+import { site, legalLinks } from '../data/site';
+const year = new Date().getFullYear();
+---
+<footer class="site-footer">
+  <div class="container">
+    <address>
+      <strong>{site.legalName}</strong><br />
+      {site.address.street}<br />
+      {site.address.city}, {site.address.region} {site.address.postalCode}<br />
+      <a href={`tel:${site.phoneE164}`}>{site.phone}</a> ·
+      <a href={`mailto:${site.email}`}>{site.email}</a>
+    </address>
+    <p class="legal">
+      © {year} {site.name}.
+      {legalLinks.map((l, i) => <>{i > 0 && ' | '}<a href={l.href}>{l.label}</a></>)}
+    </p>
+  </div>
+</footer>
+
+<style>
+  .site-footer { background: var(--color-bg-dark); color: #cfcbc6; padding-block: var(--space-5); margin-top: var(--space-6); }
+  .site-footer a { color: var(--color-accent); }
+  address { font-style: normal; line-height: 1.8; }
+  .legal { margin-top: var(--space-3); font-size: 0.875rem; }
+</style>
