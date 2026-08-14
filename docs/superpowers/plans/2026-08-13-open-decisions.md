@@ -1,73 +1,90 @@
-# Open Decisions — raised during Plan 1
+# Decisions — raised during Plan 1
 
-Findings from the content migration that need a call from the client before
-Plan 2 builds routes on top of them. Recorded 2026-08-13.
+Findings from the content migration and the Cloudflare prerequisite check.
+Recorded 2026-08-13, resolved 2026-08-14 except where noted.
 
 ---
 
-## 1. The business address is inconsistent across the live site
+## 1. Business address — RESOLVED
 
-Three different suite numbers appear on ruckuscreative.com right now:
+Three different suite numbers appeared across the live site (homepage 300-173,
+contact page 100-173, footer 300-1733). Client confirmed the correct address:
 
-| Where | Address |
+> **Ruckus Creative, LLC**
+> 27525 Puerta Real, Suite 300-173
+> Mission Viejo, CA 92691
+> 714.514.1482
+
+**This is the single source of truth** for the footer, contact page, homepage, and
+the `LocalBusiness` structured data. The migrated page copy still carries the two
+incorrect variants and must be corrected in Plan 2 wherever the address is
+rendered — do not simply pass through the migrated text.
+
+---
+
+## 2. `/portfolio-ruckus/` — RESOLVED
+
+**Rebuild as a proper index of all 20 portfolio pieces.** Keep the existing URL
+`/portfolio-ruckus/` so the page's accumulated equity is retained.
+
+Rationale (client): the page is already broken with 4 of 8 links 404ing, it omits
+16 of 20 items, and the 20 detail pages currently have no listing parent for
+internal linking. A real index fixes the dead links and strengthens site
+architecture in one move.
+
+Plan 2 builds this from `getCollection('work')` rather than the migrated body, so
+it stays complete automatically. The migrated `portfolio-ruckus.mdx` body becomes
+intro copy only; its 8 hardcoded cards are discarded.
+
+---
+
+## 3. Contact form backend — NEEDS A NEW DECISION
+
+The original plan used Cloudflare's native `send_email` binding. **The
+prerequisite check has ruled this out as originally designed.**
+
+Verified 2026-08-14 against account `c0780521925c950ef323a873c907c291`:
+
+| Check | Result |
 |---|---|
-| Homepage | 27525 Puerta Real, **Suite 300-173** |
-| Contact page | 27525 Puerta Real, **Suite 100-173** |
-| Footer (every page) | 27525 Puerta Real, **Suite 300-1733** |
+| `ruckuscreative.com` zone on target account | ✅ yes, id `e5b7473f2766d25e0ab54a939e527786`, active |
+| Email Routing enabled | ❌ no — `status: unconfigured` |
+| Verified destination addresses | ❌ none |
+| **Existing MX records** | **Google Workspace** (`aspmx.l.google.com`) |
+| Existing SPF | `v=spf1 a mx include:_spf.google.com ~all` |
 
-Two of these are wrong. This is not a migration artifact — it is how the source
-site reads today.
+**Enabling Cloudflare Email Routing rewrites the zone's MX records and would break
+all inbound Google Workspace mail for the domain.** That is not an acceptable
+trade for a contact form. Do not enable it.
 
-**Why it matters:** Plan 2 adds `LocalBusiness` structured data, which the
-current site has none of. Publishing an incorrect address in structured data is
-worse than publishing none, because search engines treat NAP (name/address/phone)
-consistency as a local ranking signal and will cross-check it against other
-listings.
+### Options
 
-**Needed:** the correct suite number. Migration is unblocked either way — the page
-copy was carried over verbatim — but the JSON-LD in Plan 2 should not be written
-until this is settled.
+1. **Transactional email API from the Worker** — Resend, Postmark, or similar.
+   The Worker validates the submission, verifies the Turnstile token, and POSTs to
+   the provider. **No DNS changes to the existing mail setup**; sending happens on
+   a subdomain (e.g. `send.ruckuscreative.com`) or the provider's own domain, so
+   Google Workspace is untouched. Resend's free tier is 3,000 emails/month, far
+   beyond what this form will see. *Recommended.*
 
-The phone number is consistent everywhere (714-514-1482) and needs no decision.
+2. **Account-level destination address without zone routing** — destination
+   addresses are an account-scoped resource, so it *may* be possible to verify one
+   without enabling Email Routing on the zone. Unconfirmed, and it would leave the
+   form dependent on undocumented behavior. Would need testing before committing.
 
----
+3. **Third-party form service** — Formspree or Web3Forms. Nothing to maintain, no
+   DNS impact, but free tiers cap around 50–250 submissions/month and submissions
+   live on someone else's server.
 
-## 2. `/portfolio-ruckus/` is a stale page that is already broken
+Turnstile is unaffected by this decision and remains the spam control in all three
+options.
 
-The page links to 8 portfolio items. Verified against the live site:
-
-- **4 resolve** — `dos-equis`, `aqua-flo`, `metrex-research`, `future-fins`. They
-  use pre-rename `/portfolio/*` URLs that 301 to `/work/*`. The migration now
-  rewrites these to `/work/*` directly.
-- **4 are dead** — `benchmark-wealth-management`, `buddies-without-boundaries`,
-  `coach-net`, `international-window-corp`. All 404 under both `/portfolio/` and
-  `/work/`. The migration unwraps these links, so the cards remain but no longer
-  point anywhere.
-- **16 of the 20 real portfolio items do not appear on this page at all.**
-
-The live portfolio experience is really the homepage `#work` grid, which carries
-all 20 items. `/portfolio-ruckus/` looks like an abandoned earlier version.
-
-**Options:**
-
-1. **Rebuild it as a real index of all 20 `/work/` items.** Fixes 4 dead links,
-   surfaces 16 items that are currently invisible on it, and gives the 20
-   portfolio pages an internal-linking parent — a genuine SEO gain. Departs from
-   the current page, but the current page is broken. *Recommended.*
-2. **Redirect `/portfolio-ruckus/` → `/#work`** and drop the page. Simplest, and
-   honest about the page being superseded. Loses the URL as a ranking target.
-3. **Carry it over as-is**, with 4 unlinked dead cards and 16 missing items.
-   Faithful to a page that does not work.
-
-**Needed:** which of the three. Blocks nothing in Plan 1; Plan 2 needs it before
-building the route.
+**Blocks:** Plan 3 only. Plans 1 and 2 proceed regardless.
 
 ---
 
-## 3. Minor — duplicate `id="about"` on the homepage
+## 4. Minor — duplicate `id="about"` on the homepage
 
 `src/content/pages/home.mdx` carries `id="about"` three times, which is invalid
-HTML and means `#about` in the one-page nav resolves to the first match only.
-Inherited from the source page. Plan 2's homepage rebuild should reduce it to one;
-no client decision needed, just noting it so it is not mistaken for a migration
-defect.
+HTML and means the `#about` nav link resolves to the first match only. Inherited
+from the source page. Plan 2's homepage rebuild should reduce it to one. No client
+decision needed.
