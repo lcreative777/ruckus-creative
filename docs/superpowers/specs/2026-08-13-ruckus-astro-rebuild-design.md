@@ -3,7 +3,7 @@
 **Date:** 2026-08-13
 **Status:** Approved
 **Source site:** https://ruckuscreative.com (WordPress + Salient 16.2.2 + WPBakery + Gravity Forms)
-**Target:** Astro 5 static site on Cloudflare Workers, account `c0780521925c950ef323a873c907c291`
+**Target:** Astro 7 static site on Cloudflare Workers, account `c0780521925c950ef323a873c907c291`
 
 ---
 
@@ -98,9 +98,9 @@ The 8 demo posts, all dated 2011: `you-think-water-moves-fast`, `airspeed-veloci
 
 ## Architecture
 
-Astro 5 with `output: 'static'` and the `@astrojs/cloudflare` adapter, deployed as a **Worker with Static Assets**.
+Astro 7.2 with the `@astrojs/cloudflare` adapter 14.2 (`output` defaults to `'static'`), deployed as a **Worker with Static Assets**.
 
-All routes are pre-rendered at build time except one: `/api/contact` sets `export const prerender = false`, which Astro 5 supports on an otherwise-static build. That yields a single Worker script that serves static assets and handles exactly one dynamic route.
+All routes are pre-rendered at build time except one: `/api/contact` sets `export const prerender = false`, which Astro 7 supports on an otherwise-static build. That yields a single Worker script that serves static assets and handles exactly one dynamic route.
 
 ```
 ruckus-astro/
