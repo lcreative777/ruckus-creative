@@ -706,7 +706,7 @@ export function cleanHtml(rawHtml, { baseUrl }) {
 npx vitest run tests/html-to-content.test.mjs
 ```
 
-Expected: PASS, 9 tests. If the unwrap loop or the empty-element pass breaks a specific case, fix the module rather than loosening the test — these assertions describe the output quality we need.
+Expected: PASS, 8 tests. If the unwrap loop or the empty-element pass breaks a specific case, fix the module rather than loosening the test — these assertions describe the output quality we need.
 
 - [ ] **Step 5: Commit**
 
@@ -1000,6 +1000,16 @@ grep -rl 'https://ruckuscreative.com' src/content || echo "no absolute internal 
 ```
 
 Expected: 39 MDX files, a populated media directory, and both `grep` checks reporting nothing remaining.
+
+**Also check image yield per type.** Verified during Task 6: the About and Capabilities pages legitimately contain **zero** content images — every uploads URL on those pages is chrome (favicons, header/footer logos). So a zero image count on a text page is correct, not a bug. The portfolio items are where imagery actually lives, so check those specifically:
+
+```bash
+grep -c '@assets/media/' src/content/work/*.mdx | sort -t: -k2 -n | head
+```
+
+Any `/work/` entry reporting **0** images is a genuine extraction failure and must be investigated — a portfolio case study with no imagery is wrong on its face.
+
+> **Gap for Plan 2 — site chrome images.** The header logo (`ruckus_logo_dark.png`, `ruckus_logo_light.png`), footer logo (`footer-logo.jpg`), and favicon set (`cropped-FAVICON-*.png`) appear in no page's *content* and are therefore not captured by this migration. Plan 2 must download them explicitly when building the Header and Footer components. Source paths are under `https://ruckuscreative.com/wp-content/uploads/`.
 
 - [ ] **Step 5: Commit**
 
