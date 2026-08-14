@@ -254,3 +254,57 @@ h3 { font-size: var(--step-h3); }
 }
 /* The right-hand statement is set noticeably larger than body copy. */
 .prose .light .overlay p { font-size: 1.5rem; line-height: 1.45; }
+
+/* ---- Hero / intro --------------------------------------------------------
+   Salient sized its inline SVGs with its own CSS. Once we started preserving
+   svg attributes (so the icons survived), the play-button graphic expanded to
+   800px and pushed an empty block between the hero and the intro. Constrain
+   every prose svg, and drop the migrated play button outright — HeroVideo
+   already renders the poster and its control, so it was a duplicate. */
+.prose svg { max-width: 100%; height: auto; }
+.prose [class*="steadysets-icon-"] svg, .prose .im-icon-wrap svg { width: 50px; height: 50px; }
+.prose .play_button, .prose a[class*="play_button"] { display: none; }
+
+/* The section after the video runs the full viewport height and sits flush
+   against it, as on the live site (intro 915px at a 900px viewport, gap 0). */
+.prose #intro {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  margin-top: 0;
+}
+.prose #intro > * { width: 100%; }
+
+/* ---- Work tiles ----------------------------------------------------------
+   Each tile links to its case study and reveals the project title on hover,
+   as the live grid does. */
+.prose .elastic-portfolio-item .work-item { position: relative; overflow: hidden; }
+.prose .elastic-portfolio-item .work-info {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-2);
+  text-align: center;
+  background: rgba(184, 30, 4, .88);
+  opacity: 0;
+  transition: opacity .25s ease;
+}
+.prose .elastic-portfolio-item .work-item:hover .work-info,
+.prose .elastic-portfolio-item .work-item:focus-within .work-info { opacity: 1; }
+.prose .elastic-portfolio-item .work-info a,
+.prose .elastic-portfolio-item .work-info :is(h2, h3, h4, span) {
+  color: #fff;
+  text-decoration: none;
+  font-family: var(--font-display);
+  text-transform: uppercase;
+  letter-spacing: .05em;
+  font-size: 1rem;
+  line-height: 1.3;
+}
+/* The whole tile is the click target, not just the caption. */
+.prose .elastic-portfolio-item .work-info a::after { content: ''; position: absolute; inset: 0; }
+@media (prefers-reduced-motion: reduce) {
+  .prose .elastic-portfolio-item .work-info { transition: none; }
+}
