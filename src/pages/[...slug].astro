@@ -1,0 +1,50 @@
+---
+import { getCollection } from 'astro:content';
+import Base from '../layouts/Base.astro';
+import Seo from '../components/Seo.astro';
+import RichText from '../components/RichText.astro';
+import { site } from '../data/site';
+
+export async function getStaticPaths() {
+  const [pages, posts] = await Promise.all([getCollection('pages'), getCollection('knowledge')]);
+  const slugOf = (path: string) => path.replace(/^\/|\/$/g, '');
+
+  const fromPages = pages
+    .filter(p => p.data.path !== '/' && p.data.path !== '/portfolio-ruckus/')
+    .map(p => ({ params: { slug: slugOf(p.data.path) }, props: { entry: p, kind: 'page' as const } }));
+
+  const fromPosts = posts
+    .map(p => ({ params: { slug: slugOf(p.data.path) }, props: { entry: p, kind: 'post' as const } }));
+
+  return [...fromPages, ...fromPosts];
+}
+
+const { entry, kind } = Astro.props;
+const d = entry.data;
+const isPost = kind === 'post';
+
+const breadcrumbs = isPost
+  ? [{ name: 'Home', url: '/' }, { name: 'Knowledge', url: '/knowledge/' }, { name: d.title, url: d.path }]
+  : [{ name: 'Home', url: '/' }, { name: d.title, url: d.path }];
+
+const schema = isPost && 'pubDate' in d
+  ? { '@type': 'Article', headline: d.title, datePublished: d.pubDate.toISOString(),
+      author: { '@id': `${site.url}/#organization` }, publisher: { '@id': `${site.url}/#organization` } }
+  : undefined;
+---
+<Base>
+  <Seo slot="head" title={d.seo.title ?? d.title} description={d.seo.description}
+       canonical={d.seo.canonical} ogImage={d.seo.ogImage}
+       type={isPost ? 'article' : 'website'}
+       publishedTime={isPost && 'pubDate' in d ? d.pubDate.toISOString() : undefined}
+       breadcrumbs={breadcrumbs} schema={schema} />
+  <article class="container section">
+    <h1>{d.title}</h1>
+    {isPost && 'pubDate' in d && (
+      <time datetime={d.pubDate.toISOString()}>
+        {d.pubDate.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
+      </time>
+    )}
+    <RichText html={entry.body ?? ''} />
+  </article>
+</Base>

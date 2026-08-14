@@ -1,0 +1,21 @@
+---
+import { getCollection } from 'astro:content';
+import Base from '../layouts/Base.astro';
+import Seo from '../components/Seo.astro';
+import PortfolioGrid from '../components/PortfolioGrid.astro';
+
+const entry = (await getCollection('pages')).find(p => p.data.path === '/portfolio-ruckus/')!;
+const d = entry.data;
+const work = await getCollection('work');
+---
+<Base>
+  <Seo slot="head" title={d.seo.title ?? d.title} description={d.seo.description}
+       canonical={d.seo.canonical}
+       breadcrumbs={[{ name: 'Home', url: '/' }, { name: 'Work', url: '/portfolio-ruckus/' }]}
+       schema={{ '@type': 'CollectionPage', name: d.title,
+                 hasPart: work.map(w => ({ '@type': 'CreativeWork', name: w.data.title, url: new URL(w.data.path, Astro.site!).href })) }} />
+  <div class="container section">
+    <h1>{d.title}</h1>
+    <PortfolioGrid />
+  </div>
+</Base>

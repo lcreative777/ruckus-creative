@@ -1,0 +1,30 @@
+---
+import { getCollection } from 'astro:content';
+import Base from '../../layouts/Base.astro';
+import Seo from '../../components/Seo.astro';
+import RichText from '../../components/RichText.astro';
+import { site } from '../../data/site';
+
+export async function getStaticPaths() {
+  const work = await getCollection('work');
+  return work.map(entry => ({
+    params: { slug: entry.data.path.replace('/work/', '').replace(/\/$/, '') },
+    props: { entry },
+  }));
+}
+
+const { entry } = Astro.props;
+const d = entry.data;
+---
+<Base>
+  <Seo slot="head" title={d.seo.title ?? d.title} description={d.seo.description}
+       canonical={d.seo.canonical} ogImage={d.seo.ogImage}
+       breadcrumbs={[{ name: 'Home', url: '/' }, { name: 'Work', url: '/portfolio-ruckus/' }, { name: d.title, url: d.path }]}
+       schema={{ '@type': 'CreativeWork', name: d.title, url: new URL(d.path, site.url).href,
+                 creator: { '@id': `${site.url}/#organization` } }} />
+  <article class="container section">
+    <h1>{d.title}</h1>
+    <RichText html={entry.body ?? ''} />
+    <p><a href="/portfolio-ruckus/">← All work</a></p>
+  </article>
+</Base>
