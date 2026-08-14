@@ -4,7 +4,7 @@
 
 **Goal:** Scaffold the Astro project and extract all 39 pages of content plus media from the live WordPress site into validated, committed content collections, so that the build no longer depends on WordPress.
 
-**Architecture:** A one-shot Node migration script split into four focused modules — URL inventory, WordPress client, HTML cleaner, media downloader — orchestrated by `scripts/migrate.mjs`. Each module is unit-tested against real fixture HTML captured from the live site. Output is MDX files under `src/content/` with SEO metadata in frontmatter and cleaned semantic HTML in the body.
+**Architecture:** A one-shot Node migration script split into four focused modules — URL inventory, WordPress client, HTML cleaner, media downloader — orchestrated by `scripts/migrate.mjs`. Each module is unit-tested against real fixture HTML captured from the live site. Output is Markdown files under `src/content/` with SEO metadata in frontmatter and cleaned semantic HTML in the body.
 
 **Tech Stack:** Astro 7.2, `@astrojs/cloudflare` 14.2, `@astrojs/mdx`, `@astrojs/sitemap`, Vitest, Cheerio 1.x, Wrangler 4.x.
 
@@ -38,7 +38,7 @@
 | `scripts/migrate.mjs` | Orchestrator: inventory → fetch → clean → media → write MDX |
 | `tests/fixtures/` | Real HTML captured from the live site |
 | `tests/*.test.mjs` | Unit tests per module |
-| `src/content/{pages,work,knowledge}/*.mdx` | Migration output (committed) |
+| `src/content/{pages,work,knowledge}/*.md` | Migration output (committed) |
 | `src/assets/media/` | Downloaded images (committed) |
 
 **Why this split:** `inventory` is pure data with no I/O, so it is trivially testable and is the one place scope changes. `wp-client` owns all network access. `html-to-content` is a pure function — HTML in, HTML out — which is what makes the messy WPBakery logic testable against fixtures. `media` owns the filesystem. The orchestrator holds no logic of its own.

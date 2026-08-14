@@ -58,7 +58,7 @@ for (const entry of allEntries()) {
 
     const dir = join(CONTENT_DIR, DIR_FOR[entry.type]);
     await mkdir(dir, { recursive: true });
-    await writeFile(join(dir, `${entry.slug}.mdx`), frontmatter(rec) + html + '\n', 'utf8');
+    await writeFile(join(dir, `${entry.slug}.md`), frontmatter(rec) + html + '\n', 'utf8');
 
     console.log(`ok (${rec.source}, ${images.length} images, ${html.length}b)`);
   } catch (err) {

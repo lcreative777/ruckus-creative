@@ -6,7 +6,7 @@ import { PAGES, WORK, KNOWLEDGE } from '../scripts/lib/inventory.mjs';
 
 const root = new URL('../src/content/', import.meta.url).pathname;
 const read = (d, f) => readFileSync(join(root, d, f), 'utf8');
-const list = (d) => readdirSync(join(root, d)).filter(f => f.endsWith('.mdx'));
+const list = (d) => readdirSync(join(root, d)).filter(f => f.endsWith('.md'));
 
 describe('migrated content', () => {
   it('produced one file per inventory entry', () => {
@@ -92,7 +92,7 @@ describe('business address', () => {
   });
 
   it('renders the address consistently wherever it appears', () => {
-    const files = ['pages/contact-ruckus-creative.mdx', 'pages/home.mdx'];
+    const files = ['pages/contact-ruckus-creative.md', 'pages/home.md'];
     for (const rel of files) {
       const [dir, f] = rel.split('/');
       expect(read(dir, f), `${rel} missing the confirmed address`)

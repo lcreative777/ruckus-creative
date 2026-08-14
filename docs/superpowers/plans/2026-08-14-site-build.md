@@ -6,7 +6,9 @@
 
 **Architecture:** Astro renders each collection entry's raw body HTML through a single `RichText` component that resolves the `@assets/media/` sentinels left by Plan 1 into optimized `<picture>` markup at build time. Design tokens live as CSS custom properties in one file. Every interactive behaviour is a small vanilla island loaded only on the pages that need it.
 
-**Tech Stack:** Astro 7.2, `@astrojs/cloudflare` 14.2, `@astrojs/mdx`, `@astrojs/sitemap`, `@fontsource/*`, Vitest.
+**Tech Stack:** Astro 7.2, `@astrojs/cloudflare` 14.2 (`imageService: 'compile'`), `@astrojs/sitemap`, `@fontsource/*`, Vitest.
+
+> **Content is `.md`, not `.mdx`.** MDX parses embedded HTML as JSX and rejects unclosed void elements, and WordPress emits `<br>` and `<img>` unclosed — so any build touching the collections failed with `mdx-jsx:unexpected-character`. Nothing renders the markdown anyway (`RichText` consumes `entry.body` as a raw string), so `.md` removes the constraint at zero cost. `@astrojs/mdx` was dropped from the integrations.
 
 **Spec:** `docs/superpowers/specs/2026-08-13-ruckus-astro-rebuild-design.md`
 **Decisions:** `docs/superpowers/plans/2026-08-13-open-decisions.md`

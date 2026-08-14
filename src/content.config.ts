@@ -17,17 +17,17 @@ const base = {
 };
 
 const pages = defineCollection({
-  loader: glob({ base: './src/content/pages', pattern: '**/*.mdx' }),
+  loader: glob({ base: './src/content/pages', pattern: '**/*.md' }),
   schema: z.object({ ...base }),
 });
 
 const work = defineCollection({
-  loader: glob({ base: './src/content/work', pattern: '**/*.mdx' }),
+  loader: glob({ base: './src/content/work', pattern: '**/*.md' }),
   schema: z.object({ ...base, client: z.string().nullable().default(null) }),
 });
 
 const knowledge = defineCollection({
-  loader: glob({ base: './src/content/knowledge', pattern: '**/*.mdx' }),
+  loader: glob({ base: './src/content/knowledge', pattern: '**/*.md' }),
   schema: z.object({ ...base, pubDate: z.coerce.date(), updatedDate: z.coerce.date().optional() }),
 });
 
