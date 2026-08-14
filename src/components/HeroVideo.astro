@@ -1,0 +1,58 @@
+---
+// The live site autoloads a YouTube background video, its worst LCP and TBT
+// offender. The poster carries LCP here and the player is fetched only on click.
+// `mode` is reserved so motion can be restored later without a rewrite.
+import { getImage } from 'astro:assets';
+import { resolveMedia } from '../lib/images';
+
+interface Props { videoId: string; poster: string; title?: string; mode?: 'facade' | 'autoplay' }
+const { videoId, poster, title = 'Play video', mode = 'facade' } = Astro.props;
+
+const img = resolveMedia(poster);
+if (!img) throw new Error(`HeroVideo: poster "${poster}" was not migrated — check src/assets/media/`);
+
+const [avif, webp, fallback] = await Promise.all([
+  getImage({ src: img, format: 'avif', widths: [768, 1280, 1920] }),
+  getImage({ src: img, format: 'webp', widths: [768, 1280, 1920] }),
+  getImage({ src: img, format: 'jpeg', width: 1920 }),
+]);
+---
+<div class="hero-video" data-video-id={videoId} data-mode={mode}>
+  <picture>
+    <source type="image/avif" srcset={avif.srcSet.attribute} sizes="100vw" />
+    <source type="image/webp" srcset={webp.srcSet.attribute} sizes="100vw" />
+    <img src={fallback.src} width={img.width} height={img.height} alt=""
+         fetchpriority="high" loading="eager" decoding="async" />
+  </picture>
+  <button type="button" class="play" aria-label={title}>
+    <svg viewBox="0 0 68 48" width="68" height="48" aria-hidden="true">
+      <path d="M66.5 7.7a8 8 0 0 0-5.6-5.7C56 .7 34 .7 34 .7s-22 0-26.9 1.3A8 8 0 0 0 1.5 7.7 83 83 0 0 0 .2 24a83 83 0 0 0 1.3 16.3 8 8 0 0 0 5.6 5.7C12 47.3 34 47.3 34 47.3s22 0 26.9-1.3a8 8 0 0 0 5.6-5.7A83 83 0 0 0 67.8 24a83 83 0 0 0-1.3-16.3z" fill="#212121" fill-opacity=".8"/>
+      <path d="M27.2 34.4 45.5 24 27.2 13.6z" fill="#fff"/>
+    </svg>
+  </button>
+</div>
+
+<script>
+  document.querySelectorAll<HTMLElement>('.hero-video').forEach((el) => {
+    const button = el.querySelector('button');
+    button?.addEventListener('click', () => {
+      const id = el.dataset.videoId;
+      if (!id) return;
+      const iframe = document.createElement('iframe');
+      iframe.src = `https://www.youtube-nocookie.com/embed/${id}?autoplay=1&rel=0`;
+      iframe.title = button.getAttribute('aria-label') ?? 'Video';
+      iframe.allow = 'accelerometer; autoplay; encrypted-media; picture-in-picture';
+      iframe.allowFullscreen = true;
+      iframe.loading = 'lazy';
+      el.replaceChildren(iframe);
+    }, { once: true });
+  });
+</script>
+
+<style>
+  .hero-video { position: relative; aspect-ratio: 16 / 9; background: #000; overflow: hidden; }
+  .hero-video img, .hero-video :global(iframe) { width: 100%; height: 100%; object-fit: cover; border: 0; }
+  .play { position: absolute; inset: 0; margin: auto; width: 68px; height: 48px;
+          background: none; border: 0; cursor: pointer; padding: 0; }
+  .play:hover path:first-child { fill-opacity: 1; }
+</style>
