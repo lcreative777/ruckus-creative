@@ -900,7 +900,7 @@ import { join } from 'node:path';
 import { allEntries, ORIGIN } from './lib/inventory.mjs';
 import { fetchEntry } from './lib/wp-client.mjs';
 import { cleanHtml } from './lib/html-to-content.mjs';
-import { downloadMedia } from './lib/media.mjs';
+import { downloadMedia, localNameFor } from './lib/media.mjs';
 
 const ROOT = new URL('..', import.meta.url).pathname;
 const CONTENT_DIR = join(ROOT, 'src/content');
@@ -946,7 +946,10 @@ for (const entry of allEntries()) {
   try {
     process.stdout.write(`${entry.path} ... `);
     const rec = await fetchEntry(entry);
-    const { html, images } = cleanHtml(rec.html, { baseUrl: ORIGIN });
+    // nameFor MUST be localNameFor so the sentinel paths written into the MDX
+    // match the filenames downloadMedia writes to disk. Without it, two images
+    // sharing a basename produce a reference to a file that never gets written.
+    const { html, images } = cleanHtml(rec.html, { baseUrl: ORIGIN, nameFor: localNameFor });
     allImages.push(...images);
 
     const dir = join(CONTENT_DIR, DIR_FOR[entry.type]);

@@ -21,12 +21,18 @@ function largestFromSrcset(srcset) {
   return best?.url ?? null;
 }
 
+/** Default naming: the WordPress filename, unchanged. */
+const plainBasename = (url) => basename(new URL(url).pathname);
+
 /**
  * @param {string} rawHtml
- * @param {{baseUrl: string}} opts
+ * @param {{baseUrl: string, nameFor?: (url: string) => string}} opts
+ *   `nameFor` maps an absolute image URL to its local filename. It MUST be the
+ *   same function the downloader uses, or the sentinel paths written here will
+ *   not match the files written to disk. Pass `localNameFor` from ./media.mjs.
  * @returns {{html: string, images: string[]}}
  */
-export function cleanHtml(rawHtml, { baseUrl }) {
+export function cleanHtml(rawHtml, { baseUrl, nameFor = plainBasename }) {
   const $ = load(stripShortcodes(rawHtml), null, false);
   const images = [];
 
@@ -40,7 +46,7 @@ export function cleanHtml(rawHtml, { baseUrl }) {
     if (!chosen) { $el.remove(); return; }
     const abs = new URL(chosen, baseUrl).href;
     if (!images.includes(abs)) images.push(abs);
-    $el.attr('src', `@assets/media/${basename(new URL(abs).pathname)}`);
+    $el.attr('src', `@assets/media/${nameFor(abs)}`);
     $el.removeAttr('srcset').removeAttr('sizes').removeAttr('loading');
   });
 
