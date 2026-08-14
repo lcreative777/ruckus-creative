@@ -1,11 +1,6 @@
 {
   "name": "ruckus-astro",
   "version": "0.1.0",
-  "description": "",
-  "main": "index.js",
-  "directories": {
-    "doc": "docs"
-  },
   "scripts": {
     "test": "vitest run",
     "dev": "astro dev",
@@ -15,9 +10,7 @@
     "migrate": "node scripts/migrate.mjs",
     "redirects": "node scripts/emit-redirects.mjs"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
+  "license": "UNLICENSED",
   "type": "module",
   "private": true,
   "dependencies": {
