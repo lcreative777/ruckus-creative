@@ -1,5 +1,5 @@
 ---
-title: "Clarity &#8211; create an unforgettable brand"
+title: "Clarity – create an unforgettable brand"
 path: "/clarity-create-an-unforgettable-brand/"
 source: "rest"
 seo:

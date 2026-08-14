@@ -1,5 +1,5 @@
 ---
-title: "Differentiate for higher profits &#8211; create a monopoly and raise your prices"
+title: "Differentiate for higher profits – create a monopoly and raise your prices"
 path: "/differentiate-for-higher-profits-create-a-monopoly-and-raise-your-prices/"
 source: "rest"
 seo:

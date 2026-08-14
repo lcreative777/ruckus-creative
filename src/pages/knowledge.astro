@@ -1,0 +1,45 @@
+---
+// The live /knowledge/ page is broken: its [blog] shortcode is unregistered, so
+// it prints the raw shortcode text and lists zero posts. This renders the page's
+// real intro copy and then an actual index of the 9 articles.
+import { getCollection } from 'astro:content';
+import Base from '../layouts/Base.astro';
+import Seo from '../components/Seo.astro';
+import RichText from '../components/RichText.astro';
+
+const entry = (await getCollection('pages')).find(p => p.data.path === '/knowledge/')!;
+const d = entry.data;
+const posts = (await getCollection('knowledge'))
+  .sort((a, b) => b.data.pubDate.getTime() - a.data.pubDate.getTime());
+const fmt = (dt: Date) => dt.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+---
+<Base>
+  <Seo slot="head" title={d.seo.title ?? d.title} description={d.seo.description}
+       canonical={d.seo.canonical} ogImage={d.seo.ogImage}
+       breadcrumbs={[{ name: 'Home', url: '/' }, { name: d.title, url: d.path }]}
+       schema={{ '@type': 'CollectionPage', name: d.title,
+                 hasPart: posts.map(p => ({ '@type': 'Article', headline: p.data.title,
+                                            datePublished: p.data.pubDate.toISOString(),
+                                            url: new URL(p.data.path, Astro.site!).href })) }} />
+  <article class="container section page-band">
+    <h1 class="visually-hidden">{d.title}</h1>
+    <RichText html={entry.body ?? ''} />
+    <ul class="post-index">
+      {posts.map(p => (
+        <li>
+          <a href={p.data.path}>{p.data.title}</a>
+          <time datetime={p.data.pubDate.toISOString()}>{fmt(p.data.pubDate)}</time>
+        </li>
+      ))}
+    </ul>
+  </article>
+</Base>
+
+<style>
+  .post-index { list-style: none; margin: var(--space-3) 0 0; padding: 0; }
+  .post-index li { padding-block: var(--space-2); border-top: 1px solid var(--color-rule); }
+  .post-index a { display: block; font-family: var(--font-display); font-size: 1.05rem;
+                  color: var(--color-heading); text-decoration: none; }
+  .post-index a:hover { color: var(--color-accent); }
+  .post-index time { display: block; margin-top: 4px; font-size: 0.8rem; color: var(--color-accent); }
+</style>

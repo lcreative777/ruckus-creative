@@ -1,5 +1,5 @@
 ---
-title: "What&#8217;s your point?: Let your prospects say no, as long as they know what you offer"
+title: "What’s your point?: Let your prospects say no, as long as they know what you offer"
 path: "/whats-your-point-let-your-prospects-say-no-as-long-as-they-know-what-you-offer/"
 source: "rest"
 seo:

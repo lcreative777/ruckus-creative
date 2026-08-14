@@ -3,6 +3,19 @@ import { ORIGIN } from './inventory.mjs';
 
 export const REST_TYPE = { page: 'pages', knowledge: 'posts', work: 'portfolio' };
 
+/**
+ * Decode HTML entities in a plain-text field.
+ *
+ * WordPress stores smart punctuation entity-encoded, so titles arrive as
+ * "Clarity &#8211; create an unforgettable brand". Written straight into
+ * frontmatter, Astro escapes the ampersand on output and the page renders a
+ * literal "&#8211;". Decode once, at the source.
+ */
+export function decodeEntities(text) {
+  if (!text) return text;
+  return load(`<x>${text}</x>`)('x').text();
+}
+
 /** Decide whether REST content is usable, or whether we must scrape the rendered page. */
 export function pickSource(restJson) {
   if (!Array.isArray(restJson) || restJson.length === 0) return 'dom';
@@ -78,7 +91,7 @@ export async function fetchEntry(entry) {
 
   return {
     entry,
-    title: rec?.title?.rendered ?? seo.ogTitle ?? seo.title ?? entry.slug,
+    title: decodeEntities(rec?.title?.rendered ?? seo.ogTitle ?? seo.title ?? entry.slug),
     date: rec?.date ?? null,
     modified: rec?.modified ?? null,
     html,

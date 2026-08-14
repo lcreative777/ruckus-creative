@@ -36,3 +36,15 @@ export const legalLinks = [
   { label: 'Privacy Policy', href: '/privacy-policy/' },
   { label: 'Terms and Conditions', href: '/terms-and-conditions/' },
 ] as const;
+
+/**
+ * Secondary nav shown beside knowledge posts. The live site renders these in a
+ * span_3 sidebar next to the span_9 article column.
+ */
+export const sidebarLinks = [
+  { label: 'Results', href: '/results-based-advertising-branding/' },
+  { label: 'Portfolio', href: '/portfolio-ruckus/' },
+  { label: 'Capabilities', href: '/strategic-creative-capabilities/' },
+  { label: 'Process', href: '/process-ruckus-creative/' },
+  { label: 'About', href: '/about/' },
+] as const;

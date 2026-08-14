@@ -1,5 +1,5 @@
 ---
-title: "Ask and ye shall receive &#8211; get a response"
+title: "Ask and ye shall receive – get a response"
 path: "/ask-and-ye-shall-receive-get-a-response/"
 source: "rest"
 seo:

@@ -1,5 +1,5 @@
 ---
-title: "Don&#8217;t just say it, prove it!"
+title: "Don’t just say it, prove it!"
 path: "/dont-just-say-it-prove-it/"
 source: "rest"
 seo:
