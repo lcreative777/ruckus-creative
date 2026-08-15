@@ -1,0 +1,49 @@
+---
+// src/components/home/Pillars.astro
+// Titles/bodies parsed from home.md (src/lib/home-content.ts); icon choice
+// per handoff § Assets → Icons ("We Drive Growth" · "We're Creative
+// Opportunist" · "We're Focused on Success").
+import Icon from '../Icon.astro';
+import { getPillars } from '../../lib/home-content';
+
+const pillars = await getPillars();
+const icons = ['chart-gear-svgrepo-com', 'hvv-svgrepo-com', 'fast-svgrepo-com'];
+---
+<section class="pillars">
+  {pillars.map((p, i) => (
+    <div class="cell" data-reveal>
+      <span class="icon"><Icon name={icons[i]} size={38} /></span>
+      <h5>{p.title}</h5>
+      <p>{p.body}</p>
+    </div>
+  ))}
+</section>
+
+<style>
+  .pillars {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: var(--gap-hairline);
+    background: var(--color-hairline);
+  }
+  .cell {
+    background: var(--color-canvas);
+    padding: clamp(40px, 4vw, 64px) clamp(28px, 3.4vw, 52px);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 16px;
+  }
+  .icon { color: var(--color-flame); }
+  .cell h5 {
+    margin: 0;
+    font-family: var(--font-display);
+    font-weight: 900;
+    font-size: 17px;
+    letter-spacing: .05em;
+    text-transform: uppercase;
+    color: #fff;
+  }
+  .cell p { margin: 0; line-height: 1.85; max-width: 36ch; }
+</style>

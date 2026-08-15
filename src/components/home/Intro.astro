@@ -1,0 +1,110 @@
+---
+// src/components/home/Intro.astro
+// Copy transcribed verbatim from src/content/pages/home.md's #intro block —
+// a single prose block, so authored directly rather than parsed.
+import { getImage } from 'astro:assets';
+import { resolveMedia } from '../../lib/images';
+
+const img = resolveMedia('imac.jpg');
+if (!img) throw new Error('Intro: "imac.jpg" was not found in src/assets/media/');
+
+const [avif, webp, fallback] = await Promise.all([
+  getImage({ src: img, format: 'avif', widths: [640, 960, 1280] }),
+  getImage({ src: img, format: 'webp', widths: [640, 960, 1280] }),
+  getImage({ src: img, format: 'jpeg', width: 1280 }),
+]);
+---
+<section id="intro" class="intro">
+  <div class="copy">
+    <p data-reveal class="lead">
+      <strong>BUSINESS RESULTS THROUGH STRATEGIC CREATIVE:</strong> It’s a mission we take seriously and a commitment our clients take to the bank, time after time.
+    </p>
+    <p data-reveal class="body">
+      Ruckus Creative is a full-service creative agency that creates results. You have the objective – a lift in sales, launch a new product, open a new market – and we have the strategy and creative to help make it a success.
+    </p>
+    <a data-reveal href="/#about" class="pill-outline">
+      Learn More <span class="caret" aria-hidden="true"></span>
+    </a>
+  </div>
+  <div class="art" data-parallax="18">
+    <picture>
+      <source type="image/avif" srcset={avif.srcSet.attribute} sizes="(max-width: 900px) 100vw, 50vw" />
+      <source type="image/webp" srcset={webp.srcSet.attribute} sizes="(max-width: 900px) 100vw, 50vw" />
+      <img src={fallback.src} width={img.width} height={img.height} alt="" loading="lazy" decoding="async" />
+    </picture>
+    <div class="art-fade" aria-hidden="true"></div>
+  </div>
+</section>
+
+<style>
+  .intro {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+    align-items: stretch;
+    background: var(--color-surface-raised);
+  }
+  .copy {
+    padding: clamp(64px, 9vw, 132px) clamp(24px, 5vw, 72px);
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+    justify-content: center;
+  }
+  .lead {
+    margin: 0;
+    font-family: var(--font-alt);
+    font-weight: 200;
+    font-size: var(--type-editorial-lead);
+    line-height: var(--type-editorial-lead-lh);
+    color: #fff;
+    letter-spacing: -.015em;
+  }
+  .lead strong {
+    font-family: var(--font-display);
+    font-weight: 900;
+    font-size: clamp(21px, 2.2vw, 31px);
+    letter-spacing: -.01em;
+  }
+  .body { margin: 0; max-width: 52ch; line-height: 1.9; }
+
+  .pill-outline {
+    align-self: flex-start;
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    padding: 16px 32px;
+    border: 1px solid rgba(255, 255, 255, .35);
+    border-radius: var(--radius-pill);
+    color: #fff;
+    text-decoration: none;
+    font-family: var(--font-display);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: .2em;
+    text-transform: uppercase;
+    transition: background .3s ease, border-color .3s ease;
+  }
+  .pill-outline:hover { background: var(--color-flame); border-color: var(--color-flame); }
+  .caret {
+    width: .5em; height: .5em;
+    border-top: 2px solid currentColor;
+    border-right: 2px solid currentColor;
+    transform: rotate(45deg);
+    display: inline-block;
+  }
+
+  .art { position: relative; min-height: 56vh; overflow: hidden; }
+  .art picture, .art img {
+    position: absolute; inset: -8% 0;
+    width: 100%; height: 116%;
+    object-fit: cover; object-position: left center;
+  }
+  .art-fade {
+    position: absolute; inset: 0;
+    background: linear-gradient(90deg, rgba(22, 21, 20, .92), rgba(22, 21, 20, .1) 46%, transparent);
+  }
+
+  @media (max-width: 899px) {
+    .art { min-height: 40vh; }
+  }
+</style>

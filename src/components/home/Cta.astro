@@ -1,0 +1,50 @@
+---
+// src/components/home/Cta.astro
+// Copy transcribed verbatim from src/content/pages/home.md's final band —
+// a single short block, so authored directly rather than parsed. The phone
+// number in the sub-line is site.ts's identity value, not the source's own
+// literal digits, per the hard constraint that identity comes from site.ts.
+import { site } from '../../data/site';
+---
+<section class="cta">
+  <div class="wash" aria-hidden="true"></div>
+  <div class="inner">
+    <h1 data-reveal>Get ready to stand out</h1>
+    <h5 data-reveal><em>We are here for you and ready to rock at any time: {site.phone}.</em></h5>
+  </div>
+</section>
+
+<style>
+  .cta {
+    position: relative;
+    padding: clamp(84px, 11vw, 150px) clamp(24px, 5vw, 72px);
+    text-align: center;
+    overflow: hidden;
+    background: var(--color-cta);
+  }
+  .wash {
+    position: absolute; inset: 0;
+    background:
+      radial-gradient(70% 130% at 50% 0%, rgba(184, 30, 4, .48), transparent 62%),
+      radial-gradient(60% 110% at 50% 110%, rgba(41, 73, 232, .34), transparent 60%);
+  }
+  .inner { position: relative; }
+  .inner h1 {
+    margin: 0 0 16px;
+    font-family: var(--font-display);
+    font-weight: 900;
+    font-size: var(--type-cta-h1);
+    line-height: 1;
+    letter-spacing: var(--type-cta-h1-ls);
+    color: #fff;
+    text-transform: uppercase;
+  }
+  .inner h5 {
+    margin: 0;
+    font-family: var(--font-alt);
+    font-style: italic;
+    font-weight: 300;
+    font-size: clamp(15px, 1.4vw, 20px);
+    color: rgba(255, 255, 255, .86);
+  }
+</style>

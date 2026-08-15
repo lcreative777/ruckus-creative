@@ -1,0 +1,73 @@
+---
+// src/components/home/Statement.astro
+// Single-paragraph "Our job" band. Copy transcribed verbatim from
+// src/content/pages/home.md's data-band-color="#b81e04" section.
+---
+<section class="statement">
+  <div class="wash" aria-hidden="true"></div>
+  <div class="row">
+    <p data-reveal class="line">
+      Our job: making you more money. ROI, results, profits, the grand poobah-moolah, doesn’t matter what you call it, it is the only goal for any successful business.
+    </p>
+    <a data-reveal href="/#about" class="pill-dark">
+      Learn More <span class="caret" aria-hidden="true"></span>
+    </a>
+  </div>
+</section>
+
+<style>
+  .statement {
+    position: relative;
+    padding: clamp(64px, 8vw, 110px) clamp(24px, 5vw, 72px);
+    overflow: hidden;
+    background: var(--color-footer);
+  }
+  .wash {
+    position: absolute; inset: 0;
+    background:
+      radial-gradient(85% 130% at 8% 50%, rgba(184, 30, 4, .5), transparent 60%),
+      radial-gradient(85% 130% at 95% 50%, rgba(41, 73, 232, .42), transparent 62%);
+  }
+  .row {
+    position: relative;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: clamp(28px, 4vw, 64px);
+    align-items: center;
+  }
+  .line {
+    margin: 0;
+    grid-column: span 2;
+    min-width: 0;
+    font-family: var(--font-alt);
+    font-weight: 200;
+    font-size: var(--type-editorial-lead);
+    line-height: 1.35;
+    color: #fff;
+  }
+  .pill-dark {
+    justify-self: start;
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    padding: 17px 34px;
+    border-radius: var(--radius-pill);
+    background: var(--color-canvas);
+    color: #fff;
+    text-decoration: none;
+    font-family: var(--font-display);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: .2em;
+    text-transform: uppercase;
+    transition: background .3s ease, color .3s ease;
+  }
+  .pill-dark:hover { background: #fff; color: var(--color-canvas); }
+  .caret {
+    width: .5em; height: .5em;
+    border-top: 2px solid currentColor;
+    border-right: 2px solid currentColor;
+    transform: rotate(45deg);
+    display: inline-block;
+  }
+</style>

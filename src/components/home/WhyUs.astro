@@ -1,0 +1,69 @@
+---
+// src/components/home/WhyUs.astro
+// Copy transcribed verbatim from src/content/pages/home.md's "Why Us?" block —
+// a single prose block, so authored directly rather than parsed.
+---
+<section class="why-us">
+  <div>
+    <h3 data-reveal class="label">Why Us?</h3>
+    <h2 data-reveal class="statement">In a marketplace filled with homogeneous, milktoast advertising and design, filled with cliches, plattitudes, and ambiguity, it’s not hard to make some noise. <span class="smtext">It’s time to create some marketing with charisma and personality. It’s time to add a bit of character and spunk.</span></h2>
+  </div>
+  <div class="panel" data-reveal>
+    <div class="edge" aria-hidden="true"></div>
+    <p>We understand, that with customer attrition, increased competition, and other pressures, your business needs growth just to stay at its current level. But that’s not good enough for us. We want to create real momentum for you.</p>
+    <p>We want to put a face on your brand and we want to create its voice. How does that voice sound, who is it talking to and what does it say? Our Brand Alignment process and Ignition-7 Keys to Strategic Creative ensure your brand message will inspire, connect and compel your market to respond. Let’s work together to create a brand that sells your products and services when your salesperson is not there to do it for you. Let’s create a brand that sells 24-7.</p>
+    <a href="/#work" class="link">View The Goods</a>
+  </div>
+</section>
+
+<style>
+  .why-us {
+    padding: clamp(72px, 9vw, 120px) clamp(24px, 5vw, 72px);
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: clamp(32px, 5vw, 64px);
+  }
+  .label {
+    margin: 0 0 22px;
+    font-family: var(--font-display);
+    font-size: 11px;
+    font-weight: 900;
+    letter-spacing: .26em;
+    text-transform: uppercase;
+    color: var(--color-flame);
+  }
+  .statement {
+    margin: 0;
+    font-family: var(--font-alt);
+    font-weight: 200;
+    font-size: var(--type-editorial-lead);
+    line-height: 1.32;
+    color: #fff;
+  }
+  .smtext { font-size: .6em; color: var(--color-text-body); }
+
+  .panel {
+    position: relative;
+    background: var(--color-surface-deep);
+    padding: clamp(30px, 3.4vw, 48px);
+    display: flex;
+    flex-direction: column;
+    gap: 22px;
+    overflow: hidden;
+  }
+  .edge {
+    position: absolute; left: 0; top: 0; bottom: 0; width: 2px;
+    background: var(--gradient-brand-180);
+  }
+  .panel p { margin: 0; line-height: 1.9; }
+  .link {
+    align-self: flex-start;
+    font-family: var(--font-display);
+    font-style: italic;
+    font-size: 14px;
+    color: var(--color-flame);
+    text-decoration: none;
+    border-bottom: 1px solid rgba(246, 101, 60, .5);
+  }
+  .link:hover { color: #fff; border-color: #fff; }
+</style>

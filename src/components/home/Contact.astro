@@ -1,0 +1,254 @@
+---
+// src/components/home/Contact.astro
+// Identity values come from src/data/site.ts only — never the source's own
+// literal text, per the hard constraint (the live WordPress site renders
+// three different suite numbers; site.ts carries the confirmed one). The
+// "always available" paragraph is copy, transcribed verbatim from
+// src/content/pages/home.md. The form posts to /api/contact, a route Plan 3
+// still owns — this only builds the client side of it.
+import { getImage } from 'astro:assets';
+import { resolveMedia } from '../../lib/images';
+import { site } from '../../data/site';
+
+const img = resolveMedia('seasm.jpg');
+if (!img) throw new Error('Contact: "seasm.jpg" was not found in src/assets/media/');
+
+const [avif, webp, fallback] = await Promise.all([
+  getImage({ src: img, format: 'avif', widths: [768, 1280, 1920] }),
+  getImage({ src: img, format: 'webp', widths: [768, 1280, 1920] }),
+  getImage({ src: img, format: 'jpeg', width: 1920 }),
+]);
+---
+<section id="contact" class="contact">
+  <picture class="bg">
+    <source type="image/avif" srcset={avif.srcSet.attribute} sizes="100vw" />
+    <source type="image/webp" srcset={webp.srcSet.attribute} sizes="100vw" />
+    <img src={fallback.src} width={img.width} height={img.height} alt="" loading="lazy" decoding="async" />
+  </picture>
+  <div class="tint" aria-hidden="true"></div>
+
+  <div class="grid">
+    <div class="info">
+      <p class="name">{site.legalName.replace(/, LLC$/i, ', llc')}</p>
+      <a href={`tel:${site.phoneE164}`} class="phone">{site.phone}</a>
+      <p class="address">{site.address.street}<br />{site.address.city}, {site.address.region} {site.address.postalCode}</p>
+      <p class="note">
+        <strong>We are always available to answer any question you might have, or even offer a bit of off-the-cuff advice.</strong> Please feel free to reach out with any questions or comments at any time. We will get back with you immediately.
+      </p>
+      <a href={`mailto:${site.email}`} class="email">{site.email}</a>
+    </div>
+
+    <form class="form" data-contact-form action="/api/contact" method="post">
+      <div class="fields">
+        <p class="eyebrow">Start a Ruckus</p>
+        <label>Name
+          <input type="text" name="name" required />
+        </label>
+        <label>Email
+          <input type="email" name="email" required />
+        </label>
+        <label>Phone
+          <input type="tel" name="phone" />
+        </label>
+        <label>Message
+          <textarea name="message" rows="4"></textarea>
+        </label>
+        <button type="submit" class="submit">
+          Send it <span class="caret" aria-hidden="true"></span>
+        </button>
+        <p class="error" data-contact-error role="alert" hidden>
+          Something went wrong sending your message — please try again, or email us directly.
+        </p>
+      </div>
+      <div class="success" data-contact-success hidden>
+        <p class="sent">Message sent</p>
+        <p>We will get back with you immediately.</p>
+        <button type="button" class="reset" data-contact-reset>Send another</button>
+      </div>
+    </form>
+  </div>
+</section>
+
+<script>
+  for (const form of document.querySelectorAll<HTMLFormElement>('[data-contact-form]')) {
+    const fields = form.querySelector<HTMLElement>('.fields');
+    const success = form.querySelector<HTMLElement>('[data-contact-success]');
+    const error = form.querySelector<HTMLElement>('[data-contact-error]');
+    const reset = form.querySelector<HTMLButtonElement>('[data-contact-reset]');
+    if (!fields || !success) continue;
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      error?.setAttribute('hidden', '');
+      try {
+        const res = await fetch(form.action, { method: 'POST', body: new FormData(form) });
+        if (!res.ok) throw new Error(`${res.status}`);
+        fields.setAttribute('hidden', '');
+        success.removeAttribute('hidden');
+      } catch {
+        error?.removeAttribute('hidden');
+      }
+    });
+
+    reset?.addEventListener('click', () => {
+      form.reset();
+      success.setAttribute('hidden', '');
+      fields.removeAttribute('hidden');
+    });
+  }
+</script>
+
+<style>
+  .contact { position: relative; overflow: hidden; }
+  .bg, .bg img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+  .tint {
+    position: absolute; inset: 0;
+    background: linear-gradient(90deg, rgba(18, 17, 16, .97), rgba(18, 17, 16, .82));
+  }
+
+  .grid {
+    position: relative;
+    padding: clamp(64px, 8vw, 120px) clamp(24px, 5vw, 72px);
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: clamp(36px, 5vw, 72px);
+  }
+
+  .info { display: flex; flex-direction: column; gap: 16px; }
+  .info .name {
+    margin: 0;
+    font-family: var(--font-display);
+    font-weight: 900;
+    font-size: 20px;
+    letter-spacing: .05em;
+    text-transform: uppercase;
+    color: #fff;
+  }
+  .info .phone {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: clamp(24px, 2.4vw, 32px);
+    color: var(--color-flame);
+    text-decoration: none;
+  }
+  .info .phone:hover { color: #fff; }
+  .info .address { margin: 0; line-height: 1.8; }
+  .info .note { margin: 0; line-height: 1.9; max-width: 46ch; }
+  .info .note strong { color: #fff; }
+  .info .email {
+    align-self: flex-start;
+    font-family: var(--font-display);
+    font-size: 13px;
+    letter-spacing: .06em;
+    color: var(--color-flame);
+    text-decoration: none;
+    border-bottom: 1px solid rgba(246, 101, 60, .5);
+  }
+  .info .email:hover { color: #fff; border-color: #fff; }
+
+  .form {
+    position: relative;
+    background: var(--color-surface-card-a86);
+    border: 1px solid var(--color-hairline-strong);
+    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px);
+    padding: var(--space-card-pad);
+  }
+  .fields { display: flex; flex-direction: column; gap: 18px; }
+  .fields .eyebrow {
+    margin: 0;
+    font-family: var(--font-display);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: .24em;
+    text-transform: uppercase;
+    color: var(--color-flame);
+  }
+  label {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    font-family: var(--font-display);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: .16em;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, .6);
+  }
+  input, textarea {
+    background: rgba(255, 255, 255, .04);
+    border: 1px solid rgba(255, 255, 255, .16);
+    color: #fff;
+    padding: 14px 16px;
+    font-family: var(--font-body);
+    font-size: 15px;
+    font-weight: 400;
+    letter-spacing: normal;
+    text-transform: none;
+  }
+  textarea { resize: vertical; }
+  input:focus-visible, textarea:focus-visible { outline: 2px solid var(--color-accent); outline-offset: 2px; }
+
+  .submit {
+    align-self: flex-start;
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    padding: 16px 32px;
+    border: 0;
+    border-radius: var(--radius-pill);
+    background: var(--gradient-brand-120);
+    color: #fff;
+    font-family: var(--font-display);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: .2em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: filter .3s ease;
+  }
+  .submit:hover { filter: brightness(1.15); }
+  .caret {
+    width: .5em; height: .5em;
+    border-top: 2px solid currentColor;
+    border-right: 2px solid currentColor;
+    transform: rotate(45deg);
+    display: inline-block;
+  }
+
+  .error { margin: 0; font-size: 13px; color: var(--color-flame); }
+
+  .success {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    min-height: 280px;
+    justify-content: center;
+  }
+  .success .sent {
+    margin: 0;
+    font-family: var(--font-display);
+    font-weight: 900;
+    font-size: 22px;
+    letter-spacing: .04em;
+    text-transform: uppercase;
+    color: #fff;
+  }
+  .success p:not(.sent) { margin: 0; line-height: 1.85; }
+  .reset {
+    align-self: flex-start;
+    margin-top: 8px;
+    padding: 14px 26px;
+    border: 1px solid rgba(255, 255, 255, .35);
+    border-radius: var(--radius-pill);
+    background: transparent;
+    color: #fff;
+    font-family: var(--font-display);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: .2em;
+    text-transform: uppercase;
+    cursor: pointer;
+  }
+  .reset:hover { background: var(--color-flame); border-color: var(--color-flame); }
+</style>
