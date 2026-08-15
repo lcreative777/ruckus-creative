@@ -53,6 +53,11 @@ const [avif, webp, fallback] = await Promise.all([
         <label>Message
           <textarea name="message" rows="4"></textarea>
         </label>
+        {site.turnstileSiteKey && (
+
+          <div class="cf-turnstile" data-sitekey={site.turnstileSiteKey} data-theme="dark"></div>
+
+        )}
         <button type="submit" class="submit">
           Send it <span class="caret" aria-hidden="true"></span>
         </button>
@@ -252,3 +257,7 @@ const [avif, webp, fallback] = await Promise.all([
   }
   .reset:hover { background: var(--color-flame); border-color: var(--color-flame); }
 </style>
+
+{site.turnstileSiteKey && (
+  <script is:inline defer src="https://challenges.cloudflare.com/turnstile/v0/api.js"></script>
+)}

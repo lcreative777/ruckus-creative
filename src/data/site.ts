@@ -18,7 +18,15 @@ export const site = {
     postalCode: '92691',
     country: 'US',
   },
-  founded: '1993',   // "In business for over 25 years", per the About page
+  founded: '1993',
+  /**
+   * Cloudflare Turnstile PUBLIC site key. Safe to commit — the matching secret
+   * lives in a Worker secret (TURNSTILE_SECRET_KEY), never here.
+   * Empty until the widget is created; the contact form renders without the
+   * challenge and /api/contact fails closed with a 503 and the phone number,
+   * rather than accepting unverified submissions.
+   */
+  turnstileSiteKey: '',   // "In business for over 25 years", per the About page
 } as const;
 
 /**
