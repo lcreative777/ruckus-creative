@@ -21,6 +21,12 @@ export function localNameFor(url) {
 }
 
 /**
+ * NOTE: src/assets/media/imac.jpg is committed CROPPED to its right half. The
+ * WordPress original is 1900x931 with a blank white left half and the iMac on
+ * the right; the homepage intro band shows it left-anchored in a half-width
+ * column, so the blank half had to go. Re-running the migration re-downloads
+ * the uncropped original — re-crop it, or the intro band shows empty space.
+ *
  * Download every url into destDir, skipping files already present.
  * @returns {Promise<Map<string,string>>} url -> local filename
  */

@@ -124,7 +124,14 @@ h3 { font-size: var(--step-h3); }
   .prose .portfolio-items { grid-template-columns: repeat(4, 1fr); }
 }
 .prose .elastic-portfolio-item { padding: 0; margin: 0; min-width: 0; }
-.prose .elastic-portfolio-item img { width: 100%; height: 100%; object-fit: cover; display: block; }
+/* Equal squares, flush on all sides — the grid sets gap: 0 and each tile is
+   forced to a 1:1 box so rows line up regardless of source image ratio. */
+.prose .elastic-portfolio-item,
+.prose .elastic-portfolio-item .work-item,
+.prose .elastic-portfolio-item a { aspect-ratio: 1 / 1; display: block; }
+.prose .elastic-portfolio-item :is(img, picture) {
+  width: 100%; height: 100%; object-fit: cover; display: block; margin: 0;
+}
 .prose .elastic-portfolio-item .work-item { position: relative; }
 
 /* Salient marks a band's text scheme with `light` (white copy on a dark or
@@ -158,8 +165,7 @@ h3 { font-size: var(--step-h3); }
    plus JS; this approximates it with a max-width and a right-anchored
    background, which reads the same without the script. */
 @media (min-width: 900px) {
-  .prose #intro .col[class*="padding-"] { max-width: 34%; }
-  .prose #intro.has-bg { background-position: center right; }
+  /* Superseded by the split-band rules further down. */
 }
 
 /* ---- Buttons -------------------------------------------------------------
@@ -268,12 +274,52 @@ h3 { font-size: var(--step-h3); }
 /* The section after the video runs the full viewport height and sits flush
    against it, as on the live site (intro 915px at a 900px viewport, gap 0). */
 .prose #intro {
+  position: relative;
   min-height: 100vh;
   display: flex;
   align-items: center;
   margin-top: 0;
+  /* The artwork is painted by ::after over the right half, so the element's own
+     background (set by RichText from data-bg) must not also cover the section. */
+  background-image: none;
 }
-.prose #intro > * { width: 100%; }
+
+/* Right half: the artwork, full height, anchored left so the visible portion is
+   the left edge of the image rather than its centre. */
+.prose #intro::after {
+  content: '';
+  position: absolute;
+  inset: 0 0 0 50%;
+  background-image: var(--bg);
+  background-size: cover;
+  /* imac.jpg is committed pre-cropped to its right half (the blank left half
+     of the WordPress original is gone), so anchoring left is correct at every
+     viewport size — no per-breakpoint percentage tuning. */
+  background-position: left center;
+  background-repeat: no-repeat;
+}
+
+/* Left half: the copy, with real margins instead of running to the edge. */
+.prose #intro > * {
+  position: relative;
+  z-index: 1;
+  width: 50%;
+  /* The generic band rule centres a band's child with margin-inline: auto.
+     Here the copy must sit in the LEFT half, or it overlaps the artwork. */
+  margin-inline: 0;
+  max-width: none;
+  padding-inline: clamp(1.25rem, 4vw, 4rem);
+  box-sizing: border-box;
+}
+/* Undo the percentage-padding column widths Salient used; the half-width
+   parent already sets the measure, and stacking both pushed copy off-screen. */
+.prose #intro .col[class*="padding-"] { max-width: none; padding: 0; }
+
+/* Below the split, the artwork sits behind full-width copy rather than beside it. */
+@media (max-width: 899px) {
+  .prose #intro::after { inset: 0; opacity: .25; }
+  .prose #intro > * { width: 100%; margin-inline: 0; }
+}
 
 /* ---- Work tiles ----------------------------------------------------------
    Each tile links to its case study and reveals the project title on hover,
