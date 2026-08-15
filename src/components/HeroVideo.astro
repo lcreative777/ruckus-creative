@@ -1,8 +1,8 @@
 ---
 // src/components/HeroVideo.astro
 //
-// Background hero video: autoplays muted and loops, no player chrome, with a
-// single control to turn sound on.
+// Cinema hero: full-bleed autoplay video background behind bottom-aligned
+// headline copy, with the same battle-tested playback plumbing as before.
 //
 // How this stays fast:
 //   - The poster is a real <img> with fetchpriority="high", so it is the LCP
@@ -13,7 +13,7 @@
 //     dynamic import, which Astro emits as a separate chunk — it is never part
 //     of the initial payload and is only requested once we have decided to play.
 //   - Skipped entirely for prefers-reduced-motion and Save-Data, which keep the
-//     poster and just show the play control.
+//     poster and just show the sound control.
 //
 // This asset has NO static MP4 renditions (stream.mux.com/<id>/high.mp4 and
 // every other name 404), so HLS is the only source. Enabling static renditions
@@ -21,18 +21,19 @@
 // removing ~40KB gzipped from the page.
 import { getImage } from 'astro:assets';
 import { resolveMedia } from '../lib/images';
+import { site } from '../data/site';
 
 interface Props {
   /** Mux public playback ID (the id in player.mux.com/<id>). */
   playbackId: string;
-  /** Poster filename in src/assets/media/. */
-  poster: string;
   title?: string;
 }
-const { playbackId, poster, title = 'Background video' } = Astro.props;
+const { playbackId, title = 'Background video' } = Astro.props;
 
-const img = resolveMedia(poster);
-if (!img) throw new Error(`HeroVideo: poster "${poster}" was not found in src/assets/media/`);
+// The handoff calls for the ink-splatter still, not the flat Mux poster
+// frame (mux-hero-poster.jpg reads as a near-empty grey box).
+const img = resolveMedia('ruckus_vid-1.jpg');
+if (!img) throw new Error('HeroVideo: poster "ruckus_vid-1.jpg" was not found in src/assets/media/');
 
 const src = `https://stream.mux.com/${playbackId}.m3u8`;
 
@@ -42,26 +43,46 @@ const [avif, webp, fallback] = await Promise.all([
   getImage({ src: img, format: 'jpeg', width: 1920 }),
 ]);
 ---
-<div class="hero-video" data-src={src}>
-  <picture class="hero-poster">
-    <source type="image/avif" srcset={avif.srcSet.attribute} sizes="100vw" />
-    <source type="image/webp" srcset={webp.srcSet.attribute} sizes="100vw" />
-    <img src={fallback.src} width={img.width} height={img.height} alt=""
-         fetchpriority="high" loading="eager" decoding="async" />
-  </picture>
+<section class="hero" id="home">
+  <div class="hero-video" data-src={src}>
+    <picture class="hero-poster">
+      <source type="image/avif" srcset={avif.srcSet.attribute} sizes="100vw" />
+      <source type="image/webp" srcset={webp.srcSet.attribute} sizes="100vw" />
+      <img src={fallback.src} width={img.width} height={img.height} alt=""
+           fetchpriority="high" loading="eager" decoding="async" />
+    </picture>
 
-  <video class="hero-media" muted loop playsinline preload="none"
-         aria-label={title} tabindex="-1"></video>
+    <video class="hero-media" muted loop playsinline preload="none"
+           aria-label={title} tabindex="-1"></video>
 
-  <button type="button" class="sound" aria-pressed="false" aria-label="Turn sound on">
-    <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" fill="none"
-         stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-      <path d="M11 5 6 9H2v6h4l5 4z"/>
-      <path class="muted-slash" d="m23 9-6 6M17 9l6 6"/>
-      <path class="waves" d="M15.5 8.5a5 5 0 0 1 0 7M18.5 5.5a9 9 0 0 1 0 13"/>
-    </svg>
-  </button>
-</div>
+    <div class="overlay overlay-gradient" aria-hidden="true"></div>
+    <div class="overlay overlay-wash" aria-hidden="true"></div>
+    <div class="overlay overlay-grain" aria-hidden="true"></div>
+
+    <div class="hero-content">
+      <div class="hero-row">
+        <div class="hero-copy">
+          <p class="eyebrow"><span class="rule" aria-hidden="true"></span>Full-service creative agency since {site.founded}</p>
+          <h1>
+            <span class="line">Business results through</span>
+            <span class="line line-wash">strategic creative</span>
+          </h1>
+        </div>
+
+        <button type="button" class="sound" aria-pressed="false" aria-label="Turn sound on">
+          <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" fill="none"
+               stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M11 5 6 9H2v6h4l5 4z"/>
+            <path class="muted-slash" d="m23 9-6 6M17 9l6 6"/>
+            <path class="waves" d="M15.5 8.5a5 5 0 0 1 0 7M18.5 5.5a9 9 0 0 1 0 13"/>
+          </svg>
+        </button>
+      </div>
+
+      <p class="scroll-cue"><span class="arrow" aria-hidden="true">↓</span> Scroll</p>
+    </div>
+  </div>
+</section>
 
 <script>
   for (const box of document.querySelectorAll<HTMLElement>('.hero-video')) {
@@ -135,11 +156,24 @@ const [avif, webp, fallback] = await Promise.all([
 </script>
 
 <style>
-  .hero-video { position: relative; aspect-ratio: 16 / 9; background: #000; overflow: hidden; }
+  .hero { position: relative; }
 
+  .hero-video {
+    position: relative;
+    min-height: 100vh;
+    display: flex;
+    align-items: flex-end;
+    overflow: hidden;
+    background: #000;
+  }
+
+  /* Oversize + inset gives the parallax translate headroom (Motion.astro,
+     Task 8) without ever exposing an edge. */
   .hero-poster, .hero-media {
-    position: absolute; inset: 0;
-    width: 100%; height: 100%;
+    position: absolute;
+    inset: -6% 0;
+    width: 100%;
+    height: 112%;
     object-fit: cover;
   }
   .hero-poster img { width: 100%; height: 100%; object-fit: cover; }
@@ -149,23 +183,132 @@ const [avif, webp, fallback] = await Promise.all([
   .hero-media { opacity: 0; transition: opacity .6s ease; border: 0; }
   .hero-video.playing .hero-media { opacity: 1; }
 
-  .sound {
-    position: absolute; right: 1.25rem; bottom: 1.25rem;
-    display: inline-flex; align-items: center; justify-content: center;
-    width: 44px; height: 44px; padding: 0;
-    border: 1px solid rgba(255,255,255,.55); border-radius: 50%;
-    background: rgba(0,0,0,.35); color: #fff; cursor: pointer;
-    -webkit-backdrop-filter: blur(4px); backdrop-filter: blur(4px);
-    transition: background .2s ease, border-color .2s ease;
+  .overlay { position: absolute; inset: 0; }
+  .overlay-gradient {
+    background: linear-gradient(180deg, rgba(18,17,16,.78) 0%, rgba(18,17,16,.22) 42%, rgba(18,17,16,.97) 100%);
   }
-  .sound:hover { background: rgba(0,0,0,.6); border-color: #fff; }
+  .overlay-wash {
+    background:
+      radial-gradient(90% 70% at 78% 18%, rgba(184,30,4,.34), transparent 62%),
+      radial-gradient(70% 60% at 12% 82%, rgba(41,73,232,.26), transparent 64%);
+  }
+  .overlay-grain {
+    opacity: .14;
+    mix-blend-mode: overlay;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='3'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)' opacity='.55'/%3E%3C/svg%3E");
+  }
+
+  .hero-content {
+    position: relative;
+    z-index: 2;
+    width: 100%;
+    padding: 0 clamp(20px, 4vw, 56px) clamp(48px, 6vh, 80px);
+  }
+
+  .hero-row {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: clamp(24px, 5vw, 64px);
+    flex-wrap: wrap;
+  }
+
+  .hero-copy { max-width: min(880px, 92%); }
+
+  .eyebrow {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin: 0 0 22px;
+    font-family: var(--font-display);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: .26em;
+    text-transform: uppercase;
+    color: var(--color-flame);
+  }
+  .eyebrow .rule { width: 34px; height: 1px; background: var(--color-flame); display: inline-block; }
+
+  h1 {
+    margin: 0;
+    font-family: var(--font-display);
+    font-weight: 100;
+    font-size: clamp(40px, 6.4vw, 104px);
+    line-height: .98;
+    letter-spacing: -.035em;
+    color: #fff;
+    text-wrap: balance;
+  }
+  .line { display: block; }
+  /* padding-bottom + the taller line-height keep the italic "g" descender
+     from being clipped by the gradient's background-clip: text box. */
+  .line-wash {
+    padding-bottom: .16em;
+    line-height: 1.06;
+    font-weight: 900;
+    font-style: italic;
+    background-image: var(--gradient-headline);
+    background-size: 260% 100%;
+    background-position: 0% 50%;
+    background-repeat: no-repeat;
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: rk-wash 7s cubic-bezier(.36,.7,.25,1) 1.5s infinite;
+  }
+
+  .sound {
+    position: relative;
+    flex: 0 0 auto;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: clamp(56px, 6vw, 72px);
+    height: clamp(56px, 6vw, 72px);
+    padding: 0;
+    border-radius: 50%;
+    border: 1px solid rgba(255,255,255,.5);
+    background: rgba(255,255,255,.08);
+    color: #fff;
+    cursor: pointer;
+    -webkit-backdrop-filter: blur(8px);
+    backdrop-filter: blur(8px);
+    transition: background .35s ease, border-color .35s ease, transform .35s ease;
+  }
+  .sound:hover { background: var(--color-ink-red); border-color: var(--color-ink-red); transform: scale(1.06); }
   /* Slash shown while muted, waves shown once sound is on. */
   .sound .waves { opacity: 0; }
   .hero-video.sound-on .sound .muted-slash { opacity: 0; }
   .hero-video.sound-on .sound .waves { opacity: 1; }
 
+  .scroll-cue {
+    margin: 44px 0 0;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-family: var(--font-display);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: .24em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,.45);
+  }
+  .scroll-cue .arrow { display: inline-block; animation: rk-scrollcue 2.2s ease-in-out infinite; }
+
+  @keyframes rk-wash {
+    0% { background-position: 0% 50%; }
+    42% { background-position: 100% 50%; }
+    100% { background-position: 100% 50%; }
+  }
+  @keyframes rk-scrollcue {
+    0%, 100% { transform: translateY(0); opacity: .4; }
+    50% { transform: translateY(7px); opacity: 1; }
+  }
+
   @media (prefers-reduced-motion: reduce) {
     .hero-media { transition: none; }
     .sound { transition: none; }
+    .line-wash { animation: none; }
+    .scroll-cue .arrow { animation: none; }
   }
 </style>
