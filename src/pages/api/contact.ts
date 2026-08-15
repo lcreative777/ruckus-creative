@@ -16,6 +16,10 @@
 import type { APIRoute } from 'astro';
 import { site } from '../../data/site';
 import { validate, buildEmail } from '../../lib/contact';
+// Astro.locals.runtime.env was removed; secrets come from the Workers runtime
+// module now. This import only resolves inside the Worker, which is fine —
+// this route is the one on-demand endpoint and never prerendered.
+import { env } from 'cloudflare:workers';
 
 export const prerender = false;
 
@@ -57,8 +61,8 @@ function respond(request: Request, status: number, message: string, errors: stri
   return new Response(null, { status: 303, headers: { location: target } });
 }
 
-export const POST: APIRoute = async ({ request, locals, clientAddress }) => {
-  const env = ((locals as any)?.runtime?.env ?? {}) as Record<string, string | undefined>;
+export const POST: APIRoute = async ({ request, clientAddress }) => {
+  const secrets = env as unknown as Record<string, string | undefined>;
 
   const form = await request.formData().catch(() => null);
   if (!form) return respond(request, 400, 'That submission could not be read.');
@@ -68,7 +72,7 @@ export const POST: APIRoute = async ({ request, locals, clientAddress }) => {
 
   // Spam gate. A missing secret must fail closed — an open endpoint would be
   // harvested within days.
-  const turnstileSecret = env.TURNSTILE_SECRET_KEY;
+  const turnstileSecret = secrets.TURNSTILE_SECRET_KEY;
   if (!turnstileSecret) {
     console.error('[contact] TURNSTILE_SECRET_KEY is not set; refusing to accept submissions');
     return respond(request, 503, 'The form is not configured yet. Please call 714.514.1482.');
@@ -78,7 +82,7 @@ export const POST: APIRoute = async ({ request, locals, clientAddress }) => {
   );
   if (!passed) return respond(request, 400, 'That verification did not pass. Please try again.');
 
-  const apiKey = env.RESEND_API_KEY;
+  const apiKey = secrets.RESEND_API_KEY;
   if (!apiKey) {
     console.error('[contact] RESEND_API_KEY is not set');
     return respond(request, 503, 'The form is not configured yet. Please call 714.514.1482.');
@@ -89,8 +93,8 @@ export const POST: APIRoute = async ({ request, locals, clientAddress }) => {
       method: 'POST',
       headers: { authorization: `Bearer ${apiKey}`, 'content-type': 'application/json' },
       body: JSON.stringify({
-        from: env.CONTACT_FROM ?? DEFAULT_FROM,
-        to: [env.CONTACT_TO ?? site.email],
+        from: secrets.CONTACT_FROM ?? DEFAULT_FROM,
+        to: [secrets.CONTACT_TO ?? site.email],
         reply_to: fields.email,
         subject: `Website enquiry — ${fields.name}`,
         text: buildEmail(fields),
