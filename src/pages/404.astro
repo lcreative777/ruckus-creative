@@ -1,11 +1,34 @@
 ---
+// src/pages/404.astro — Cinema restyle.
 import Base from '../layouts/Base.astro';
 import Seo from '../components/Seo.astro';
 ---
 <Base>
   <Seo slot="head" title="Page not found · Ruckus Creative" description="That page doesn't exist." />
-  <div class="container section">
-    <h1>Page not found</h1>
-    <p>That page doesn't exist. Try <a href="/">the homepage</a> or <a href="/portfolio-ruckus/">our work</a>.</p>
+  <div class="page-404">
+    <div class="container">
+      <p class="eyebrow">404</p>
+      <h1>Page not found</h1>
+      <p>That page doesn't exist. Try <a href="/">the homepage</a> or <a href="/portfolio-ruckus/">our work</a>.</p>
+    </div>
   </div>
 </Base>
+
+<style>
+  .page-404 {
+    min-height: 60vh;
+    display: flex;
+    align-items: center;
+    padding-top: 76px;
+  }
+  .eyebrow {
+    margin: 0 0 var(--space-2);
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 11px;
+    letter-spacing: .26em;
+    text-transform: uppercase;
+    color: var(--color-flame);
+  }
+  .page-404 a { color: var(--color-flame); }
+</style>

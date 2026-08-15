@@ -1,9 +1,18 @@
 ---
+// src/pages/[...slug].astro — Cinema treatment for the 7 standalone pages
+// (About, Capabilities, Process, Results, Contact, Privacy, Terms) and the
+// 9 knowledge posts. The handoff doesn't design these explicitly, so this
+// applies its system: dark canvas (inherited from tokens.css/base.css),
+// the .prose rules already retuned for dark, a sparing ambient wash behind
+// the top of the page, and a 76px top offset to clear the fixed header
+// (see Plan 4 Task 7's "KNOWN ISSUE"). Legal pages skip the wash and get a
+// tighter reading measure instead, per the handoff's "comfortable measure,
+// no ambient washes" instruction.
 import { getCollection } from 'astro:content';
 import Base from '../layouts/Base.astro';
 import Seo from '../components/Seo.astro';
 import RichText from '../components/RichText.astro';
-import { site, sidebarLinks } from '../data/site';
+import { site, sidebarLinks, legalLinks } from '../data/site';
 
 export async function getStaticPaths() {
   const [pages, posts] = await Promise.all([getCollection('pages'), getCollection('knowledge')]);
@@ -22,6 +31,7 @@ export async function getStaticPaths() {
 const { entry, kind } = Astro.props;
 const d = entry.data;
 const isPost = kind === 'post';
+const isLegal = legalLinks.some(l => l.href === d.path);
 
 const breadcrumbs = isPost
   ? [{ name: 'Home', url: '/' }, { name: 'Knowledge', url: '/knowledge/' }, { name: d.title, url: d.path }]
@@ -38,27 +48,61 @@ const schema = isPost && 'pubDate' in d
        type={isPost ? 'article' : 'website'}
        publishedTime={isPost && 'pubDate' in d ? d.pubDate.toISOString() : undefined}
        breadcrumbs={breadcrumbs} schema={schema} />
-  <article class="container section page-band">
-    {/* The live site shows no heading on standalone pages, but does on posts.
-        Kept in the DOM either way so the h1 signal and screen-reader landmark
-        survive — the original having none is an SEO weakness, not a feature. */}
-    <h1 class={isPost ? undefined : 'visually-hidden'}>{d.title}</h1>
-    {isPost && 'pubDate' in d && (
-      <time datetime={d.pubDate.toISOString()}>
-        {d.pubDate.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
-      </time>
-    )}
-    {isPost ? (
-      <div class="row">
-        <div class="col span_9"><RichText html={entry.body ?? ''} /></div>
-        <aside class="col span_3 col_last post-sidebar">
-          <nav aria-label="Sections">
-            <ul>{sidebarLinks.map(l => <li><a href={l.href}>{l.label}</a></li>)}</ul>
-          </nav>
-        </aside>
-      </div>
-    ) : (
-      <RichText html={entry.body ?? ''} />
-    )}
+  <article class:list={['page', { legal: isLegal }]}>
+    {!isLegal && <div class="wash" aria-hidden="true"></div>}
+    <div class="container page-inner">
+      {/* The live site shows no heading on standalone pages, but does on posts.
+          Kept in the DOM either way so the h1 signal and screen-reader landmark
+          survive — the original having none is an SEO weakness, not a feature. */}
+      <h1 class={isPost ? undefined : 'visually-hidden'}>{d.title}</h1>
+      {isPost && 'pubDate' in d && (
+        <time datetime={d.pubDate.toISOString()}>
+          {d.pubDate.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
+        </time>
+      )}
+      {isPost ? (
+        <div class="row">
+          <div class="col span_9"><RichText html={entry.body ?? ''} /></div>
+          <aside class="col span_3 col_last post-sidebar">
+            <nav aria-label="Sections">
+              <ul>{sidebarLinks.map(l => <li><a href={l.href}>{l.label}</a></li>)}</ul>
+            </nav>
+          </aside>
+        </div>
+      ) : (
+        <RichText html={entry.body ?? ''} class={isLegal ? 'prose legal-prose' : 'prose'} />
+      )}
+    </div>
   </article>
 </Base>
+
+<style>
+  .page {
+    position: relative;
+    padding-top: 76px;
+    background: var(--color-page-band);
+    overflow: hidden;
+  }
+  .wash {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background:
+      radial-gradient(50% 60% at 92% 0%, rgba(41, 73, 232, .16), transparent 65%),
+      radial-gradient(45% 55% at 4% 100%, rgba(184, 30, 4, .14), transparent 60%);
+  }
+  .page-inner { position: relative; padding-block: var(--band-pad); }
+
+  .legal :global(.legal-prose) { max-width: 68ch; }
+
+  time {
+    display: block;
+    margin-bottom: var(--space-3);
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 11px;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    color: var(--color-flame);
+  }
+</style>

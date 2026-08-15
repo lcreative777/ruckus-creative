@@ -1,0 +1,155 @@
+---
+// src/components/home/ProcessRail.astro
+// Titles/bodies parsed from home.md (src/lib/home-content.ts), including the
+// "(+)" suffixes the source authored. Icon choice + step numbering per the
+// handoff § Assets → Icons.
+import Icon from '../Icon.astro';
+import { getProcessSteps } from '../../lib/home-content';
+
+const steps = await getProcessSteps();
+const icons = [
+  'foundation',                 // FOUNDATION — client-supplied icon
+  'mobile-device-svgrepo-com',  // VALIDATION
+  'presentation-svgrepo-com',   // INNOVATION
+  'fast-svgrepo-com',           // IMPLEMENTATION
+  'chart-gear-svgrepo-com',     // EVALUATION
+];
+---
+<section id="about" class="process">
+  <div class="wash" aria-hidden="true"></div>
+  <div class="head">
+    <h2 data-reveal>BRAND ALIGNMENT PROCESS™</h2>
+    <span class="meta">Five stages</span>
+  </div>
+  <div class="rail" data-process-track>
+    {steps.map((step, i) => (
+      <div class="card" data-reveal data-step>
+        <span class="icon"><Icon name={icons[i]} size={36} /></span>
+        <span class="num">{String(i + 1).padStart(2, '0')}</span>
+        <h4>{step.title}</h4>
+        <p>{step.body}</p>
+      </div>
+    ))}
+  </div>
+  <div class="track">
+    <div class="progress" data-process-progress></div>
+  </div>
+</section>
+
+<script>
+  for (const rail of document.querySelectorAll<HTMLElement>('[data-process-track]')) {
+    const bar = rail.parentElement?.querySelector<HTMLElement>('[data-process-progress]');
+    if (!bar) continue;
+    const update = () => {
+      const max = rail.scrollWidth - rail.clientWidth;
+      const pct = max > 0 ? (rail.scrollLeft / max) * 100 : 0;
+      bar.style.width = `${Math.min(100, Math.max(12, pct))}%`;
+    };
+    update();
+    rail.addEventListener('scroll', update, { passive: true });
+    addEventListener('resize', update);
+  }
+</script>
+
+<style>
+  .process {
+    position: relative;
+    padding: clamp(72px, 9vw, 128px) 0;
+    background: var(--color-surface-raised);
+    overflow: hidden;
+  }
+  .wash {
+    position: absolute; inset: 0;
+    background:
+      radial-gradient(60% 55% at 88% 12%, rgba(41, 73, 232, .3), transparent 65%),
+      radial-gradient(55% 50% at 6% 90%, rgba(184, 30, 4, .26), transparent 62%);
+  }
+  .head {
+    position: relative;
+    padding: 0 clamp(24px, 5vw, 72px);
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 24px;
+    flex-wrap: wrap;
+    margin-bottom: clamp(30px, 4vw, 52px);
+  }
+  .head h2 {
+    margin: 0;
+    font-family: var(--font-display);
+    font-weight: 900;
+    font-style: italic;
+    font-size: var(--type-process-h2);
+    line-height: 1;
+    letter-spacing: var(--type-process-h2-ls);
+    color: #fff;
+    text-transform: uppercase;
+  }
+  .meta {
+    font-family: var(--font-display);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: .22em;
+    text-transform: uppercase;
+    color: var(--color-text-dim);
+  }
+
+  .rail {
+    position: relative;
+    display: flex;
+    gap: var(--gap-rail);
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: none;
+    padding: 0 clamp(24px, 5vw, 72px) 10px;
+  }
+  .rail::-webkit-scrollbar { display: none; }
+
+  .card {
+    flex: 0 0 clamp(280px, 26vw, 380px);
+    scroll-snap-align: start;
+    background: var(--color-surface-card-a86);
+    border: 1px solid var(--color-hairline-strong);
+    padding: var(--space-card-pad);
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    min-height: 330px;
+    transition: border-color .4s ease, transform .5s var(--ease-primary), background .4s ease;
+  }
+  .card:hover { border-color: rgba(246, 101, 60, .65); transform: translateY(-6px); }
+  .card .icon { color: var(--color-flame); }
+  .card .num {
+    font-family: var(--font-display);
+    font-size: var(--type-step-number);
+    font-weight: 700;
+    letter-spacing: var(--type-step-number-ls);
+    color: var(--color-flame);
+  }
+  .card h4 {
+    margin: 0;
+    font-family: var(--font-display);
+    font-weight: 900;
+    font-size: 19px;
+    letter-spacing: .04em;
+    color: #fff;
+    text-transform: uppercase;
+  }
+  .card p { margin: 0; font-size: 14px; line-height: 1.85; }
+
+  .track {
+    position: relative;
+    margin: 28px clamp(24px, 5vw, 72px) 0;
+    height: 2px;
+    background: var(--color-hairline-strong);
+  }
+  .progress {
+    position: absolute; inset: 0 auto 0 0;
+    width: 12%;
+    background: var(--gradient-brand-90);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .card { transition: none; }
+  }
+</style>

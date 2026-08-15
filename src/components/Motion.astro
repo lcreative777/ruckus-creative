@@ -1,0 +1,275 @@
+---
+// src/components/Motion.astro
+//
+// One motion island, mounted once in Base.astro so it covers every page that
+// carries [data-reveal]/[data-count]/[data-parallax] hooks (currently the
+// homepage sections and the knowledge index) without each page having to
+// remember to include it.
+//
+// GSAP + ScrollTrigger are never in the initial JS payload: both are pulled
+// in with a dynamic import() inside the script below, exactly like hls.js in
+// HeroVideo.astro, so Astro/Vite emit them as separate chunks that are only
+// requested after `window.load`. Verify with:
+//   grep -l 'gsap' dist/client/index.html   -> should find nothing
+//   ls dist/client/_astro/ | grep gsap      -> should show the lazy chunk(s)
+//
+// Content is never motion-dependent:
+//   - `prefers-reduced-motion: reduce` short-circuits everything below; every
+//     [data-reveal] element and stat counter is left exactly as authored.
+//   - A 2.6s safety timeout force-reveals any [data-reveal] element not yet
+//     revealed, and backfills any [data-count] counter still reading "0" —
+//     independent of whether GSAP loaded, so it also covers cases where a
+//     ScrollTrigger silently never fires.
+//   - Fallback chain: GSAP -> IntersectionObserver -> immediate reveal. If
+//     the dynamic import() rejects (network failure, ad blocker, etc.) the
+//     IntersectionObserver path takes over; if IntersectionObserver itself
+//     isn't supported, everything is revealed immediately.
+---
+<script>
+  const FORCE_REVEAL_MS = 2600;
+
+  const revealables = () => document.querySelectorAll<HTMLElement>('[data-reveal]');
+  // Work tiles and process cards get their own staggered treatment in the
+  // GSAP path, so the generic one-at-a-time reveal skips them there — but
+  // they still carry [data-reveal] and must still be covered by the plain
+  // fallback and the safety net.
+  const genericReveal = () =>
+    document.querySelectorAll<HTMLElement>('[data-reveal]:not([data-work-tile]):not([data-step])');
+
+  function forceReveal(el: HTMLElement) {
+    el.style.opacity = '1';
+    el.style.visibility = 'visible';
+    el.style.transform = 'none';
+    el.dataset.revealed = 'true';
+  }
+
+  function backfillCounters() {
+    for (const el of document.querySelectorAll<HTMLElement>('[data-count]')) {
+      if (el.textContent?.trim() !== '0') continue;
+      const target = Number(el.dataset.count);
+      if (!Number.isFinite(target)) continue;
+      el.textContent = target.toLocaleString('en-US');
+      el.dataset.revealed = 'true';
+    }
+  }
+
+  function boot() {
+    const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (reduced) return; // every element is already in its final authored state
+
+    // Independent safety net: runs no matter which path below succeeds or
+    // fails, so nothing can be left permanently hidden by a motion failure.
+    setTimeout(() => {
+      for (const el of revealables()) {
+        if (el.dataset.revealed !== 'true') forceReveal(el);
+      }
+      backfillCounters();
+    }, FORCE_REVEAL_MS);
+
+    setupMotion().catch((err) => {
+      console.warn('[Motion] GSAP unavailable, falling back to IntersectionObserver.', err);
+      setupIntersectionFallback();
+    });
+  }
+
+  async function setupMotion() {
+    // Dynamic imports: gsap and ScrollTrigger are emitted as separate chunks
+    // and are only fetched here, never as part of the page's initial JS.
+    const [{ default: gsap }, { ScrollTrigger }] = await Promise.all([
+      import('gsap'),
+      import('gsap/ScrollTrigger'),
+    ]);
+    gsap.registerPlugin(ScrollTrigger);
+
+    setupHeroParallax(gsap, ScrollTrigger);
+    setupImacParallax(gsap, ScrollTrigger);
+    setupReveals(gsap, ScrollTrigger);
+    setupWorkTileStagger(gsap, ScrollTrigger);
+    setupProcessCardStagger(gsap, ScrollTrigger);
+    setupCounters(gsap, ScrollTrigger);
+
+    // Trap #2 (handoff): triggers cache start/end offsets at creation time,
+    // which go stale once images/fonts finish settling layout. Refresh once
+    // on the next frame, and again a few hundred ms later.
+    requestAnimationFrame(() => ScrollTrigger.refresh());
+    setTimeout(() => ScrollTrigger.refresh(), 400);
+    window.addEventListener('load', () => ScrollTrigger.refresh(), { once: true });
+  }
+
+  // --- Scrubbed parallax -----------------------------------------------
+  //
+  // Trap #1 (handoff): a scrubbed tween must never bind to a DOM node
+  // captured once in a closure — if the node is ever replaced the tween
+  // keeps animating the detached element and the visible one never moves.
+  // Both parallax setups below use ScrollTrigger.create({ onUpdate }) and
+  // re-query the live element by selector on every tick instead.
+
+  function setupHeroParallax(gsap: any, ScrollTrigger: any) {
+    const hero = document.querySelector('.hero');
+    if (!hero) return;
+    ScrollTrigger.create({
+      trigger: hero,
+      start: 'top top',
+      end: 'bottom top',
+      scrub: true,
+      onUpdate(self: any) {
+        const y = self.progress * 10; // 0% -> translateY(10%)
+        const poster = document.querySelector<HTMLElement>('.hero-poster');
+        const media = document.querySelector<HTMLElement>('.hero-media');
+        if (poster) poster.style.transform = `translateY(${y}%)`;
+        if (media) media.style.transform = `translateY(${y}%)`;
+      },
+    });
+  }
+
+  function setupImacParallax(gsap: any, ScrollTrigger: any) {
+    const hosts = [...document.querySelectorAll<HTMLElement>('[data-parallax]')];
+    hosts.forEach((host, i) => {
+      const ratio = Number(host.dataset.parallax) || 18;
+      const marker = `rk-parallax-${i}`;
+      host.setAttribute('data-parallax-id', marker);
+      ScrollTrigger.create({
+        trigger: host,
+        start: 'top bottom',
+        end: 'bottom top',
+        scrub: true,
+        onUpdate(self: any) {
+          // Re-queried every tick by the marker attribute rather than a
+          // reference captured in this closure — see trap #1 above.
+          const live = document.querySelector<HTMLElement>(`[data-parallax-id="${marker}"]`);
+          const media = live?.querySelector<HTMLElement>('picture, img');
+          if (!media) return;
+          const y = (self.progress - 0.5) * 2 * ratio; // -ratio% -> +ratio%
+          media.style.transform = `translateY(${y}%)`;
+        },
+      });
+    });
+  }
+
+  // --- One-shot reveals ---------------------------------------------------
+
+  function setupReveals(gsap: any, ScrollTrigger: any) {
+    for (const el of genericReveal()) {
+      gsap.set(el, { autoAlpha: 0, y: 22 });
+      ScrollTrigger.create({
+        trigger: el,
+        start: 'top 88%',
+        once: true,
+        onEnter: () => {
+          gsap.to(el, {
+            autoAlpha: 1,
+            y: 0,
+            duration: 0.9,
+            ease: 'power3.out',
+            onComplete: () => { el.dataset.revealed = 'true'; },
+          });
+        },
+      });
+    }
+  }
+
+  function setupWorkTileStagger(gsap: any, ScrollTrigger: any) {
+    const tiles = [...document.querySelectorAll<HTMLElement>('[data-work-tile]')];
+    if (!tiles.length) return;
+    const trigger = document.querySelector('.work .grid') ?? tiles[0];
+    gsap.set(tiles, { autoAlpha: 0, y: 34 });
+    ScrollTrigger.create({
+      trigger,
+      start: 'top 85%',
+      once: true,
+      onEnter: () => {
+        gsap.to(tiles, {
+          autoAlpha: 1,
+          y: 0,
+          duration: 0.8,
+          ease: 'power3.out',
+          stagger: 0.045,
+          onComplete: () => { tiles.forEach((t) => { t.dataset.revealed = 'true'; }); },
+        });
+      },
+    });
+  }
+
+  function setupProcessCardStagger(gsap: any, ScrollTrigger: any) {
+    const cards = [...document.querySelectorAll<HTMLElement>('[data-step]')];
+    if (!cards.length) return;
+    const trigger = document.querySelector('[data-process-track]') ?? cards[0];
+    gsap.set(cards, { autoAlpha: 0, y: 30 });
+    ScrollTrigger.create({
+      trigger,
+      start: 'top 85%',
+      once: true,
+      onEnter: () => {
+        gsap.to(cards, {
+          autoAlpha: 1,
+          y: 0,
+          duration: 0.8,
+          ease: 'power3.out',
+          stagger: 0.08,
+          onComplete: () => { cards.forEach((c) => { c.dataset.revealed = 'true'; }); },
+        });
+      },
+    });
+  }
+
+  // Process rail's scroll-driven progress bar is plain scrollLeft math with
+  // no dependency on GSAP (see ProcessRail.astro's own inline script) — it
+  // already works with or without this island, so there is nothing to wire
+  // up here.
+
+  function setupCounters(gsap: any, ScrollTrigger: any) {
+    for (const el of document.querySelectorAll<HTMLElement>('[data-count]')) {
+      const target = Number(el.dataset.count);
+      if (!Number.isFinite(target)) continue;
+      ScrollTrigger.create({
+        trigger: el,
+        start: 'top 90%',
+        once: true,
+        onEnter: () => {
+          const counter = { val: 0 };
+          gsap.to(counter, {
+            val: target,
+            duration: 1.8,
+            ease: 'power2.out',
+            onUpdate: () => { el.textContent = Math.round(counter.val).toLocaleString('en-US'); },
+            onComplete: () => {
+              el.textContent = target.toLocaleString('en-US');
+              el.dataset.revealed = 'true';
+            },
+          });
+        },
+      });
+    }
+  }
+
+  // --- Fallback: no GSAP, still get a fade-in via IntersectionObserver ---
+
+  function setupIntersectionFallback() {
+    const els = [...revealables()];
+    if (!('IntersectionObserver' in window)) {
+      els.forEach(forceReveal);
+      return;
+    }
+    for (const el of els) {
+      el.style.opacity = '0';
+      el.style.transform = 'translateY(22px)';
+      el.style.transition = 'opacity .6s ease, transform .6s ease';
+    }
+    const io = new IntersectionObserver(
+      (entries, obs) => {
+        for (const entry of entries) {
+          if (!entry.isIntersecting) continue;
+          forceReveal(entry.target as HTMLElement);
+          obs.unobserve(entry.target);
+        }
+      },
+      { rootMargin: '0px 0px -10% 0px', threshold: 0.05 },
+    );
+    els.forEach((el) => io.observe(el));
+    // Counters have no count-up animation without GSAP; the authored text
+    // is already the correct final value, so there is nothing to backfill.
+  }
+
+  if (document.readyState === 'complete') boot();
+  else window.addEventListener('load', boot, { once: true });
+</script>

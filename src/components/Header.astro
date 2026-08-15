@@ -1,24 +1,33 @@
 ---
+// src/components/Header.astro — Cinema fixed header.
 import { Image } from 'astro:assets';
-import { nav, site } from '../data/site';
-import logoDark from '../assets/chrome/ruckus_logo_dark.png';
+import { nav, ctaLink, site } from '../data/site';
+import logoLight from '../assets/chrome/ruckus_logo_light.png';
+
+// The header's own nav omits Contact — it's reached via the "Start a
+// Ruckus" pill (and the mobile panel's contact block below) — per the
+// handoff's Header spec: Home, Intro, Work, About, Services, Knowledge.
+const navLinks = nav.filter((item) => item.label !== 'Contact');
 ---
 <header class="site-header">
-  <div class="container-wide bar">
+  <div class="bar">
     <a href="/#home" class="logo" aria-label={`${site.name} home`}>
-      <Image src={logoDark} alt={site.name} widths={[180, 360]} sizes="180px" loading="eager" />
+      <Image src={logoLight} alt={site.name} height={55} widths={[263, 526, 669]} sizes="263px" loading="eager" />
     </a>
 
     <nav class="desktop-nav" aria-label="Main">
-      <ul>{nav.map(item => <li><a href={item.href}>{item.label}</a></li>)}</ul>
+      <ul>{navLinks.map(item => <li><a href={item.href}>{item.label}</a></li>)}</ul>
     </nav>
+
+    <a class="cta-pill" href={ctaLink.href}>{ctaLink.label}</a>
 
     <details class="menu">
       <summary aria-label="Menu"><span class="bars" aria-hidden="true"></span></summary>
       <div class="panel">
         <nav aria-label="Menu">
-          <ul>{nav.map(item => <li><a href={item.href}>{item.label}</a></li>)}</ul>
+          <ul>{navLinks.map(item => <li><a href={item.href}>{item.label}</a></li>)}</ul>
         </nav>
+        <a class="cta-pill panel-cta" href={ctaLink.href}>{ctaLink.label}</a>
         <div class="contact">
           <p><a href={`mailto:${site.email}`}>{site.email}</a></p>
           <p><a href={`tel:${site.phoneE164}`}>{site.phone}</a></p>
@@ -30,25 +39,86 @@ import logoDark from '../assets/chrome/ruckus_logo_dark.png';
 </header>
 
 <style>
-  .site-header { position: sticky; top: 0; z-index: 50; background: var(--color-bg); border-bottom: 1px solid var(--color-rule); }
-  .bar { display: flex; align-items: center; justify-content: space-between; gap: var(--space-3); padding-block: var(--space-2); }
-  .logo img { width: 180px; height: auto; }
+  .site-header {
+    position: fixed;
+    inset-inline: 0;
+    top: 0;
+    z-index: 50;
+    padding: 18px clamp(20px, 4vw, 56px);
+    background: rgba(18, 17, 16, .72);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    border-bottom: 1px solid var(--color-hairline);
+  }
+  .bar { display: flex; align-items: center; gap: var(--space-3); }
+  .logo { display: inline-flex; margin-right: auto; }
+  .logo :global(img) { height: 55px; width: auto; }
+
   .desktop-nav ul, .panel ul { list-style: none; margin: 0; padding: 0; }
-  .desktop-nav ul { display: flex; gap: var(--space-3); }
-  .desktop-nav a { text-decoration: none; font-size: 0.9rem; letter-spacing: 0.04em; text-transform: uppercase; }
-  .desktop-nav a:hover { color: var(--color-accent); }
+  .desktop-nav ul { display: flex; gap: clamp(1rem, 2vw, 1.75rem); }
+  .desktop-nav a {
+    text-decoration: none;
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 11px;
+    letter-spacing: .2em;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, .72);
+    transition: color .2s ease;
+  }
+  .desktop-nav a:hover { color: #fff; }
   @media (max-width: 860px) { .desktop-nav { display: none; } }
 
-  .menu { position: relative; }
-  .menu summary { list-style: none; cursor: pointer; padding: var(--space-1); }
+  .cta-pill {
+    margin-left: clamp(1rem, 2vw, 1.75rem);
+    padding: 11px 20px;
+    border-radius: var(--radius-pill);
+    background: var(--gradient-brand-120);
+    color: #fff;
+    text-decoration: none;
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 11px;
+    letter-spacing: .16em;
+    text-transform: uppercase;
+    white-space: nowrap;
+    transition: filter .2s ease;
+  }
+  .cta-pill:hover { filter: brightness(1.12); }
+  @media (max-width: 860px) { .cta-pill:not(.panel-cta) { display: none; } }
+
+  .menu { position: relative; display: none; }
+  @media (max-width: 860px) { .menu { display: block; } }
+  .menu summary { list-style: none; cursor: pointer; padding: var(--space-1); margin-left: var(--space-2); }
   .menu summary::-webkit-details-marker { display: none; }
-  .bars, .bars::before, .bars::after { display: block; width: 24px; height: 2px; background: var(--color-heading); }
+  .bars, .bars::before, .bars::after { display: block; width: 24px; height: 2px; background: #fff; }
   .bars { position: relative; }
   .bars::before, .bars::after { content: ''; position: absolute; }
   .bars::before { top: -7px; } .bars::after { top: 7px; }
-  .panel { position: absolute; right: 0; top: 100%; width: min(320px, calc(100vw - 2rem));
-           background: var(--color-bg); border: 1px solid var(--color-rule); padding: var(--space-3); }
+  .panel {
+    position: absolute; right: 0; top: calc(100% + 12px); width: min(320px, calc(100vw - 2.5rem));
+    background: var(--color-surface-card); border: 1px solid var(--color-hairline); padding: var(--space-3);
+  }
   .panel li + li { margin-top: var(--space-1); }
-  .panel a { text-decoration: none; }
-  .contact { margin-top: var(--space-3); border-top: 1px solid var(--color-rule); padding-top: var(--space-2); font-size: 0.9rem; }
+  .panel a {
+    display: block;
+    text-decoration: none;
+    color: var(--color-text-bright);
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 11px;
+    letter-spacing: .16em;
+    text-transform: uppercase;
+  }
+  .panel a:hover { color: var(--color-flame); }
+  .panel-cta { display: block; text-align: center; margin-top: var(--space-3); }
+  .contact {
+    margin-top: var(--space-3);
+    border-top: 1px solid var(--color-hairline);
+    padding-top: var(--space-2);
+    font-size: .85rem;
+    color: var(--color-text-muted);
+  }
+  .contact a { color: var(--color-text-bright); text-decoration: none; }
+  .contact a:hover { color: var(--color-flame); }
 </style>

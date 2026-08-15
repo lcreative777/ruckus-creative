@@ -1,9 +1,18 @@
 ---
+// src/pages/work/[slug].astro — Cinema work case study.
+// Per the handoff: brief column left is the entry's span_3 meta, image
+// column right is its span_9 media, both extracted from the migrated body
+// (see src/lib/work-content.ts) and rendered through RichText.astro. Project
+// titles come from home.md via getWorkTiles() — the same verbatim source the
+// homepage work grid uses — rather than the collection's `title` field,
+// which carries an SEO " - Ruckus Creative" suffix not meant for an H1.
 import { getCollection } from 'astro:content';
 import Base from '../../layouts/Base.astro';
 import Seo from '../../components/Seo.astro';
 import RichText from '../../components/RichText.astro';
 import { site } from '../../data/site';
+import { getWorkTiles } from '../../lib/home-content';
+import { parseCaseStudy } from '../../lib/work-content';
 
 export async function getStaticPaths() {
   const work = await getCollection('work');
@@ -15,22 +24,162 @@ export async function getStaticPaths() {
 
 const { entry } = Astro.props;
 const d = entry.data;
+const slug = d.path.replace('/work/', '').replace(/\/$/, '');
+
+const tiles = await getWorkTiles();
+const titleBySlug = new Map(tiles.map(t => [t.slug, t.title]));
+const title = titleBySlug.get(slug) ?? d.title;
+
+const { imagesHtml, briefHtml, prevSlug } = parseCaseStudy(entry.body ?? '', slug);
+const prevTitle = prevSlug ? (titleBySlug.get(prevSlug) ?? prevSlug) : null;
 ---
 <Base>
   <Seo slot="head" title={d.seo.title ?? d.title} description={d.seo.description}
        canonical={d.seo.canonical} ogImage={d.seo.ogImage}
-       breadcrumbs={[{ name: 'Home', url: '/' }, { name: 'Work', url: '/portfolio-ruckus/' }, { name: d.title, url: d.path }]}
-       schema={{ '@type': 'CreativeWork', name: d.title, url: new URL(d.path, site.url).href,
+       breadcrumbs={[{ name: 'Home', url: '/' }, { name: 'Work', url: '/portfolio-ruckus/' }, { name: title, url: d.path }]}
+       schema={{ '@type': 'CreativeWork', name: title, url: new URL(d.path, site.url).href,
                  creator: { '@id': `${site.url}/#organization` } }} />
-  <div class="work-header"><div class="container"><h1>{d.title}</h1></div></div>
-  <article class="container section page-band">
-    <RichText html={entry.body ?? ''} />
-    <p><a href="/portfolio-ruckus/">← All work</a></p>
-  </article>
+
+  <div class="case">
+    <div class="case-top">
+      <a href="/#work" class="nav-link back"><span class="caret" aria-hidden="true"></span> Back to all projects</a>
+      <h1>{title}</h1>
+    </div>
+
+    <div class="case-body">
+      <aside class="brief">
+        <RichText html={briefHtml} class="prose brief-fields" />
+        <a href="/#contact" class="cta-pill">Start a project</a>
+      </aside>
+      <RichText html={imagesHtml} class="case-images" />
+    </div>
+
+    <div class="case-bottom">
+      {prevSlug && (
+        <a href={`/work/${prevSlug}/`} class="nav-link prev">
+          <span class="caret" aria-hidden="true"></span> Previous Project — {prevTitle}
+        </a>
+      )}
+      <a href="/#work" class="nav-link all">All projects</a>
+    </div>
+  </div>
 </Base>
 
 <style>
-  /* The live site puts the portfolio title in its own band above the content. */
-  .work-header { background: var(--color-bg-dark); color: #fff; padding-block: var(--space-4); }
-  .work-header :global(h1) { color: #fff; margin: 0; }
+  .case { padding-top: 76px; }
+
+  .case-top { padding: clamp(36px, 5vw, 72px) clamp(24px, 5vw, 72px) 0; }
+  .nav-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    font-family: var(--font-display);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: .22em;
+    text-transform: uppercase;
+    color: var(--color-text-muted);
+    text-decoration: none;
+    transition: color .2s ease;
+  }
+  .nav-link:hover { color: #fff; }
+  .caret {
+    width: .5em;
+    height: .5em;
+    border-top: 2px solid currentColor;
+    border-left: 2px solid currentColor;
+    transform: rotate(-45deg);
+    display: inline-block;
+  }
+  .case-top h1 {
+    margin: 26px 0 0;
+    font-family: var(--font-display);
+    font-weight: 100;
+    font-size: clamp(34px, 5.4vw, 78px);
+    line-height: 1;
+    letter-spacing: -.035em;
+    color: #fff;
+  }
+
+  .case-body {
+    padding: clamp(36px, 4.5vw, 64px) clamp(24px, 5vw, 72px) clamp(64px, 8vw, 110px);
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: clamp(32px, 4vw, 64px);
+    align-items: start;
+  }
+
+  .brief {
+    position: sticky;
+    top: 104px;
+    display: flex;
+    flex-direction: column;
+    gap: 22px;
+    max-width: 44ch;
+  }
+  .brief :global(.brief-fields) {
+    display: flex;
+    flex-direction: column;
+    color: var(--color-text-bright);
+    line-height: 1.85;
+  }
+  .brief :global(.brief-fields p) {
+    margin: 0;
+    padding-bottom: 20px;
+    border-bottom: 1px solid rgba(255, 255, 255, .1);
+  }
+  .brief :global(.brief-fields p + p) { margin-top: 22px; }
+  .brief :global(.brief-fields p strong:first-child) {
+    display: block;
+    margin-bottom: 7px;
+    font-family: var(--font-display);
+    font-weight: 900;
+    font-size: 10px;
+    letter-spacing: .26em;
+    text-transform: uppercase;
+    color: var(--color-flame);
+  }
+  .cta-pill {
+    align-self: flex-start;
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    padding: 15px 30px;
+    border-radius: var(--radius-pill);
+    background: var(--gradient-brand-120);
+    color: #fff;
+    text-decoration: none;
+    font-family: var(--font-display);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: .2em;
+    text-transform: uppercase;
+    transition: filter .2s ease;
+  }
+  .cta-pill:hover { filter: brightness(1.15); }
+
+  .case-body :global(.case-images) {
+    display: flex;
+    flex-direction: column;
+    gap: clamp(18px, 2.4vw, 32px);
+    min-width: 0;
+  }
+  .case-body :global(.case-images picture),
+  .case-body :global(.case-images img) {
+    display: block;
+    width: 100%;
+    height: auto;
+    background: var(--color-surface-card);
+    margin: 0;
+  }
+
+  .case-bottom {
+    border-top: 1px solid rgba(255, 255, 255, .1);
+    padding: clamp(30px, 4vw, 54px) clamp(24px, 5vw, 72px);
+    display: flex;
+    justify-content: space-between;
+    gap: 20px;
+    flex-wrap: wrap;
+  }
+  .case-bottom .all { margin-left: auto; }
 </style>

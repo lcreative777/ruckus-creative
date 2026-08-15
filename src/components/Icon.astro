@@ -1,0 +1,56 @@
+---
+// src/components/Icon.astro
+// Inlines the SVGs in src/assets/icons/ so their currentColor fills/strokes
+// pick up the surrounding text color, instead of the handoff's <img> +
+// long invert/sepia/hue-rotate filter chain.
+interface Props {
+  name: string;
+  size?: number;
+  class?: string;
+}
+
+const { name, size = 36, class: className } = Astro.props;
+
+const icons = import.meta.glob('/src/assets/icons/*.svg', {
+  query: '?raw',
+  import: 'default',
+  eager: true,
+}) as Record<string, string>;
+
+const path = `/src/assets/icons/${name}.svg`;
+const raw = icons[path];
+
+if (!raw) {
+  const available = Object.keys(icons)
+    .map((p) => p.replace('/src/assets/icons/', '').replace('.svg', ''))
+    .sort()
+    .join(', ');
+  throw new Error(
+    `Icon.astro: no icon named "${name}" in src/assets/icons/. Available: ${available}`
+  );
+}
+
+// Drop the XML prolog and set sizing/accessibility attributes on the root <svg>.
+const svg = raw
+  .replace(/<\?xml[^>]*\?>/, '')
+  .trim()
+  .replace(
+    /<svg\b/,
+    `<svg width="${size}" height="${size}" aria-hidden="true" focusable="false"`
+  );
+---
+
+<span class:list={['icon', className]} set:html={svg} />
+
+<style>
+  .icon {
+    display: inline-flex;
+    color: currentColor;
+    line-height: 0;
+  }
+  .icon :global(svg) {
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+</style>

@@ -1,0 +1,127 @@
+---
+// src/components/home/Capabilities.astro
+// Groups/items parsed from home.md (src/lib/home-content.ts), including the
+// source's own "Mircrosites" typo — left as-is deliberately. Icon choice per
+// the handoff § Assets → Icons, keyed by group title.
+import Icon from '../Icon.astro';
+import { getCapabilityGroups } from '../../lib/home-content';
+
+const groups = await getCapabilityGroups();
+
+const ICONS: Record<string, string> = {
+  'Online': 'mobile-device-svgrepo-com',
+  'Online Marketing': 'chart-gear-svgrepo-com',
+  'Print': 'print-outline',
+  'Presentations': 'presentation-svgrepo-com',
+  'Brand Development': 'atom-svgrepo-com',
+  'Event Marketing': 'event-svgrepo-com',
+};
+---
+<section id="services" class="capabilities">
+  <div class="inner">
+    <h2 data-reveal>Capabilities</h2>
+    <div class="grid">
+      {groups.map((g) => (
+        <div class="cell" data-reveal>
+          <span class="icon"><Icon name={ICONS[g.title] ?? 'chart-gear-svgrepo-com'} size={36} /></span>
+          <h4>{g.title}</h4>
+          <div class="items">
+            {g.items.map((item) => <span>– {item}</span>)}
+          </div>
+        </div>
+      ))}
+    </div>
+
+    {/* Client-authored line, written to the page's voice. Not migrated copy. */}
+    <p class="coda" data-reveal>
+      Every service here is <em>human-led, AI-accelerated</em>. Anyone can prompt.
+      Damn few can art direct — and that is the difference between noise and a ruckus.
+    </p>
+  </div>
+</section>
+
+<style>
+  .capabilities { padding: clamp(72px, 9vw, 124px) clamp(24px, 5vw, 72px); }
+  /* Centred with equal left/right margins. Without a max-width the grid grew to
+     fill ultra-wide viewports and the block no longer read as centred. */
+  .capabilities .inner {
+    width: 100%;
+    max-width: var(--container-wide, 1425px);
+    margin-inline: auto;
+  }
+
+  /* Client-authored coda beneath the grid. */
+  .coda {
+    margin: clamp(36px, 4vw, 56px) auto 0;
+    max-width: 62ch;
+    text-align: center;
+    font-family: var(--font-alt);
+    font-weight: 200;
+    font-size: clamp(18px, 1.9vw, 26px);
+    line-height: 1.55;
+    color: #fff;
+    text-wrap: pretty;
+  }
+  .coda em {
+    font-style: italic;
+    color: var(--color-flame, #f6653c);
+    font-weight: 300;
+  }
+  .capabilities h2 {
+    margin: 0 0 clamp(32px, 4vw, 56px);
+    font-family: var(--font-display);
+    font-weight: 100;
+    font-size: clamp(32px, 4.6vw, 66px);
+    line-height: 1;
+    letter-spacing: -.03em;
+    color: #fff;
+  }
+  /* Six capability groups: 3 rows of 2 on mobile, 2 rows of 3 on desktop.
+     Fixed column counts rather than auto-fit, so the row shape is exactly the
+     one asked for at each size instead of depending on the content width. */
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--gap-hairline);
+    background: var(--color-hairline);
+  }
+  @media (min-width: 900px) {
+    .grid { grid-template-columns: repeat(3, 1fr); }
+  }
+  /* Two columns are kept all the way down, as specified. Padding and the
+     dashed-list type tighten instead of dropping to a single column. */
+  @media (max-width: 560px) {
+    .cell { padding: 22px 16px; }
+    .cell li { font-size: 13px; }
+  }
+  .cell {
+    background: var(--color-canvas);
+    padding: clamp(30px, 3vw, 44px);
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    transition: background .4s ease;
+  }
+  .cell:hover { background: #1a1917; }
+  .icon { color: var(--color-flame); }
+  .cell h4 {
+    margin: 0;
+    font-family: var(--font-display);
+    font-weight: 900;
+    font-size: 18px;
+    letter-spacing: .05em;
+    text-transform: uppercase;
+    color: #fff;
+  }
+  .items {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    font-size: 14px;
+    line-height: 1.7;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .cell { transition: none; }
+  }
+</style>

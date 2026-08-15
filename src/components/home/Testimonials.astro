@@ -1,0 +1,170 @@
+---
+// src/components/home/Testimonials.astro
+// All 8 quotes parsed verbatim, in source order, from home.md
+// (src/lib/home-content.ts) — including its own inconsistencies (leading en
+// dashes on some names, a missing closing curly quote on some bodies,
+// "beginning to worth with them"). The track is a native scroll-snap
+// container, so swipe/trackpad/keyboard scrolling work with no script;
+// script only adds dot nav + the 6s auto-advance.
+import { getTestimonials } from '../../lib/home-content';
+
+const quotes = await getTestimonials();
+---
+<section class="testimonials">
+  <div class="wash" aria-hidden="true"></div>
+  <div class="inner">
+    <div class="track" data-testi-track>
+      {quotes.map((q) => (
+        <blockquote>
+          <p>{q.body}</p>
+          <span class="name">{q.name}</span>
+          <span class="role">{q.title}</span>
+        </blockquote>
+      ))}
+    </div>
+    <ul class="dots" data-testi-dots></ul>
+  </div>
+</section>
+
+<script>
+  const AUTO_ADVANCE_MS = 6000;
+
+  for (const section of document.querySelectorAll<HTMLElement>('.testimonials')) {
+    const track = section.querySelector<HTMLElement>('[data-testi-track]');
+    const dotsList = section.querySelector<HTMLElement>('[data-testi-dots]');
+    const slides = [...(track?.children ?? [])] as HTMLElement[];
+    if (!track || !dotsList || slides.length < 2) continue;
+
+    slides.forEach((slide, i) => {
+      const li = document.createElement('li');
+      const button = document.createElement('button');
+      button.type = 'button';
+      button.setAttribute('aria-label', `Show testimonial ${i + 1} of ${slides.length}`);
+      button.setAttribute('aria-current', String(i === 0));
+      button.addEventListener('click', () => {
+        track.scrollTo({ left: slide.offsetLeft - track.offsetLeft, behavior: 'smooth' });
+      });
+      li.append(button);
+      dotsList.append(li);
+    });
+
+    const buttons = [...dotsList.querySelectorAll<HTMLButtonElement>('button')];
+    let current = 0;
+
+    const sync = () => {
+      const centre = track.scrollLeft + track.clientWidth / 2;
+      let nearest = 0, best = Infinity;
+      slides.forEach((slide, i) => {
+        const distance = Math.abs(slide.offsetLeft - track.offsetLeft + slide.clientWidth / 2 - centre);
+        if (distance < best) { best = distance; nearest = i; }
+      });
+      current = nearest;
+      buttons.forEach((b, i) => b.setAttribute('aria-current', String(i === nearest)));
+    };
+
+    let queued = 0;
+    track.addEventListener('scroll', () => {
+      cancelAnimationFrame(queued);
+      queued = requestAnimationFrame(sync);
+    }, { passive: true });
+
+    const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (reduced) continue; // manual scroll + dots still work; no auto-advance
+
+    let timer: ReturnType<typeof setInterval> | null = null;
+    const advance = () => {
+      const next = (current + 1) % slides.length;
+      track.scrollTo({ left: slides[next].offsetLeft - track.offsetLeft, behavior: 'smooth' });
+    };
+    const start = () => { if (!timer) timer = setInterval(advance, AUTO_ADVANCE_MS); };
+    const stop = () => { if (timer) { clearInterval(timer); timer = null; } };
+
+    start();
+    section.addEventListener('mouseenter', stop);
+    section.addEventListener('mouseleave', start);
+    section.addEventListener('focusin', stop);
+    section.addEventListener('focusout', start);
+  }
+</script>
+
+<style>
+  .testimonials {
+    position: relative;
+    padding: clamp(72px, 9vw, 124px) 0;
+    background: var(--color-surface-raised);
+    overflow: hidden;
+  }
+  .wash {
+    position: absolute; inset: 0;
+    background:
+      radial-gradient(70% 60% at 20% 20%, rgba(184, 30, 4, .3), transparent 62%),
+      radial-gradient(70% 60% at 85% 80%, rgba(41, 73, 232, .3), transparent 64%);
+  }
+  .inner { position: relative; }
+
+  .track {
+    display: flex;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scroll-behavior: smooth;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+  .track::-webkit-scrollbar { display: none; }
+
+  blockquote {
+    flex: 0 0 100%;
+    scroll-snap-align: center;
+    margin: 0;
+    padding: 0 clamp(24px, 7vw, 110px);
+    box-sizing: border-box;
+  }
+  blockquote p {
+    margin: 0 0 28px;
+    font-family: var(--font-alt);
+    font-weight: 200;
+    font-size: var(--type-quote);
+    line-height: var(--type-quote-lh);
+    color: #fff;
+    text-wrap: pretty;
+  }
+  blockquote .name {
+    display: block;
+    font-family: var(--font-display);
+    font-weight: 900;
+    font-size: 12px;
+    letter-spacing: .2em;
+    text-transform: uppercase;
+    color: var(--color-flame);
+  }
+  blockquote .role {
+    display: block;
+    margin-top: 6px;
+    font-size: 13px;
+    color: var(--color-text-muted);
+  }
+
+  .dots {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin: clamp(32px, 4vw, 48px) 0 0;
+    padding: 0;
+    list-style: none;
+  }
+  .dots :global(button) {
+    width: 9px; height: 9px; padding: 0; border: 0; border-radius: 50%;
+    background: rgba(255, 255, 255, .38);
+    cursor: pointer;
+    transition: background .2s ease, transform .2s ease;
+  }
+  .dots :global(button[aria-current="true"]) {
+    background: #fff;
+    transform: scale(1.3);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .track { scroll-behavior: auto; }
+    .dots :global(button) { transition: none; }
+  }
+</style>

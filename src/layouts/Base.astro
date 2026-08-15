@@ -3,12 +3,27 @@ import '@fontsource/open-sans/300.css';
 import '@fontsource/open-sans/400.css';
 import '@fontsource/open-sans/600.css';
 import '@fontsource/open-sans/700.css';
+// Lato: 100 for the thin display headings, 300 for lighter meta, 700 for
+// uppercase labels/meta, 900 (+ 900 italic) for titles and the italic
+// accent words ("strategic creative", section-heading "work", etc.).
+import '@fontsource/lato/100.css';
+import '@fontsource/lato/100-italic.css';
+import '@fontsource/lato/300.css';
+import '@fontsource/lato/300-italic.css';
+import '@fontsource/lato/700.css';
 import '@fontsource/lato/900.css';
+import '@fontsource/lato/900-italic.css';
+// Raleway: 200 for editorial leads/quotes, 300 italic for the CTA sub-line;
+// 400 stays loaded for migrated prose blockquotes that don't set a weight.
+import '@fontsource/raleway/200.css';
+import '@fontsource/raleway/300.css';
+import '@fontsource/raleway/300-italic.css';
 import '@fontsource/raleway/400.css';
 import '../styles/tokens.css';
 import '../styles/base.css';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
+import Motion from '../components/Motion.astro';
 import favicon from '../assets/chrome/cropped-FAVICON-192x192.png';
 import appleIcon from '../assets/chrome/cropped-FAVICON-180x180.png';
 ---
@@ -17,14 +32,51 @@ import appleIcon from '../assets/chrome/cropped-FAVICON-180x180.png';
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#121110" />
     <link rel="icon" type="image/png" href={favicon.src} />
     <link rel="apple-touch-icon" href={appleIcon.src} />
     <slot name="head" />
   </head>
   <body>
-    <a href="#main" class="visually-hidden">Skip to content</a>
+    <a href="#main" class="skip-link">Skip to content</a>
     <Header />
     <main id="main"><slot /></main>
     <Footer />
+    <Motion />
   </body>
 </html>
+
+<style>
+  /* Visually hidden until focused, then parked below the fixed header
+     (Header.astro) instead of at the very top edge, which the header
+     would otherwise cover. A dedicated class, not .visually-hidden,
+     since that utility is also used where staying hidden on focus is
+     correct (see src/pages/*.astro's visually-hidden <h1>s). */
+  .skip-link {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+    border: 0;
+  }
+  .skip-link:focus-visible {
+    position: fixed;
+    top: 90px;
+    left: clamp(20px, 4vw, 56px);
+    z-index: 100;
+    width: auto;
+    height: auto;
+    padding: .75em 1.25em;
+    margin: 0;
+    overflow: visible;
+    clip: auto;
+    white-space: normal;
+    background: var(--color-surface-card);
+    color: var(--color-white);
+    border: 1px solid var(--color-hairline-strong);
+  }
+</style>

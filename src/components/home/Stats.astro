@@ -1,0 +1,73 @@
+---
+// src/components/home/Stats.astro
+// Values/labels parsed from home.md (src/lib/home-content.ts). Rendered as
+// the final formatted text (data-count carries the raw target for Task 8's
+// GSAP counter, which zeroes and re-counts only on its own trigger — a
+// stale/missing trigger must never leave a visible "0").
+import { getStats } from '../../lib/home-content';
+
+const stats = await getStats();
+---
+<section class="stats">
+  <div class="cell blue">
+    <div class="number" data-count={stats[0].value}>{stats[0].value.toLocaleString('en-US')}</div>
+    <div class="label">{stats[0].label}</div>
+  </div>
+  <div class="cell red">
+    <div class="number" data-count={stats[1].value}>{stats[1].value.toLocaleString('en-US')}</div>
+    <div class="label">{stats[1].label}</div>
+  </div>
+  <div class="cell share">
+    <span>Share</span>
+    <a href="/">Facebook</a>
+    <a href="/">X</a>
+    <a href="/">LinkedIn</a>
+    <a href="/">Pinterest</a>
+  </div>
+</section>
+
+<style>
+  .stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: var(--gap-hairline);
+    background: var(--color-hairline);
+  }
+  .cell {
+    position: relative;
+    padding: clamp(40px, 4.4vw, 64px) clamp(24px, 3vw, 44px);
+    overflow: hidden;
+  }
+  .cell.blue { background: linear-gradient(140deg, var(--color-signal-blue), var(--color-deep-blue)); color: #fff; }
+  .cell.red { background: linear-gradient(140deg, var(--color-blue-93), var(--color-ink-red)); color: #fff; }
+  .number {
+    font-family: var(--font-display);
+    font-weight: 900;
+    font-size: clamp(40px, 4.6vw, 64px);
+    line-height: 1;
+  }
+  .label {
+    margin-top: 8px;
+    font-family: var(--font-display);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: .22em;
+    text-transform: uppercase;
+  }
+
+  .cell.share {
+    background: var(--color-surface-card);
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 16px;
+    font-family: var(--font-display);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: .18em;
+    text-transform: uppercase;
+    color: var(--color-text-dim);
+  }
+  .cell.share a { color: #fff; text-decoration: none; }
+  .cell.share a:hover { color: var(--color-flame); }
+</style>

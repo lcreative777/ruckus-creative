@@ -1,4 +1,10 @@
 ---
+// src/pages/portfolio-ruckus.astro — Cinema restyle of the all-work index.
+// PortfolioGrid.astro already reads from the `work` collection and is
+// already dark-token-driven, so only the page chrome changes here: a
+// visible section heading (Lato 100, matching the homepage's section
+// scale), a sparing ambient wash, and the 76px fixed-header offset shared
+// with every non-homepage route (Plan 4 Task 7's "KNOWN ISSUE").
 import { getCollection } from 'astro:content';
 import Base from '../layouts/Base.astro';
 import Seo from '../components/Seo.astro';
@@ -14,8 +20,30 @@ const work = await getCollection('work');
        breadcrumbs={[{ name: 'Home', url: '/' }, { name: 'Work', url: '/portfolio-ruckus/' }]}
        schema={{ '@type': 'CollectionPage', name: d.title,
                  hasPart: work.map(w => ({ '@type': 'CreativeWork', name: w.data.title, url: new URL(w.data.path, Astro.site!).href })) }} />
-  <div class="container section page-band">
-    <h1 class="visually-hidden">{d.title}</h1>
-    <PortfolioGrid />
+  <div class="page">
+    <div class="wash" aria-hidden="true"></div>
+    <div class="container page-inner">
+      <h1>{d.title}</h1>
+      <PortfolioGrid />
+    </div>
   </div>
 </Base>
+
+<style>
+  .page {
+    position: relative;
+    padding-top: 76px;
+    background: var(--color-page-band);
+    overflow: hidden;
+  }
+  .wash {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background:
+      radial-gradient(55% 60% at 92% 0%, rgba(41, 73, 232, .16), transparent 62%),
+      radial-gradient(50% 55% at 4% 100%, rgba(184, 30, 4, .14), transparent 60%);
+  }
+  .page-inner { position: relative; padding-block: var(--band-pad); }
+  h1 { margin-bottom: var(--space-3); }
+</style>

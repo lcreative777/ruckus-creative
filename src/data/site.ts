@@ -21,7 +21,13 @@ export const site = {
   founded: '1993',   // "In business for over 25 years", per the About page
 } as const;
 
-/** Main navigation. Every item targets a homepage section, not a standalone page. */
+/**
+ * Main navigation. The first six items target homepage sections; Knowledge
+ * is the one standalone-page link the Cinema header adds. Contact is not
+ * rendered as its own nav link in the Cinema header — it's reached through
+ * the "Start a Ruckus" pill (see `ctaLink` below) — but stays in this list
+ * since the mobile slide-out's contact block links back to it too.
+ */
 export const nav = [
   { label: 'Home', href: '/#home' },
   { label: 'Intro', href: '/#intro' },
@@ -29,7 +35,11 @@ export const nav = [
   { label: 'About', href: '/#about' },
   { label: 'Services', href: '/#services' },
   { label: 'Contact', href: '/#contact' },
+  { label: 'Knowledge', href: '/knowledge/' },
 ] as const;
+
+/** "Start a Ruckus" pill target, top-right of the fixed header. */
+export const ctaLink = { label: 'Start a Ruckus', href: '/#contact' } as const;
 
 /** Footer legal links. */
 export const legalLinks = [
