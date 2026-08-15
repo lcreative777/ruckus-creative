@@ -1,22 +1,24 @@
 ---
 // src/components/HeroVideo.astro
 //
-// Poster-first video facade, now backed by Mux.
+// Background hero video: autoplays muted and loops, no player chrome, with a
+// single control to turn sound on.
 //
-// The live WordPress site autoloads a YouTube background video, which is its
-// worst LCP and TBT offender. Here the poster carries LCP and NOTHING of the
-// player is fetched until someone clicks — no player script, no third-party
-// connection, no cookies on load.
+// How this stays fast:
+//   - The poster is a real <img> with fetchpriority="high", so it is the LCP
+//     element and paints immediately from our own origin.
+//   - The video is NOT fetched during page load. Playback is set up after the
+//     window load event, so nothing competes with LCP.
+//   - Safari plays HLS natively. Everywhere else hls.js is pulled in with a
+//     dynamic import, which Astro emits as a separate chunk — it is never part
+//     of the initial payload and is only requested once we have decided to play.
+//   - Skipped entirely for prefers-reduced-motion and Save-Data, which keep the
+//     poster and just show the play control.
 //
-// Why a facade rather than an inline player or an autoplaying loop:
-//   - `<mux-player>` is a web component costing ~100KB of JS before anything
-//     paints. It buys controls we do not need until playback starts.
-//   - A muted autoplay background loop would need a progressive MP4. Mux static
-//     renditions are not enabled on this asset (stream.mux.com/<id>/high.mp4
-//     returns 404), so the only source is HLS, which needs hls.js (~100KB) in
-//     every browser except Safari. Not worth it for a hero loop.
-// The poster is downloaded from Mux's thumbnail API and committed, so Astro
-// re-encodes it to AVIF/WebP at build time and it is served from our own origin.
+// This asset has NO static MP4 renditions (stream.mux.com/<id>/high.mp4 and
+// every other name 404), so HLS is the only source. Enabling static renditions
+// on the Mux asset would let us drop hls.js and use a plain <video src=".mp4">,
+// removing ~40KB gzipped from the page.
 import { getImage } from 'astro:assets';
 import { resolveMedia } from '../lib/images';
 
@@ -26,13 +28,13 @@ interface Props {
   /** Poster filename in src/assets/media/. */
   poster: string;
   title?: string;
-  /** Reserved: 'facade' loads on click, 'inline' would embed immediately. */
-  mode?: 'facade' | 'inline';
 }
-const { playbackId, poster, title = 'Play video', mode = 'facade' } = Astro.props;
+const { playbackId, poster, title = 'Background video' } = Astro.props;
 
 const img = resolveMedia(poster);
 if (!img) throw new Error(`HeroVideo: poster "${poster}" was not found in src/assets/media/`);
+
+const src = `https://stream.mux.com/${playbackId}.m3u8`;
 
 const [avif, webp, fallback] = await Promise.all([
   getImage({ src: img, format: 'avif', widths: [768, 1280, 1920] }),
@@ -40,45 +42,130 @@ const [avif, webp, fallback] = await Promise.all([
   getImage({ src: img, format: 'jpeg', width: 1920 }),
 ]);
 ---
-<div class="hero-video" data-playback-id={playbackId} data-mode={mode}>
-  <picture>
+<div class="hero-video" data-src={src}>
+  <picture class="hero-poster">
     <source type="image/avif" srcset={avif.srcSet.attribute} sizes="100vw" />
     <source type="image/webp" srcset={webp.srcSet.attribute} sizes="100vw" />
     <img src={fallback.src} width={img.width} height={img.height} alt=""
          fetchpriority="high" loading="eager" decoding="async" />
   </picture>
-  <button type="button" class="play" aria-label={title}>
-    <svg viewBox="0 0 68 48" width="68" height="48" aria-hidden="true">
-      <path d="M66.5 7.7a8 8 0 0 0-5.6-5.7C56 .7 34 .7 34 .7s-22 0-26.9 1.3A8 8 0 0 0 1.5 7.7 83 83 0 0 0 .2 24a83 83 0 0 0 1.3 16.3 8 8 0 0 0 5.6 5.7C12 47.3 34 47.3 34 47.3s22 0 26.9-1.3a8 8 0 0 0 5.6-5.7A83 83 0 0 0 67.8 24a83 83 0 0 0-1.3-16.3z" fill="#212121" fill-opacity=".8"/>
-      <path d="M27.2 34.4 45.5 24 27.2 13.6z" fill="#fff"/>
+
+  <video class="hero-media" muted loop playsinline preload="none"
+         aria-label={title} tabindex="-1"></video>
+
+  <button type="button" class="sound" aria-pressed="false" aria-label="Turn sound on">
+    <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" fill="none"
+         stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M11 5 6 9H2v6h4l5 4z"/>
+      <path class="muted-slash" d="m23 9-6 6M17 9l6 6"/>
+      <path class="waves" d="M15.5 8.5a5 5 0 0 1 0 7M18.5 5.5a9 9 0 0 1 0 13"/>
     </svg>
   </button>
 </div>
 
 <script>
-  // ~600 bytes. Swaps the poster for the Mux player on first click only.
-  document.querySelectorAll<HTMLElement>('.hero-video').forEach((el) => {
-    const button = el.querySelector('button');
-    button?.addEventListener('click', () => {
-      const id = el.dataset.playbackId;
-      if (!id) return;
-      const iframe = document.createElement('iframe');
-      iframe.src = `https://player.mux.com/${id}?autoplay=1`;
-      iframe.title = button.getAttribute('aria-label') ?? 'Video';
-      iframe.allow = 'accelerometer; gyroscope; autoplay; encrypted-media; picture-in-picture';
-      iframe.allowFullscreen = true;
-      iframe.setAttribute('style', 'width:100%;height:100%;border:none;aspect-ratio:16/9');
-      el.replaceChildren(iframe);
-    }, { once: true });
-  });
+  for (const box of document.querySelectorAll<HTMLElement>('.hero-video')) {
+    const video = box.querySelector('video');
+    const button = box.querySelector<HTMLButtonElement>('.sound');
+    const src = box.dataset.src;
+    if (!video || !button || !src) continue;
+
+    // Sound toggle works whether or not the video ever loads.
+    button.addEventListener('click', () => {
+      video.muted = !video.muted;
+      const on = !video.muted;
+      button.setAttribute('aria-pressed', String(on));
+      button.setAttribute('aria-label', on ? 'Turn sound off' : 'Turn sound on');
+      box.classList.toggle('sound-on', on);
+      // Browsers only grant unmuted playback from a user gesture, which this is.
+      if (on) video.play().catch(() => {});
+    });
+
+    const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const saveData = (navigator as any).connection?.saveData === true;
+    if (reduced || saveData) continue;   // keep the poster, skip the download
+
+    /** Resolves once the element actually has decodable video, or times out. */
+    const gotMetadata = (ms: number) => new Promise<boolean>((resolve) => {
+      if (video.readyState >= 1) return resolve(true);
+      const done = () => { clearTimeout(timer); resolve(true); };
+      const timer = setTimeout(() => {
+        video.removeEventListener('loadedmetadata', done);
+        resolve(false);
+      }, ms);
+      video.addEventListener('loadedmetadata', done, { once: true });
+    });
+
+    const start = async () => {
+      try {
+        // Chromium answers "maybe" to canPlayType for HLS but cannot actually
+        // play it, so feature detection alone picks the wrong path. Try native
+        // first (real Safari succeeds, and costs no download), and fall back to
+        // hls.js if no metadata arrives.
+        let ready = false;
+        if (video.canPlayType('application/vnd.apple.mpegurl')) {
+          video.src = src;
+          video.load();
+          ready = await gotMetadata(2500);
+        }
+
+        if (!ready) {
+          video.removeAttribute('src');
+          video.load();
+          const { default: Hls } = await import('hls.js');   // separate chunk
+          if (!Hls.isSupported()) return;                    // poster stays
+          const hls = new Hls({ capLevelToPlayerSize: true, startLevel: -1 });
+          hls.loadSource(src);
+          hls.attachMedia(video);
+          await new Promise<void>((resolve) =>
+            hls.on(Hls.Events.MANIFEST_PARSED, () => resolve()));
+        }
+
+        await video.play();
+        box.classList.add('playing');           // cross-fades the poster out
+      } catch {
+        /* autoplay refused or network failed — the poster stays, which is fine */
+      }
+    };
+
+    // Wait for load so the video never competes with LCP.
+    if (document.readyState === 'complete') start();
+    else addEventListener('load', start, { once: true });
+  }
 </script>
 
 <style>
   .hero-video { position: relative; aspect-ratio: 16 / 9; background: #000; overflow: hidden; }
-  .hero-video img, .hero-video :global(iframe) { width: 100%; height: 100%; object-fit: cover; border: 0; }
-  .play {
-    position: absolute; inset: 0; margin: auto; width: 68px; height: 48px;
-    background: none; border: 0; cursor: pointer; padding: 0;
+
+  .hero-poster, .hero-media {
+    position: absolute; inset: 0;
+    width: 100%; height: 100%;
+    object-fit: cover;
   }
-  .play:hover path:first-child { fill-opacity: 1; }
+  .hero-poster img { width: 100%; height: 100%; object-fit: cover; }
+
+  /* The video sits above the poster and fades in once it is actually playing,
+     so there is never a black frame or a flash of empty <video>. */
+  .hero-media { opacity: 0; transition: opacity .6s ease; border: 0; }
+  .hero-video.playing .hero-media { opacity: 1; }
+
+  .sound {
+    position: absolute; right: 1.25rem; bottom: 1.25rem;
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 44px; height: 44px; padding: 0;
+    border: 1px solid rgba(255,255,255,.55); border-radius: 50%;
+    background: rgba(0,0,0,.35); color: #fff; cursor: pointer;
+    -webkit-backdrop-filter: blur(4px); backdrop-filter: blur(4px);
+    transition: background .2s ease, border-color .2s ease;
+  }
+  .sound:hover { background: rgba(0,0,0,.6); border-color: #fff; }
+  /* Slash shown while muted, waves shown once sound is on. */
+  .sound .waves { opacity: 0; }
+  .hero-video.sound-on .sound .muted-slash { opacity: 0; }
+  .hero-video.sound-on .sound .waves { opacity: 1; }
+
+  @media (prefers-reduced-motion: reduce) {
+    .hero-media { transition: none; }
+    .sound { transition: none; }
+  }
 </style>
