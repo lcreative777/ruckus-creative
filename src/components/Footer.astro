@@ -1,26 +1,62 @@
 ---
-import { site, legalLinks } from '../data/site';
-const year = new Date().getFullYear();
+// src/components/Footer.astro — Cinema footer.
+// The handoff's footer drops the address/phone/email block the light
+// build showed — that identity content already lives in the homepage
+// contact section and the header's mobile panel, so this stays to logo +
+// copyright + the sidebar/legal links.
+import { Image } from 'astro:assets';
+import { site, sidebarLinks, legalLinks } from '../data/site';
+import logoLight from '../assets/chrome/ruckus_logo_light.png';
+
+const footerLinks = [...sidebarLinks, ...legalLinks];
 ---
 <footer class="site-footer">
-  <div class="container">
-    <address>
-      <strong>{site.legalName}</strong><br />
-      {site.address.street}<br />
-      {site.address.city}, {site.address.region} {site.address.postalCode}<br />
-      <a href={`tel:${site.phoneE164}`}>{site.phone}</a> ·
-      <a href={`mailto:${site.email}`}>{site.email}</a>
-    </address>
-    <p class="legal">
-      © {year} {site.name}.
-      {legalLinks.map((l, i) => <>{i > 0 && ' | '}<a href={l.href}>{l.label}</a></>)}
-    </p>
+  <div class="container-wide bar">
+    <div class="brand">
+      <Image src={logoLight} alt={site.name} height={30} widths={[60, 90, 120]} sizes="60px" loading="lazy" />
+      <p>© {site.legalName}</p>
+    </div>
+    <nav aria-label="Footer">
+      <ul>
+        {footerLinks.map(l => <li><a href={l.href}>{l.label}</a></li>)}
+      </ul>
+    </nav>
   </div>
 </footer>
 
 <style>
-  .site-footer { background: var(--color-bg-dark); color: #cfcbc6; padding-block: var(--space-5); margin-top: var(--space-6); }
-  .site-footer a { color: var(--color-accent); }
-  address { font-style: normal; line-height: 1.8; }
-  .legal { margin-top: var(--space-3); font-size: 0.875rem; }
+  .site-footer {
+    background: var(--color-footer);
+    border-top: 1px solid rgba(255, 255, 255, .09);
+    padding-block: var(--space-4);
+  }
+  .bar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-3);
+  }
+  .brand { display: flex; align-items: center; gap: var(--space-2); }
+  .brand :global(img) { height: 30px; width: auto; opacity: .85; }
+  .brand p {
+    margin: 0;
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 12px;
+    letter-spacing: .04em;
+    color: var(--color-text-muted);
+  }
+  nav ul { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: var(--space-3); }
+  nav a {
+    text-decoration: none;
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 11px;
+    letter-spacing: .18em;
+    text-transform: uppercase;
+    color: var(--color-text-muted);
+    transition: color .2s ease;
+  }
+  nav a:hover { color: #fff; }
 </style>

@@ -29,6 +29,14 @@ h1 { font-size: var(--step-h1); line-height: var(--step-h1-lh); letter-spacing: 
 h2 { font-size: var(--step-h2); line-height: var(--step-h2-lh); letter-spacing: var(--step-h2-ls); font-weight: 900; }
 h3 { font-size: var(--step-h3); line-height: var(--step-h3-lh); font-weight: 700; }
 
+/* The header is fixed (Header.astro), so in-page anchor targets need their
+   own scroll offset rather than JS-driven scroll compensation. 70px clears
+   the fixed bar per the handoff. These ids are already on the migrated
+   homepage content (see src/content/pages/home.md). */
+#home, #intro, #work, #about, #services, #contact {
+  scroll-margin-top: 70px;
+}
+
 .container { width: min(100% - 2rem, var(--container)); margin-inline: auto; }
 .container-wide { width: min(100% - 2rem, var(--container-wide)); margin-inline: auto; }
 .section { padding-block: var(--band-pad); }
