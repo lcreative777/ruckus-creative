@@ -15,3 +15,50 @@ const d = entry.data;
   <section class="hero"><HeroVideo videoId="NgliiMV4jzE" poster="ruckus_vid-1.jpg" title="Play the Ruckus Creative reel" /></section>
   <RichText html={entry.body ?? ''} class="prose container-wide" />
 </Base>
+
+<script>
+  // Progressive enhancement for the testimonial slider. The track is a
+  // scroll-snap container, so swipe, trackpad and keyboard scrolling already
+  // work with no script at all — this only adds dot navigation and keeps the
+  // active dot in sync. Roughly 700 bytes.
+  for (const slider of document.querySelectorAll<HTMLElement>('.testimonial_slider')) {
+    const track = slider.querySelector<HTMLElement>('.slides');
+    const slides = [...(track?.children ?? [])] as HTMLElement[];
+    if (!track || slides.length < 2) continue;
+
+    const dots = document.createElement('ul');
+    dots.className = 'testimonial-dots';
+
+    slides.forEach((slide, i) => {
+      const li = document.createElement('li');
+      const button = document.createElement('button');
+      button.type = 'button';
+      button.setAttribute('aria-label', `Show testimonial ${i + 1} of ${slides.length}`);
+      button.setAttribute('aria-current', String(i === 0));
+      button.addEventListener('click', () => {
+        track.scrollTo({ left: slide.offsetLeft - track.offsetLeft });
+      });
+      li.append(button);
+      dots.append(li);
+    });
+    slider.append(dots);
+
+    const buttons = [...dots.querySelectorAll('button')];
+    // Mark whichever slide is closest to the track's centre as current.
+    const sync = () => {
+      const centre = track.scrollLeft + track.clientWidth / 2;
+      let nearest = 0, best = Infinity;
+      slides.forEach((slide, i) => {
+        const distance = Math.abs(slide.offsetLeft - track.offsetLeft + slide.clientWidth / 2 - centre);
+        if (distance < best) { best = distance; nearest = i; }
+      });
+      buttons.forEach((b, i) => b.setAttribute('aria-current', String(i === nearest)));
+    };
+
+    let queued = 0;
+    track.addEventListener('scroll', () => {
+      cancelAnimationFrame(queued);
+      queued = requestAnimationFrame(sync);
+    }, { passive: true });
+  }
+</script>

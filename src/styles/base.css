@@ -308,3 +308,69 @@ h3 { font-size: var(--step-h3); }
 @media (prefers-reduced-motion: reduce) {
   .prose .elastic-portfolio-item .work-info { transition: none; }
 }
+
+/* ---- Testimonial slider --------------------------------------------------
+   The quotes sit in Salient's own .testimonial_slider > .slides > blockquote
+   structure, which survived migration. Salient drove it with jQuery; this is a
+   scroll-snap track instead, so swipe and keyboard scrolling work natively and
+   the only script needed is the dot navigation. */
+.prose #services {
+  background: linear-gradient(45deg, #b81e04 0%, #2949e8 100%);
+  margin-inline: calc(50% - 50vw);
+  width: 100vw;
+  padding-block: var(--space-6);
+}
+.prose #services > * { width: min(100% - 2rem, var(--container-wide)); margin-inline: auto; }
+
+.prose .testimonial_slider { position: relative; }
+.prose .testimonial_slider .slides {
+  display: flex;
+  gap: 0;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  scroll-behavior: smooth;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.prose .testimonial_slider .slides::-webkit-scrollbar { display: none; }
+.prose .testimonial_slider blockquote {
+  flex: 0 0 100%;
+  scroll-snap-align: center;
+  margin: 0;
+  padding: 0 clamp(1rem, 6vw, 5rem);
+  text-align: center;
+  color: #fff;
+}
+.prose .testimonial_slider blockquote p {
+  font-family: var(--font-alt);
+  font-size: clamp(1.05rem, .8rem + .9vw, 1.6rem);
+  line-height: 1.5;
+  color: #fff;
+  margin-bottom: var(--space-3);
+}
+.prose .testimonial_slider .image-icon {
+  font-family: var(--font-display);
+  font-size: 4rem; line-height: 1; color: #fff; opacity: .5; margin-bottom: .25em;
+}
+.prose .testimonial_slider .testimonial-name {
+  display: block; font-weight: 700; color: #fff; letter-spacing: .03em;
+}
+.prose .testimonial_slider .title {
+  display: block; font-size: .85rem; color: rgba(255,255,255,.8); margin-top: .2em;
+}
+
+/* Dot navigation, injected by the enhancement script. */
+.prose .testimonial-dots {
+  display: flex; justify-content: center; gap: .6rem; margin-top: var(--space-3);
+  padding: 0; list-style: none;
+}
+.prose .testimonial-dots button {
+  width: 10px; height: 10px; padding: 0; border: 0; border-radius: 50%;
+  background: rgba(255,255,255,.45); cursor: pointer; transition: background .2s ease, transform .2s ease;
+}
+.prose .testimonial-dots button[aria-current="true"] { background: #fff; transform: scale(1.25); }
+
+@media (prefers-reduced-motion: reduce) {
+  .prose .testimonial_slider .slides { scroll-behavior: auto; }
+  .prose .testimonial-dots button { transition: none; }
+}
