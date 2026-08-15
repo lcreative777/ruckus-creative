@@ -1,28 +1,92 @@
-/* src/styles/tokens.css — values measured from the live site 2026-08-14 */
+/* src/styles/tokens.css — "Cinema" dark theme.
+   Every color, type, spacing and motion value below is taken verbatim from
+   docs/design/cinema/handoff.md's "Design Tokens" section. This replaces the
+   light WordPress-metric theme measured 2026-08-14; the light-theme values
+   are gone, not merely shadowed, so anything still reading var(--color-bg)
+   etc. picks up the dark palette automatically. */
 :root {
   --font-body: "Open Sans", Helvetica, Arial, sans-serif;
   --font-display: "Lato", "Open Sans", Helvetica, sans-serif;
   --font-alt: "Raleway", "Open Sans", Helvetica, sans-serif;
 
-  --color-text: #676767;
-  --color-heading: #1f1f1f;
-  --color-bg: #ffffff;
-  --color-bg-dark: #1a1a1a;
-  --color-accent: #dd9933;
-  --color-accent-2: #f6653c;
-  --color-rule: #e6e4e1;
+  /* ---- Cinema palette (handoff § Design Tokens → Colors) ---------------- */
+  --color-ink-red: #b81e04;    /* primary brand accent, gradient start */
+  --color-flame: #f6653c;      /* interactive accent, icon tint, labels */
+  --color-signal-blue: #2949e8; /* gradient end, stat band */
+  --color-deep-blue: #1b2f9e;   /* gradient shade */
+  --color-blue-93: rgba(60, 88, 232, .93); /* stat band 2 */
+  --color-canvas: #121110;      /* page background */
+  --color-surface-raised: #161514; /* alternating sections */
+  --color-surface-card: #1b1a18;   /* cards, rails */
+  --color-surface-card-a86: rgba(27, 26, 24, .86);
+  --color-surface-deep: #020202;   /* Why Us panel */
+  --color-footer: #0f0e0d;         /* footer, statement band */
+  --color-cta: #1a1a1a;            /* CTA section */
+  --color-text-body: #a8a29a;      /* default copy */
+  --color-text-muted: #8d8983;     /* meta, roles */
+  --color-text-dim: #6e6a63;       /* section meta */
+  --color-text-bright: #e4e0da;    /* brief values */
+  --color-white: #ffffff;          /* headings */
+  --color-hairline: rgba(255, 255, 255, .08);   /* grid gaps, borders */
+  --color-hairline-strong: rgba(255, 255, 255, .12);
 
-  /* Live site: h1 54/62, h2 34/44. Fluid below those caps so mobile does not overflow. */
-  --step-h1: clamp(2rem, 1.35rem + 2.6vw, 3.375rem);
-  --step-h1-lh: 1.15;
-  --step-h2: clamp(1.5rem, 1.15rem + 1.4vw, 2.125rem);
-  --step-h2-lh: 1.3;
-  --step-h3: clamp(1.25rem, 1.1rem + 0.6vw, 1.5rem);
-  /* Measured from the live site: body 14px / 26px line-height, paragraphs
-     separated by 27px. Small by modern standards, but this is a faithful
-     rebuild — matching it is the point. */
-  --step-body: 14px;
-  --body-lh: 26px;
+  /* Existing variable names, retuned to the Cinema palette so every
+     consumer (Header, Footer, RichText, PortfolioGrid, base.css itself)
+     picks up the dark theme without a rewrite. */
+  --color-text: var(--color-text-body);
+  --color-heading: var(--color-white);
+  --color-bg: var(--color-canvas);
+  --color-bg-dark: var(--color-footer);
+  --color-accent: var(--color-flame);   /* interactive default: links, focus, hover */
+  --color-accent-2: var(--color-ink-red); /* brand accent / gradient start */
+  --color-rule: var(--color-hairline);
+  --color-page-band: var(--color-surface-raised);
+
+  /* ---- Gradients (handoff § Design Tokens → Gradients) ------------------ */
+  --gradient-brand-120: linear-gradient(120deg, var(--color-ink-red), var(--color-signal-blue));
+  --gradient-brand-90: linear-gradient(90deg, var(--color-ink-red), var(--color-signal-blue));
+  --gradient-brand-180: linear-gradient(180deg, var(--color-ink-red), var(--color-signal-blue));
+  --gradient-headline: linear-gradient(100deg, #fff 6%, #ffd9cb 26%, #ff8f6d 44%, #ffffff 56%, #8fa4ff 78%, #7d8dff 96%);
+
+  /* ---- Type scale (handoff § Design Tokens → Typography) ----------------
+     Generic <h1>/<h2>/<h3> map to the handoff's "Section H2" role and a
+     proportionally-scaled step below it — component-level markup (hero,
+     CTA, process rail, quotes) sets its own clamp() per the handoff's table
+     rather than relying on these bare-element defaults. */
+  --step-h1: clamp(32px, 4.6vw, 66px);
+  --step-h1-lh: 1;
+  --step-h1-ls: -0.03em;
+  --step-h2: clamp(24px, 3.2vw, 40px);
+  --step-h2-lh: 1.2;
+  --step-h2-ls: -0.02em;
+  --step-h3: clamp(20px, 2vw, 28px);
+  --step-h3-lh: 1.25;
+
+  /* Hero/CTA/editorial roles, for components built in later tasks. */
+  --type-hero-h1: clamp(40px, 6.4vw, 104px);
+  --type-hero-h1-lh: .98;
+  --type-hero-h1-ls: -0.035em;
+  --type-process-h2: clamp(28px, 4.2vw, 60px);
+  --type-process-h2-ls: -0.025em;
+  --type-cta-h1: clamp(34px, 5.6vw, 80px);
+  --type-cta-h1-ls: -0.035em;
+  --type-editorial-lead: clamp(24px, 2.7vw, 38px);
+  --type-editorial-lead-lh: 1.3;
+  --type-quote: clamp(22px, 2.7vw, 38px);
+  --type-quote-lh: 1.42;
+  --type-card-title: 19px;
+  --type-card-title-lh: 1.25;
+  --type-block-title: 17px;
+  --type-block-title-ls: .05em;
+  --type-label: 11px;
+  --type-label-ls: .22em;
+  --type-step-number: 11px;
+  --type-step-number-ls: .24em;
+
+  /* Body copy: the handoff raises the WordPress-metric 14px/26px default to
+     15px/1.8–1.9 for readability (Plan 4 decision table). */
+  --step-body: 15px;
+  --body-lh: 1.85;
   --p-gap: 27px;
 
   --space-1: 0.5rem;
@@ -32,10 +96,27 @@
   --space-5: 4rem;
   --space-6: 6rem;
 
-  /* .container is 880px on the live site's inner pages, not 1100px. */
+  /* Section/card spacing (handoff § Design Tokens → Spacing). */
+  --space-section-block: clamp(64px, 8vw, 110px);
+  --space-section-block-lg: clamp(84px, 11vw, 150px);
+  --space-section-inline: clamp(24px, 5vw, 72px);
+  --space-card-pad: clamp(26px, 3vw, 42px);
+  --gap-cards: clamp(18px, 2.2vw, 28px);
+  --gap-hairline: 1px;
+  --gap-rail: 20px;
+
   --container: 880px;
   --container-wide: 1425px;
-  /* Inner pages sit on a light grey band, not white. */
-  --color-page-band: #f8f8f8;
   --band-pad: 40px;
+
+  /* ---- Radius / borders (handoff § Design Tokens → Radius, borders, shadows)
+     No box-shadows anywhere — depth comes from gradient light and hairlines. */
+  --radius-pill: 999px;
+  --radius-card: 2px;
+
+  /* ---- Motion (handoff § Design Tokens → Motion tokens) ----------------- */
+  --ease-primary: cubic-bezier(.2, .7, .2, 1);
+  --reveal-offset: 22px;
+  --stagger-tile: .045s;
+  --stagger-card: .08s;
 }

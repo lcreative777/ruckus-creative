@@ -1,6 +1,9 @@
-/* src/styles/base.css */
+/* src/styles/base.css — "Cinema" dark theme.
+   Colors below are retuned from tokens.css's Cinema palette; the grid, band
+   and prose rules that follow are unchanged in structure from the light
+   build (several were hard-won migration fixes) — only their colours move. */
 *, *::before, *::after { box-sizing: border-box; }
-html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; }
+html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; color-scheme: dark; }
 body {
   margin: 0;
   background: var(--color-bg);
@@ -22,15 +25,16 @@ h1, h2, h3, h4 {
   margin: 0 0 var(--space-1);
   text-wrap: balance;
 }
-h1 { font-size: var(--step-h1); line-height: var(--step-h1-lh); }
-h2 { font-size: var(--step-h2); line-height: var(--step-h2-lh); }
-h3 { font-size: var(--step-h3); }
+h1 { font-size: var(--step-h1); line-height: var(--step-h1-lh); letter-spacing: var(--step-h1-ls); font-weight: 100; }
+h2 { font-size: var(--step-h2); line-height: var(--step-h2-lh); letter-spacing: var(--step-h2-ls); font-weight: 900; }
+h3 { font-size: var(--step-h3); line-height: var(--step-h3-lh); font-weight: 700; }
 
 .container { width: min(100% - 2rem, var(--container)); margin-inline: auto; }
 .container-wide { width: min(100% - 2rem, var(--container-wide)); margin-inline: auto; }
 .section { padding-block: var(--band-pad); }
 
-/* Inner pages sit on the light grey band the live site uses, not on white. */
+/* Inner pages sit on the raised dark surface (#161514), not the live
+   site's light grey band. */
 .page-band { background: var(--color-page-band); }
 .visually-hidden {
   position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
@@ -189,8 +193,8 @@ h3 { font-size: var(--step-h3); }
   transition: filter .2s ease;
 }
 .prose .n-sc-button:hover { filter: brightness(1.08); }
-.prose .n-sc-button.extra-color-1 { background: #f6653c; color: #fff; }
-.prose .n-sc-button.extra-color-3 { background: #333; color: #fff; }
+.prose .n-sc-button.extra-color-1 { background: var(--color-flame); color: #fff; }
+.prose .n-sc-button.extra-color-3 { background: var(--color-cta); color: #fff; }
 .prose .light .n-sc-button { color: #fff; text-decoration: none; }
 /* The arrow glyph came from Salient's icon font; draw it as a caret instead. */
 .prose .icon-button-arrow { width: .6em; height: .6em; border-top: 2px solid currentColor;
