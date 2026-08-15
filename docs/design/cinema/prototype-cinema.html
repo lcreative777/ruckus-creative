@@ -1,0 +1,714 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Lato:ital,wght@0,100;0,300;0,400;0,700;0,900;1,300;1,900&family=Open+Sans:ital,wght@0,400;0,600;0,700;1,400&family=Raleway:ital,wght@0,200;0,300;0,400;0,600;1,300&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/ScrollTrigger.min.js"></script>
+<style>
+  body { margin: 0; background: #121110; color: #a8a29a; font-family: "Open Sans", Helvetica, Arial, sans-serif; font-size: 15px; line-height: 1.8; -webkit-font-smoothing: antialiased; }
+  a { color: #f6653c; }
+  a:hover { color: #ff8560; }
+  ::selection { background: #b81e04; color: #fff; }
+  [data-track]::-webkit-scrollbar { display: none; }
+  @keyframes rk-pulse { 0%,100% { transform: scale(1); opacity: .5; } 50% { transform: scale(1.4); opacity: 0; } }
+  @keyframes rk-wash { 0% { background-position: 0% 50%; } 42% { background-position: 100% 50%; } 100% { background-position: 100% 50%; } }
+  @keyframes rk-scrollcue { 0%,100% { transform: translateY(0); opacity: .4; } 50% { transform: translateY(7px); opacity: 1; } }
+</style>
+</helmet>
+
+<div style="position:relative; overflow-x:hidden">
+
+  <header style="position:fixed; top:0; left:0; right:0; z-index:50; display:flex; align-items:center; justify-content:space-between; padding:18px clamp(20px,4vw,56px); background:rgba(18,17,16,.72); backdrop-filter:blur(14px); border-bottom:1px solid rgba(255,255,255,.08)">
+    <a href="#home" onClick="{{ goHome }}" style="display:flex; align-items:center; text-decoration:none">
+      <img src="src/assets/chrome/ruckus_logo_light.png" alt="Ruckus Creative" style="height:55px; width:auto; display:block">
+    </a>
+    <nav style="display:flex; align-items:center; gap:clamp(14px,2vw,30px); font-family:Lato,sans-serif; font-size:11px; font-weight:700; letter-spacing:.2em; text-transform:uppercase">
+      <a href="#home" onClick="{{ goHome }}" style="color:rgba(255,255,255,.72); text-decoration:none" style-hover="color:#fff">Home</a>
+      <a href="#intro" onClick="{{ goHome }}" style="color:rgba(255,255,255,.72); text-decoration:none" style-hover="color:#fff">Intro</a>
+      <a href="#work" onClick="{{ goHome }}" style="color:rgba(255,255,255,.72); text-decoration:none" style-hover="color:#fff">Work</a>
+      <a href="#about" onClick="{{ goHome }}" style="color:rgba(255,255,255,.72); text-decoration:none" style-hover="color:#fff">About</a>
+      <a href="#services" onClick="{{ goHome }}" style="color:rgba(255,255,255,.72); text-decoration:none" style-hover="color:#fff">Services</a>
+      <a href="/knowledge/" onClick="{{ goKnowledge }}" style="color:rgba(255,255,255,.72); text-decoration:none" style-hover="color:#fff">Knowledge</a>
+      <a href="#contact" onClick="{{ goHome }}" style="display:inline-flex; align-items:center; gap:8px; padding:11px 20px; border-radius:999px; background:linear-gradient(120deg,#b81e04,#2949e8); color:#fff; text-decoration:none">Start a Ruckus</a>
+    </nav>
+  </header>
+
+  <sc-if value="{{ isHome }}" hint-placeholder-val="{{ true }}">
+  <main>
+
+    <section id="home" style="position:relative; min-height:100vh; display:flex; align-items:flex-end; overflow:hidden">
+      <img src="src/assets/media/ruckus_vid-1.jpg" alt="" data-hero-img style="position:absolute; inset:-6% 0; width:100%; height:112%; object-fit:cover; will-change:transform">
+      <div style="position:absolute; inset:0; background:linear-gradient(180deg, rgba(18,17,16,.78) 0%, rgba(18,17,16,.22) 42%, rgba(18,17,16,.97) 100%)"></div>
+      <div style="position:absolute; inset:0; background:radial-gradient(90% 70% at 78% 18%, rgba(184,30,4,.34), transparent 62%), radial-gradient(70% 60% at 12% 82%, rgba(41,73,232,.26), transparent 64%)"></div>
+      <div style="position:absolute; inset:0; opacity:.14; mix-blend-mode:overlay; background-image:url('data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22140%22 height=%22140%22%3E%3Cfilter id=%22n%22%3E%3CfeTurbulence type=%22fractalNoise%22 baseFrequency=%22.8%22 numOctaves=%223%22/%3E%3C/filter%3E%3Crect width=%22140%22 height=%22140%22 filter=%22url(%23n%29%22 opacity=%22.55%22/%3E%3C/svg%3E')"></div>
+
+      <sc-if value="{{ videoPlaying }}" hint-placeholder-val="{{ false }}">
+        <div style="position:absolute; inset:0; background:#000; z-index:3">
+          <iframe src="{{ videoSrc }}" title="Ruckus Creative reel" allow="autoplay; encrypted-media; fullscreen" allowFullScreen="{{ true }}" style="width:100%; height:100%; border:0; display:block"></iframe>
+          <button type="button" onClick="{{ stopVideo }}" style="position:absolute; top:88px; right:24px; z-index:4; display:inline-flex; align-items:center; gap:9px; padding:11px 18px; border:1px solid rgba(255,255,255,.4); border-radius:999px; background:rgba(0,0,0,.55); color:#fff; font-family:Lato,sans-serif; font-size:11px; font-weight:700; letter-spacing:.18em; text-transform:uppercase; cursor:pointer; backdrop-filter:blur(8px)" style-hover="background:#b81e04; border-color:#b81e04">Close</button>
+        </div>
+      </sc-if>
+
+      <div style="position:relative; z-index:2; width:100%; padding:0 clamp(20px,4vw,56px) clamp(48px,6vh,80px)">
+        <div style="display:flex; align-items:flex-end; justify-content:space-between; gap:clamp(24px,5vw,64px); flex-wrap:wrap">
+          <div style="max-width:min(880px,92%)">
+            <div data-hero-eyebrow style="display:flex; align-items:center; gap:14px; margin-bottom:22px; font-family:Lato,sans-serif; font-size:11px; font-weight:700; letter-spacing:.26em; text-transform:uppercase; color:#f6653c">
+              <span style="width:34px; height:1px; background:#f6653c; display:inline-block"></span>Full-service creative agency since 1993
+            </div>
+            <h1 style="margin:0; font-family:Lato,sans-serif; font-weight:100; font-size:clamp(40px,6.4vw,104px); line-height:.98; letter-spacing:-.035em; color:#fff; text-wrap:balance">
+              <span data-hero-line style="display:block">Business results through</span>
+              <span data-hero-line data-hero-wash style="display:block; padding-bottom:.16em; line-height:1.06; font-weight:900; font-style:italic; background-image:linear-gradient(100deg,#fff 6%,#ffd9cb 26%,#ff8f6d 44%,#ffffff 56%,#8fa4ff 78%,#7d8dff 96%); background-size:260% 100%; background-position:0% 50%; background-repeat:no-repeat; -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent; animation:rk-wash 7s cubic-bezier(.36,.7,.25,1) 1.5s infinite">strategic creative</span>
+            </h1>
+          </div>
+          <button type="button" onClick="{{ playVideo }}" aria-label="Play video" style="position:relative; flex:0 0 auto; width:clamp(88px,9vw,116px); height:clamp(88px,9vw,116px); border-radius:50%; border:1px solid rgba(255,255,255,.5); background:rgba(255,255,255,.08); color:#fff; cursor:pointer; display:flex; align-items:center; justify-content:center; backdrop-filter:blur(8px); transition:background .35s ease, border-color .35s ease, transform .35s ease" style-hover="background:#b81e04; border-color:#b81e04; transform:scale(1.06)">
+            <span style="position:absolute; inset:-1px; border-radius:50%; border:1px solid rgba(255,255,255,.4); animation:rk-pulse 2.8s ease-out infinite"></span>
+            <span style="width:0; height:0; border-left:20px solid currentColor; border-top:12px solid transparent; border-bottom:12px solid transparent; margin-left:6px"></span>
+          </button>
+        </div>
+        <div style="margin-top:44px; display:flex; align-items:center; gap:12px; font-family:Lato,sans-serif; font-size:10px; font-weight:700; letter-spacing:.24em; text-transform:uppercase; color:rgba(255,255,255,.45)">
+          <span style="display:inline-block; animation:rk-scrollcue 2.2s ease-in-out infinite">↓</span> Scroll
+        </div>
+      </div>
+    </section>
+
+    <section id="intro" style="position:relative; display:grid; grid-template-columns:repeat(auto-fit,minmax(340px,1fr)); align-items:stretch; background:#161514">
+      <div style="padding:clamp(64px,9vw,132px) clamp(24px,5vw,72px); display:flex; flex-direction:column; gap:30px; justify-content:center">
+        <p data-reveal style="margin:0; font-family:Raleway,sans-serif; font-weight:200; font-size:clamp(24px,2.7vw,38px); line-height:1.3; color:#fff; letter-spacing:-.015em"><strong style="font-family:Lato,sans-serif; font-weight:900; font-size:clamp(21px,2.2vw,31px); letter-spacing:-.01em">BUSINESS RESULTS THROUGH STRATEGIC CREATIVE:</strong> It’s a mission we take seriously and a commitment our clients take to the bank, time after time.</p>
+        <p data-reveal style="margin:0; max-width:52ch; line-height:1.9">Ruckus Creative is a full-service creative agency that creates results. You have the objective – a lift in sales, launch a new product, open a new market – and we have the strategy and creative to help make it a success.</p>
+        <a data-reveal href="#about" style="align-self:flex-start; display:inline-flex; align-items:center; gap:12px; padding:16px 32px; border:1px solid rgba(255,255,255,.35); border-radius:999px; color:#fff; text-decoration:none; font-family:Lato,sans-serif; font-size:11px; font-weight:700; letter-spacing:.2em; text-transform:uppercase; transition:background .3s ease, border-color .3s ease" style-hover="background:#f6653c; border-color:#f6653c">Learn More <span style="width:.5em; height:.5em; border-top:2px solid currentColor; border-right:2px solid currentColor; transform:rotate(45deg); display:inline-block"></span></a>
+      </div>
+      <div style="position:relative; min-height:56vh; overflow:hidden">
+        <img src="src/assets/media/imac.jpg" alt="" data-parallax="18" style="position:absolute; inset:-8% 0; width:100%; height:116%; object-fit:cover; object-position:left center">
+        <div style="position:absolute; inset:0; background:linear-gradient(90deg, rgba(22,21,20,.92), rgba(22,21,20,.1) 46%, transparent)"></div>
+      </div>
+    </section>
+
+    <section style="display:grid; grid-template-columns:repeat(auto-fit,minmax(280px,1fr)); gap:1px; background:rgba(255,255,255,.08)">
+      <sc-for list="{{ pillars }}" as="p" hint-placeholder-count="3">
+        <div data-reveal style="background:#121110; padding:clamp(40px,4vw,64px) clamp(28px,3.4vw,52px); display:flex; flex-direction:column; align-items:center; text-align:center; gap:16px">
+          <img src="{{ p.icon }}" alt="" style="width:38px; height:38px; filter:invert(58%) sepia(74%) saturate(2600%) hue-rotate(343deg) brightness(97%)">
+          <h5 style="margin:0; font-family:Lato,sans-serif; font-weight:900; font-size:17px; letter-spacing:.05em; text-transform:uppercase; color:#fff">{{ p.title }}</h5>
+          <p style="margin:0; line-height:1.85; max-width:36ch">{{ p.body }}</p>
+        </div>
+      </sc-for>
+    </section>
+
+    <section style="position:relative; padding:clamp(64px,8vw,110px) clamp(24px,5vw,72px); overflow:hidden; background:#0f0e0d">
+      <div style="position:absolute; inset:0; background:radial-gradient(85% 130% at 8% 50%, rgba(184,30,4,.5), transparent 60%), radial-gradient(85% 130% at 95% 50%, rgba(41,73,232,.42), transparent 62%)"></div>
+      <div style="position:relative; display:grid; grid-template-columns:repeat(auto-fit,minmax(300px,1fr)); gap:clamp(28px,4vw,64px); align-items:center">
+        <p data-reveal style="margin:0; grid-column:span 2; min-width:0; font-family:Raleway,sans-serif; font-weight:200; font-size:clamp(23px,2.6vw,36px); line-height:1.35; color:#fff">Our job: making you more money. ROI, results, profits, the grand poobah-moolah, doesn’t matter what you call it, it is the only goal for any successful business.</p>
+        <a data-reveal href="#about" style="justify-self:start; display:inline-flex; align-items:center; gap:12px; padding:17px 34px; border-radius:999px; background:#121110; color:#fff; text-decoration:none; font-family:Lato,sans-serif; font-size:11px; font-weight:700; letter-spacing:.2em; text-transform:uppercase; transition:background .3s ease,color .3s ease" style-hover="background:#fff; color:#121110">Learn More <span style="width:.5em; height:.5em; border-top:2px solid currentColor; border-right:2px solid currentColor; transform:rotate(45deg); display:inline-block"></span></a>
+      </div>
+    </section>
+
+    <section id="work" style="padding:clamp(64px,8vw,110px) 0 0">
+      <div style="padding:0 clamp(24px,5vw,72px) clamp(28px,4vw,48px); display:flex; align-items:flex-end; justify-content:space-between; gap:24px; flex-wrap:wrap">
+        <h2 data-reveal style="margin:0; font-family:Lato,sans-serif; font-weight:100; font-size:clamp(32px,4.6vw,66px); line-height:1; letter-spacing:-.03em; color:#fff">Selected <span style="font-weight:900; font-style:italic">work</span></h2>
+        <span style="font-family:Lato,sans-serif; font-size:11px; font-weight:700; letter-spacing:.22em; text-transform:uppercase; color:#6e6a63">20 projects · every link live</span>
+      </div>
+      <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(min(100%,340px),1fr)); gap:0">
+        <sc-for list="{{ work }}" as="w" hint-placeholder-count="8">
+          <a href="{{ w.href }}" onClick="{{ openCase }}" data-work-tile data-slug="{{ w.slug }}" style="position:relative; display:block; aspect-ratio:1/1; overflow:hidden; text-decoration:none; background:#1b1a18">
+            <img src="{{ w.img }}" alt="{{ w.title }}" data-tile-img style="position:absolute; inset:0; width:100%; height:100%; object-fit:cover; filter:saturate(.3) brightness(.72); transition:transform 1s cubic-bezier(.2,.7,.2,1), filter .6s ease; will-change:transform">
+            <span style="position:absolute; inset:0; display:flex; flex-direction:column; justify-content:flex-end; gap:7px; padding:22px; background:linear-gradient(180deg, rgba(18,17,16,0) 38%, rgba(18,17,16,.92) 100%); opacity:0; transition:opacity .45s ease" style-hover="opacity:1">
+              <span style="font-family:Lato,sans-serif; font-weight:900; font-size:14px; line-height:1.25; letter-spacing:.06em; text-transform:uppercase; color:#fff">{{ w.title }}</span>
+              <span style="font-family:Lato,sans-serif; font-size:10px; font-weight:700; letter-spacing:.2em; text-transform:uppercase; color:#f6653c">View case study →</span>
+            </span>
+          </a>
+        </sc-for>
+      </div>
+    </section>
+
+    <section id="about" style="position:relative; padding:clamp(72px,9vw,128px) 0; background:#161514; overflow:hidden">
+      <div style="position:absolute; inset:0; background:radial-gradient(60% 55% at 88% 12%, rgba(41,73,232,.3), transparent 65%), radial-gradient(55% 50% at 6% 90%, rgba(184,30,4,.26), transparent 62%)"></div>
+      <div style="position:relative; padding:0 clamp(24px,5vw,72px); display:flex; align-items:flex-end; justify-content:space-between; gap:24px; flex-wrap:wrap; margin-bottom:clamp(30px,4vw,52px)">
+        <h2 data-reveal style="margin:0; font-family:Lato,sans-serif; font-weight:900; font-style:italic; font-size:clamp(28px,4.2vw,60px); line-height:1; letter-spacing:-.025em; color:#fff; text-transform:uppercase">Brand Alignment Process™</h2>
+        <span style="font-family:Lato,sans-serif; font-size:11px; font-weight:700; letter-spacing:.22em; text-transform:uppercase; color:#6e6a63">Five stages</span>
+      </div>
+      <div data-process-track style="position:relative; display:flex; gap:20px; overflow-x:auto; scroll-snap-type:x mandatory; scrollbar-width:none; padding:0 clamp(24px,5vw,72px) 10px">
+        <sc-for list="{{ steps }}" as="s" hint-placeholder-count="5">
+          <div data-step style="flex:0 0 clamp(280px,26vw,380px); scroll-snap-align:start; background:rgba(27,26,24,.86); border:1px solid rgba(255,255,255,.09); padding:clamp(26px,2.6vw,36px); display:flex; flex-direction:column; gap:16px; min-height:330px; transition:border-color .4s ease, transform .5s cubic-bezier(.2,.7,.2,1), background .4s ease" style-hover="border-color:rgba(246,101,60,.65); transform:translateY(-6px)">
+            <img src="{{ s.icon }}" alt="" style="width:36px; height:36px; filter:invert(58%) sepia(74%) saturate(2600%) hue-rotate(343deg) brightness(97%)">
+            <span style="font-family:Lato,sans-serif; font-size:11px; font-weight:700; letter-spacing:.24em; color:#f6653c">{{ s.num }}</span>
+            <h4 style="margin:0; font-family:Lato,sans-serif; font-weight:900; font-size:19px; letter-spacing:.04em; color:#fff; text-transform:uppercase">{{ s.title }}</h4>
+            <p style="margin:0; font-size:14px; line-height:1.85">{{ s.body }}</p>
+          </div>
+        </sc-for>
+      </div>
+      <div style="position:relative; margin:28px clamp(24px,5vw,72px) 0; height:2px; background:rgba(255,255,255,.12)">
+        <div data-process-progress style="position:absolute; inset:0 auto 0 0; width:12%; background:linear-gradient(90deg,#b81e04,#2949e8)"></div>
+      </div>
+    </section>
+
+    <section style="padding:clamp(72px,9vw,120px) clamp(24px,5vw,72px); display:grid; grid-template-columns:repeat(auto-fit,minmax(320px,1fr)); gap:clamp(32px,5vw,64px)">
+      <div>
+        <h3 data-reveal style="margin:0 0 22px; font-family:Lato,sans-serif; font-size:11px; font-weight:900; letter-spacing:.26em; text-transform:uppercase; color:#f6653c">Why Us?</h3>
+        <h2 data-reveal style="margin:0; font-family:Raleway,sans-serif; font-weight:200; font-size:clamp(24px,2.7vw,38px); line-height:1.32; color:#fff">In a marketplace filled with homogeneous, milktoast advertising and design, filled with cliches, plattitudes, and ambiguity, it’s not hard to make some noise. <span style="font-size:.6em; color:#a8a29a">It’s time to create some marketing with charisma and personality. It’s time to add a bit of character and spunk.</span></h2>
+      </div>
+      <div data-reveal style="position:relative; background:#020202; padding:clamp(30px,3.4vw,48px); display:flex; flex-direction:column; gap:22px; overflow:hidden">
+        <div style="position:absolute; left:0; top:0; bottom:0; width:2px; background:linear-gradient(180deg,#b81e04,#2949e8)"></div>
+        <p style="margin:0; line-height:1.9">We understand, that with customer attrition, increased competition, and other pressures, your business needs growth just to stay at its current level. But that’s not good enough for us. We want to create real momentum for you.</p>
+        <p style="margin:0; line-height:1.9">We want to put a face on your brand and we want to create its voice. How does that voice sound, who is it talking to and what does it say? Our Brand Alignment process and Ignition-7 Keys to Strategic Creative ensure your brand message will inspire, connect and compel your market to respond. Let’s work together to create a brand that sells your products and services when your salesperson is not there to do it for you. Let’s create a brand that sells 24-7.</p>
+        <a href="#work" style="align-self:flex-start; font-family:Lato,sans-serif; font-style:italic; font-size:14px; color:#f6653c; text-decoration:none; border-bottom:1px solid rgba(246,101,60,.5)" style-hover="color:#fff; border-color:#fff">View The Goods</a>
+      </div>
+    </section>
+
+    <section style="display:grid; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); gap:1px; background:rgba(255,255,255,.08)">
+      <div style="position:relative; padding:clamp(40px,4.4vw,64px) clamp(24px,3vw,44px); background:linear-gradient(140deg,#2949e8,#1b2f9e); color:#fff; overflow:hidden">
+        <div data-count="2460" style="font-family:Lato,sans-serif; font-weight:900; font-size:clamp(40px,4.6vw,64px); line-height:1">2,460</div>
+        <div style="margin-top:8px; font-family:Lato,sans-serif; font-size:11px; font-weight:700; letter-spacing:.22em; text-transform:uppercase">Pixels Pushed</div>
+      </div>
+      <div style="position:relative; padding:clamp(40px,4.4vw,64px) clamp(24px,3vw,44px); background:linear-gradient(140deg,rgba(60,88,232,.93),#b81e04); color:#fff; overflow:hidden">
+        <div data-count="2000" style="font-family:Lato,sans-serif; font-weight:900; font-size:clamp(40px,4.6vw,64px); line-height:1">2,000</div>
+        <div style="margin-top:8px; font-family:Lato,sans-serif; font-size:11px; font-weight:700; letter-spacing:.22em; text-transform:uppercase">Projects Completed</div>
+      </div>
+      <div style="padding:clamp(40px,4.4vw,64px) clamp(24px,3vw,44px); background:#1b1a18; display:flex; flex-wrap:wrap; align-items:center; gap:16px; font-family:Lato,sans-serif; font-size:11px; font-weight:700; letter-spacing:.18em; text-transform:uppercase; color:#6e6a63">
+        <span>Share</span>
+        <a href="/" style="color:#fff; text-decoration:none" style-hover="color:#f6653c">Facebook</a>
+        <a href="/" style="color:#fff; text-decoration:none" style-hover="color:#f6653c">X</a>
+        <a href="/" style="color:#fff; text-decoration:none" style-hover="color:#f6653c">LinkedIn</a>
+        <a href="/" style="color:#fff; text-decoration:none" style-hover="color:#f6653c">Pinterest</a>
+      </div>
+    </section>
+
+    <section id="services" style="position:relative; padding:clamp(72px,9vw,124px) 0; background:#161514; overflow:hidden">
+      <div style="position:absolute; inset:0; background:radial-gradient(70% 60% at 20% 20%, rgba(184,30,4,.3), transparent 62%), radial-gradient(70% 60% at 85% 80%, rgba(41,73,232,.3), transparent 64%)"></div>
+      <div style="position:relative">
+        <div data-testi-track data-track style="display:flex; overflow-x:auto; scroll-snap-type:x mandatory; scrollbar-width:none">
+          <sc-for list="{{ quotes }}" as="q" hint-placeholder-count="3">
+            <blockquote style="flex:0 0 100%; scroll-snap-align:center; margin:0; padding:0 clamp(24px,7vw,110px); box-sizing:border-box">
+              <p style="margin:0 0 28px; font-family:Raleway,sans-serif; font-weight:200; font-size:clamp(22px,2.7vw,38px); line-height:1.42; color:#fff; text-wrap:pretty">{{ q.body }}</p>
+              <span style="display:block; font-family:Lato,sans-serif; font-weight:900; font-size:12px; letter-spacing:.2em; text-transform:uppercase; color:#f6653c">{{ q.name }}</span>
+              <span style="display:block; margin-top:6px; font-size:13px; letter-spacing:.04em; color:#8d8983">{{ q.title }}</span>
+            </blockquote>
+          </sc-for>
+        </div>
+        <div data-testi-dots style="display:flex; justify-content:center; gap:10px; margin-top:clamp(32px,4vw,48px)"></div>
+      </div>
+    </section>
+
+    <section style="padding:clamp(72px,9vw,124px) clamp(24px,5vw,72px)">
+      <h2 data-reveal style="margin:0 0 clamp(32px,4vw,56px); font-family:Lato,sans-serif; font-weight:100; font-size:clamp(32px,4.6vw,66px); line-height:1; letter-spacing:-.03em; color:#fff">Capabilities</h2>
+      <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(280px,1fr)); gap:1px; background:rgba(255,255,255,.08)">
+        <sc-for list="{{ capabilities }}" as="c" hint-placeholder-count="6">
+          <div data-reveal style="background:#121110; padding:clamp(30px,3vw,44px); display:flex; flex-direction:column; gap:16px; transition:background .4s ease" style-hover="background:#1a1917">
+            <img src="{{ c.icon }}" alt="" style="width:36px; height:36px; filter:invert(58%) sepia(74%) saturate(2600%) hue-rotate(343deg) brightness(97%)">
+            <h4 style="margin:0; font-family:Lato,sans-serif; font-weight:900; font-size:18px; letter-spacing:.05em; text-transform:uppercase; color:#fff">{{ c.title }}</h4>
+            <div style="display:flex; flex-direction:column; gap:6px; font-size:14px; line-height:1.7">
+              <sc-for list="{{ c.items }}" as="i" hint-placeholder-count="4">
+                <span>– {{ i }}</span>
+              </sc-for>
+            </div>
+          </div>
+        </sc-for>
+      </div>
+    </section>
+
+    <section style="position:relative; padding:clamp(84px,11vw,150px) clamp(24px,5vw,72px); text-align:center; overflow:hidden; background:#1a1a1a">
+      <div style="position:absolute; inset:0; background:radial-gradient(70% 130% at 50% 0%, rgba(184,30,4,.48), transparent 62%), radial-gradient(60% 110% at 50% 110%, rgba(41,73,232,.34), transparent 60%)"></div>
+      <div style="position:relative">
+        <h1 data-reveal style="margin:0 0 16px; font-family:Lato,sans-serif; font-weight:900; font-size:clamp(34px,5.6vw,80px); line-height:1; letter-spacing:-.035em; color:#fff; text-transform:uppercase">Get ready to stand out</h1>
+        <h5 data-reveal style="margin:0; font-family:Raleway,sans-serif; font-style:italic; font-weight:300; font-size:clamp(15px,1.4vw,20px); color:rgba(255,255,255,.86)">We are here for you and ready to rock at any time: 714-514-1482.</h5>
+      </div>
+    </section>
+
+    <section id="contact" style="position:relative; overflow:hidden">
+      <img src="src/assets/media/seasm.jpg" alt="" style="position:absolute; inset:0; width:100%; height:100%; object-fit:cover">
+      <div style="position:absolute; inset:0; background:linear-gradient(90deg, rgba(18,17,16,.97), rgba(18,17,16,.82))"></div>
+      <div style="position:relative; padding:clamp(64px,8vw,120px) clamp(24px,5vw,72px); display:grid; grid-template-columns:repeat(auto-fit,minmax(320px,1fr)); gap:clamp(36px,5vw,72px)">
+        <div style="display:flex; flex-direction:column; gap:16px">
+          <p style="margin:0; font-family:Lato,sans-serif; font-weight:900; font-size:20px; letter-spacing:.05em; text-transform:uppercase; color:#fff">Ruckus Creative, llc</p>
+          <a href="tel:+17145141482" style="font-family:Lato,sans-serif; font-weight:700; font-size:clamp(24px,2.4vw,32px); color:#f6653c; text-decoration:none" style-hover="color:#fff">714.514.1482</a>
+          <p style="margin:0; line-height:1.8">27525 Puerta Real, Suite 300-173<br>Mission Viejo, CA 92691</p>
+          <p style="margin:0; line-height:1.9; max-width:46ch"><strong style="color:#fff">We are always available to answer any question you might have, or even offer a bit of off-the-cuff advice.</strong> Please feel free to reach out with any questions or comments at any time. We will get back with you immediately.</p>
+          <a href="mailto:info@ruckuscreative.com" style="align-self:flex-start; font-family:Lato,sans-serif; font-size:13px; letter-spacing:.06em; color:#f6653c; text-decoration:none; border-bottom:1px solid rgba(246,101,60,.5)" style-hover="color:#fff; border-color:#fff">info@ruckuscreative.com</a>
+        </div>
+
+        <form onSubmit="{{ submitForm }}" style="background:rgba(27,26,24,.82); border:1px solid rgba(255,255,255,.1); padding:clamp(26px,3vw,42px); display:flex; flex-direction:column; gap:18px; backdrop-filter:blur(10px)">
+          <sc-if value="{{ formSent }}" hint-placeholder-val="{{ false }}">
+            <div style="display:flex; flex-direction:column; gap:12px; min-height:280px; justify-content:center">
+              <p style="margin:0; font-family:Lato,sans-serif; font-weight:900; font-size:22px; letter-spacing:.04em; text-transform:uppercase; color:#fff">Message sent</p>
+              <p style="margin:0; line-height:1.85">We will get back with you immediately.</p>
+              <button type="button" onClick="{{ resetForm }}" style="align-self:flex-start; margin-top:8px; padding:14px 26px; border:1px solid rgba(255,255,255,.35); border-radius:999px; background:transparent; color:#fff; font-family:Lato,sans-serif; font-size:11px; font-weight:700; letter-spacing:.2em; text-transform:uppercase; cursor:pointer" style-hover="background:#f6653c; border-color:#f6653c">Send another</button>
+            </div>
+          </sc-if>
+          <sc-if value="{{ formOpen }}" hint-placeholder-val="{{ true }}">
+            <div style="display:flex; flex-direction:column; gap:18px">
+              <p style="margin:0; font-family:Lato,sans-serif; font-size:11px; font-weight:700; letter-spacing:.24em; text-transform:uppercase; color:#f6653c">Start a Ruckus</p>
+              <label style="display:flex; flex-direction:column; gap:8px; font-family:Lato,sans-serif; font-size:11px; font-weight:700; letter-spacing:.16em; text-transform:uppercase; color:rgba(255,255,255,.6)">Name
+                <input type="text" name="name" required="{{ true }}" style="background:rgba(255,255,255,.04); border:1px solid rgba(255,255,255,.16); color:#fff; padding:14px 16px; font-family:'Open Sans',sans-serif; font-size:15px; letter-spacing:normal; text-transform:none">
+              </label>
+              <label style="display:flex; flex-direction:column; gap:8px; font-family:Lato,sans-serif; font-size:11px; font-weight:700; letter-spacing:.16em; text-transform:uppercase; color:rgba(255,255,255,.6)">Email
+                <input type="email" name="email" required="{{ true }}" style="background:rgba(255,255,255,.04); border:1px solid rgba(255,255,255,.16); color:#fff; padding:14px 16px; font-family:'Open Sans',sans-serif; font-size:15px; letter-spacing:normal; text-transform:none">
+              </label>
+              <label style="display:flex; flex-direction:column; gap:8px; font-family:Lato,sans-serif; font-size:11px; font-weight:700; letter-spacing:.16em; text-transform:uppercase; color:rgba(255,255,255,.6)">Phone
+                <input type="tel" name="phone" style="background:rgba(255,255,255,.04); border:1px solid rgba(255,255,255,.16); color:#fff; padding:14px 16px; font-family:'Open Sans',sans-serif; font-size:15px; letter-spacing:normal; text-transform:none">
+              </label>
+              <label style="display:flex; flex-direction:column; gap:8px; font-family:Lato,sans-serif; font-size:11px; font-weight:700; letter-spacing:.16em; text-transform:uppercase; color:rgba(255,255,255,.6)">Message
+                <textarea name="message" rows="4" style="background:rgba(255,255,255,.04); border:1px solid rgba(255,255,255,.16); color:#fff; padding:14px 16px; font-family:'Open Sans',sans-serif; font-size:15px; letter-spacing:normal; text-transform:none; resize:vertical"></textarea>
+              </label>
+              <button type="submit" style="align-self:flex-start; display:inline-flex; align-items:center; gap:12px; padding:16px 32px; border:0; border-radius:999px; background:linear-gradient(120deg,#b81e04,#2949e8); color:#fff; font-family:Lato,sans-serif; font-size:11px; font-weight:700; letter-spacing:.2em; text-transform:uppercase; cursor:pointer; transition:filter .3s ease" style-hover="filter:brightness(1.15)">Send it <span style="width:.5em; height:.5em; border-top:2px solid currentColor; border-right:2px solid currentColor; transform:rotate(45deg); display:inline-block"></span></button>
+            </div>
+          </sc-if>
+        </form>
+      </div>
+    </section>
+  </main>
+  </sc-if>
+
+  <sc-if value="{{ isCase }}" hint-placeholder-val="{{ false }}">
+  <main style="padding-top:76px">
+    <div style="padding:clamp(36px,5vw,72px) clamp(24px,5vw,72px) 0">
+      <a href="/#work" onClick="{{ goHome }}" style="display:inline-flex; align-items:center; gap:10px; font-family:Lato,sans-serif; font-size:11px; font-weight:700; letter-spacing:.22em; text-transform:uppercase; color:#8d8983; text-decoration:none" style-hover="color:#fff"><span style="width:.5em; height:.5em; border-top:2px solid currentColor; border-left:2px solid currentColor; transform:rotate(-45deg); display:inline-block"></span> Back to all projects</a>
+      <h1 style="margin:26px 0 0; font-family:Lato,sans-serif; font-weight:100; font-size:clamp(34px,5.4vw,78px); line-height:1; letter-spacing:-.035em; color:#fff">{{ caseTitle }}</h1>
+    </div>
+
+    <div style="padding:clamp(36px,4.5vw,64px) clamp(24px,5vw,72px) clamp(64px,8vw,110px); display:grid; grid-template-columns:repeat(auto-fit,minmax(300px,1fr)); gap:clamp(32px,4vw,64px); align-items:start">
+      <aside style="position:sticky; top:104px; display:flex; flex-direction:column; gap:22px; max-width:44ch">
+        <sc-for list="{{ caseBrief }}" as="b" hint-placeholder-count="3">
+          <div style="display:flex; flex-direction:column; gap:7px; padding-bottom:20px; border-bottom:1px solid rgba(255,255,255,.1)">
+            <span style="font-family:Lato,sans-serif; font-size:10px; font-weight:900; letter-spacing:.26em; text-transform:uppercase; color:#f6653c">{{ b.label }}</span>
+            <p style="margin:0; line-height:1.85; color:#e4e0da">{{ b.value }}</p>
+          </div>
+        </sc-for>
+        <a href="#contact" onClick="{{ goHome }}" style="align-self:flex-start; display:inline-flex; align-items:center; gap:12px; padding:15px 30px; border-radius:999px; background:linear-gradient(120deg,#b81e04,#2949e8); color:#fff; text-decoration:none; font-family:Lato,sans-serif; font-size:11px; font-weight:700; letter-spacing:.2em; text-transform:uppercase" style-hover="filter:brightness(1.15)">Start a project</a>
+      </aside>
+
+      <div style="display:flex; flex-direction:column; gap:clamp(18px,2.4vw,32px); min-width:0">
+        <sc-for list="{{ caseImages }}" as="img" hint-placeholder-count="2">
+          <figure data-reveal style="margin:0; position:relative; overflow:hidden; background:#1b1a18">
+            <img src="{{ img.src }}" alt="{{ img.alt }}" style="width:100%; height:auto; display:block">
+          </figure>
+        </sc-for>
+      </div>
+    </div>
+
+    <div style="border-top:1px solid rgba(255,255,255,.1); padding:clamp(30px,4vw,54px) clamp(24px,5vw,72px); display:flex; justify-content:space-between; gap:20px; flex-wrap:wrap">
+      <a href="{{ casePrevHref }}" onClick="{{ openCase }}" data-slug="{{ casePrevSlug }}" style="display:inline-flex; align-items:center; gap:12px; font-family:Lato,sans-serif; font-size:11px; font-weight:700; letter-spacing:.22em; text-transform:uppercase; color:#8d8983; text-decoration:none" style-hover="color:#fff"><span style="width:.5em; height:.5em; border-top:2px solid currentColor; border-left:2px solid currentColor; transform:rotate(-45deg); display:inline-block"></span> Previous Project — {{ casePrevTitle }}</a>
+      <a href="/#work" onClick="{{ goHome }}" style="font-family:Lato,sans-serif; font-size:11px; font-weight:700; letter-spacing:.22em; text-transform:uppercase; color:#8d8983; text-decoration:none" style-hover="color:#fff">All projects</a>
+    </div>
+  </main>
+  </sc-if>
+
+  <sc-if value="{{ isKnowledge }}" hint-placeholder-val="{{ false }}">
+  <main style="padding-top:76px">
+    <div style="position:relative; padding:clamp(56px,7vw,110px) clamp(24px,5vw,72px) clamp(32px,4vw,56px); overflow:hidden">
+      <div style="position:absolute; inset:0; background:radial-gradient(60% 90% at 88% 10%, rgba(41,73,232,.28), transparent 62%), radial-gradient(55% 80% at 4% 90%, rgba(184,30,4,.26), transparent 60%)"></div>
+      <div style="position:relative; max-width:70ch">
+        <h1 style="margin:0 0 22px; font-family:Lato,sans-serif; font-weight:100; font-size:clamp(30px,4.4vw,62px); line-height:1.04; letter-spacing:-.03em; color:#fff">KNOWLEDGE BASE: <span style="font-weight:900; font-style:italic">Tips, Tricks, White Papers and Free Advice</span></h1>
+        <p style="margin:0; line-height:1.9">Strategic creative easy when you ask the right questions. At Ruckus Creative, as we continuously question the advertising, marketing and branding we see in the marketplace, we’ve come up with some ideas and philosophies of our own. Please feel free to read through our white papers, and if you know someone who might benefit from them, feel free to pass them on.</p>
+      </div>
+    </div>
+    <div style="padding:0 clamp(24px,5vw,72px) clamp(72px,9vw,120px); display:grid; grid-template-columns:repeat(auto-fit,minmax(310px,1fr)); gap:clamp(18px,2.2vw,28px)">
+      <sc-for list="{{ posts }}" as="p" hint-placeholder-count="6">
+        <a href="{{ p.href }}" data-reveal style="display:flex; flex-direction:column; text-decoration:none; background:#161514; border:1px solid rgba(255,255,255,.09); overflow:hidden; transition:border-color .4s ease, transform .5s cubic-bezier(.2,.7,.2,1)" style-hover="border-color:rgba(246,101,60,.6); transform:translateY(-5px)">
+          <span style="display:flex; align-items:flex-end; height:150px; padding:20px; background:{{ p.cover }}">
+            <span style="font-family:Lato,sans-serif; font-size:10px; font-weight:900; letter-spacing:.26em; text-transform:uppercase; color:rgba(255,255,255,.85)">White Paper</span>
+          </span>
+          <span style="display:flex; flex-direction:column; gap:12px; padding:26px">
+            <span style="font-family:Lato,sans-serif; font-weight:900; font-size:19px; line-height:1.25; letter-spacing:-.005em; color:#fff">{{ p.title }}</span>
+            <span style="font-size:14px; line-height:1.8; color:#a8a29a">{{ p.excerpt }}</span>
+            <span style="margin-top:4px; font-family:Lato,sans-serif; font-size:10px; font-weight:700; letter-spacing:.22em; text-transform:uppercase; color:#8d8983">Read →</span>
+          </span>
+        </a>
+      </sc-for>
+    </div>
+  </main>
+  </sc-if>
+
+  <footer style="border-top:1px solid rgba(255,255,255,.09); padding:clamp(36px,4vw,56px) clamp(24px,5vw,72px); display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:20px; background:#0f0e0d">
+    <div style="display:flex; align-items:center; gap:18px">
+      <img src="src/assets/chrome/ruckus_logo_light.png" alt="Ruckus Creative" style="height:30px; width:auto; opacity:.85">
+      <span style="font-size:13px; color:#6e6a63">© Ruckus Creative, LLC</span>
+    </div>
+    <div style="display:flex; flex-wrap:wrap; gap:22px; font-family:Lato,sans-serif; font-size:11px; font-weight:700; letter-spacing:.18em; text-transform:uppercase">
+      <a href="/results-based-advertising-branding/" style="color:#8d8983; text-decoration:none" style-hover="color:#fff">Results</a>
+      <a href="/portfolio-ruckus/" style="color:#8d8983; text-decoration:none" style-hover="color:#fff">Portfolio</a>
+      <a href="/strategic-creative-capabilities/" style="color:#8d8983; text-decoration:none" style-hover="color:#fff">Capabilities</a>
+      <a href="/process-ruckus-creative/" style="color:#8d8983; text-decoration:none" style-hover="color:#fff">Process</a>
+      <a href="/about/" style="color:#8d8983; text-decoration:none" style-hover="color:#fff">About</a>
+      <a href="/privacy-policy/" style="color:#8d8983; text-decoration:none" style-hover="color:#fff">Privacy Policy</a>
+      <a href="/terms-and-conditions/" style="color:#8d8983; text-decoration:none" style-hover="color:#fff">Terms and Conditions</a>
+    </div>
+  </footer>
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;tileGrayscale&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Work grid&quot;},&quot;heroHeadline&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;default&quot;:&quot;light&quot;,&quot;options&quot;:[&quot;light&quot;,&quot;heavy&quot;],&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Hero&quot;}}">
+const M = 'src/assets/media/';
+const ICON = {
+  growth: 'uploads/chart-gear-svgrepo-com.svg',
+  opportunist: 'uploads/hvv-svgrepo-com.svg',
+  success: 'uploads/fast-svgrepo-com.svg',
+  diamond: 'uploads/diamond-svgrepo-com.svg',
+  mobile: 'uploads/mobile-device-svgrepo-com.svg',
+  presentation: 'uploads/presentation-svgrepo-com.svg',
+  print: 'src/assets/icons/print-outline.svg',
+  atom: 'uploads/atom-svgrepo-com.svg',
+  event: 'uploads/event-svgrepo-com.svg',
+};
+
+const WORK = [
+  ['us-pool-tile', 'US POOL TILE', 'thumbnails-portfolio-uspool.jpg'],
+  ['touchpoint-marketing', 'TOUCHPOINT MARKETING', 'thumbnails-portfolio-TPM.jpg'],
+  ['tecate-cervesa', 'TECATE CERVESA', 'thumbnails-portfolio-tecate.jpg'],
+  ['surf-rx', 'SURF RX', 'thumbnails-portfolio-surfrx.jpg'],
+  ['sophia-redpeg-marketing', 'SOPHIA / REDPEG MARKETING', 'thumbnails-portfolio-sophia.jpg'],
+  ['qai-laboratories', 'QAI Laboratories', 'thumbnails-portfolio-qai.jpg'],
+  ['national-planning-corp', 'NATIONAL PLANNING CORP.', 'thumbnails-portfolio-NPC.jpg'],
+  ['metrex-research', 'METREX RESEARCH', 'thumbnails-portfolio-metrex.jpg'],
+  ['kirin-brewery', 'KIRIN BREWERY', 'thumbnails-portfolio-kirin.jpg'],
+  ['future-fins', 'FUTURE FINS', 'thumbnails-portfolio-futurefins.jpg'],
+  ['fnic', 'FNIC', 'thumbnails-portfolio-fnic.jpg'],
+  ['dual-graphics', 'DUAL GRAPHICS', 'thumbnails-portfolio-dual-graphics.jpg'],
+  ['dos-equis', 'DOS EQUIS', 'thumbnails-portfolio-xx.jpg'],
+  ['aqua-flo', 'AQUA-FLO', 'thumbnails-portfolio-aquaflo.jpg'],
+  ['mayweather-the-best-ever-book', 'MAYWEATHER “THE BEST EVER” BOOK', 'thumbnails-portfolio-mayweather.jpg'],
+  ['universal-pool-tile', 'UNIVERSAL POOL TILE', 'thumbnails-portfolio-uni-pool.jpg'],
+  ['the-rms-group', 'THE RMS GROUP', 'thumbnails-portfolio-rms.jpg'],
+  ['jwc-environmental', 'JWC ENVIRONMENTAL', 'thumbnails-portfolio-jwc.jpg'],
+  ['colorgraphics', 'COLORGRAPHICS', 'portfolio-colorgraphics-900x604.jpg'],
+  ['heineken', 'Heineken', 'thumbnails-portfolio-hkn.jpg'],
+];
+
+/* Case-study content, verbatim from src/content/work/heineken.md. */
+const CASES = {
+  heineken: {
+    title: 'Heineken',
+    brief: [
+      ['Client', 'Heineken USA – Premium Imported Beverages'],
+      ['Results', '50%+ reduction in costs and timelines compared to agency-of-record.'],
+      ['Elements produced include', 'Advertising campaigns, POS, sweeps entry sites, mobile MP3 ringtone download sites, text2win campaigns, event photography, videography.'],
+    ],
+    images: [
+      [M + 'portfolio-heineken.jpg', 'Heineken campaign work'],
+      [M + 'thumbnails-portfolio-hkn.jpg', 'Heineken campaign detail'],
+    ],
+    prev: 'colorgraphics',
+  },
+};
+
+const STEPS = [
+  ['01', 'FOUNDATION: (+)', ICON.diamond, 'The internal view, “what we sell, and why people should buy it.” This starts with the Creative Brief to outline goals, parameters and response mechanism and moves through key executive meetings for synchronized client leadership, marcoms audit, marketing plan review, competitive landscape, and so forth.'],
+  ['02', 'VALIDATION: (+)', ICON.mobile, 'Now we know what you sell, what do your clients buy? Simple research is enacted to validate the brand / creative strategy and make sure it is aligned with your market’s mind.'],
+  ['03', 'INNOVATION: (+)', ICON.presentation, 'This the fun part – the creative process, this is the reason we get up in the morning. Where the message and brand are created and combined to solve the marketing objective. Key client concepts and corporate ID guidelines considered while developing new positioning, strategic message, core value, personality, and tone.'],
+  ['04', 'IMPLEMENTATION: (+)', ICON.success, 'Final creative and design is applied to marketing communications; brochures, catalogs, websites, ad campaigns, etc. Copywriting, photography, design and final production delivers what you need, when you need it.'],
+  ['05', 'EVALUATION: (+)', ICON.growth, 'retrospect analysis to determine effectiveness and future considerations.'],
+];
+
+const PILLARS = [
+  ['We Drive Growth', ICON.growth, 'We’re ingrained in your business and know which KPIs will make the greatest impact to your bottom line.'],
+  ['We’re Creative Opportunist', ICON.opportunist, 'We aren’t the type who stay quiet when we see stale tactics or bottlenecks preventing us from achieving our mutual goals.'],
+  ['We’re Focused on Success', ICON.success, 'When you work with us you’ll be the hero.'],
+];
+
+const CAPABILITIES = [
+  ['Online', ICON.mobile, ['Websites', 'Mobile sites', 'Mircrosites', 'MP3 download sites', 'Sweeps Entry sites']],
+  ['Online Marketing', ICON.growth, ['Social Media set up and implement', 'SEO', 'SEM & Advertising']],
+  ['Print', ICON.print, ['Advertising campaigns', 'Corporate brochures', 'Service brochures', 'Sales Kits', 'Direct marketing / mail', 'Photography']],
+  ['Presentations', ICON.presentation, ['Video', 'Custom PPT / Keynote presentations']],
+  ['Brand Development', ICON.atom, ['Brand strategy / positioning', 'Naming – product / service', 'Research – Voice of customer']],
+  ['Event Marketing', ICON.event, ['Promotional products', 'Simplified registration', 'Engagement campaigns', 'Contests']],
+];
+
+const QUOTES = [
+  ['…very creative. I was impressed with their ability to distill key selling points, focus our brand, create a competitive positioning for Aqua-Flo, and bring the message to life. Their ability to quickly learn our product, position our company, and create memorable marketing materials was fantastic.”', '– Lynn Ranzan', 'Marketing Director, Aqua-Flo'],
+  ['The work we see coming from the Ruckus Creative team is off the charts! I would give my highest recommendation to anyone considering Ruckus Creative for their design and graphic communication needs.”', 'Craig Evans', 'Sales Manager, Dual Graphics'],
+  ['A perfect balance of strategy and creativity. Ruckus Creative is able to push the creative envelope to produce impact and results, while keeping a logical framework based on real-world research and actual VOC (Voice Of Customer) brand insights. I highly recommend', 'Kim West', 'VP Marketing, FNIC'],
+  ['Ruckus Creative has a knack to distill the message to the key reasons why to buy our product, and communicate these competitive advantages and core brand effectively with every campaign. Attentive to our brand values, they manage to blend our current consumer perceptions with our future business plans perfectly.”', 'Vince Longo', 'President, Future Fins'],
+  ['Our business saw over 40% growth in the one year since beginning to worth with them, we attribute much of this success to broadened customer awareness of our services through our work with Ruckus.”', '– Chris Bowness', 'P.E.'],
+  ['Ruckus Creative keeps bringing our advertising campaigns to life, while always focusing on our long-term growth and managing our brand perceptions. Super creative, super strategic.”', '– Jeff “Doc” Lausch', 'President, Surf Prescriptions'],
+  ['Getting us on Google’s first page of organic searches is paramount, and Ruckus Creative has successfully placed us there, while positioning us as an industry leader. Plus, by bringing ideas to grow our business and implementing them, are a couple reasons why we consider Ruckus Creative a strategic business partner', '– Bob Hirschman', 'President, Universal Pool Tile'],
+  ['For the past 15 years Ruckus Creative’s work and professionalism has been unmatched. Our website and brochures have positioned us at the top of our industry and greatly improved our brand. I highly recommend!”', '– Edward Baker', 'President, US Pool Tile'],
+];
+
+const POSTS = [
+  ['Clarity – create an unforgettable brand', '/clarity-create-an-unforgettable-brand/', '2012-08-21', 'Can you describe your brand in 3 words or less? Apple®, Volvo® and Starbucks® can. – From a brand strategy to a simple postcard, how to create more sales through focused marketing and advertising.'],
+  ['Differentiate for higher profits – create a monopoly and raise your prices', '/differentiate-for-higher-profits-create-a-monopoly-and-raise-your-prices/', '2012-08-22', '"What makes you so special and why should I buy from you and not your competitor down the street?" – How to create compelling and motivational brand strategies, ad campaigns, brochures, and other marketing communications'],
+  ['Three strikes, you’re out – three overused taglines to avoid at all costs', '/three-strikes-youre-out-three-overused-taglines-to-avoid-at-all-costs/', '2012-08-12', 'The 3 "me-too" sins of advertising, design. branding and marketing. – How to create effective ads, communications and brand strategy.'],
+  ['Don’t just say it, prove it!', '/dont-just-say-it-prove-it/', '2012-08-06', 'Trust is the first step to any sale. – How to build trust in your marketing communications.'],
+  ['Ask and ye shall receive – get a response', '/ask-and-ye-shall-receive-get-a-response/', '2012-08-01', 'Get a reaction – How to ensure your ads, brochures, website and other communications are creating sales.'],
+  ['3-2-1… Using PR for lift-off and lift', '/3-2-1-using-pr-for-lift-off-and-lift/', '2012-07-27', 'For a new company and unique product, PR and grassroots efforts rule. – How to know when to leverage low cost and effective marketing tactics.'],
+  ['Advertising is for profits', '/advertising-is-for-profits/', '2012-07-22', 'Take control of your advertising and make sure it is making you sales.'],
+  ['Print is expensive, don’t let your sales team waste it. Qualify, qualify, qualify', '/print-is-expensive-dont-let-your-sales-team-waste-it-qualify-qualify-qualify/', '2012-07-20', 'Brochures are not cheap - make sure they are doing their job: How to best use your print communications in the sales cycle and ensure your sales team is making revenue and not just pushing paper.'],
+  ['What’s your point?: Let your prospects say no, as long as they know what you offer', '/whats-your-point-let-your-prospects-say-no-as-long-as-they-know-what-you-offer/', '2012-07-19', 'Clearly, you should let your prospects say “no” because they don’t need what you offer. But never let them say “no” because they don’t understand what you’re offering.'],
+];
+
+const COVERS = [
+  'linear-gradient(135deg,#b81e04,#2949e8)',
+  'linear-gradient(135deg,#2949e8,#0f0e0d)',
+  'linear-gradient(135deg,#f6653c,#b81e04)',
+  'linear-gradient(135deg,#1b2f9e,#b81e04)',
+  'linear-gradient(135deg,#b81e04,#1a1a1a)',
+  'linear-gradient(135deg,#2949e8,#f6653c)',
+];
+
+const fmt = (iso) => new Date(iso + 'T12:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+
+class Component extends DCLogic {
+  state = { view: 'home', slug: 'heineken', videoPlaying: false, formSent: false };
+
+  componentDidMount() { this.setupMotion(); }
+  componentDidUpdate() {
+    const key = this.state.view + ':' + this.state.slug;
+    if (this._motionKey === key) return;
+    if (this._motionKey && this._motionKey.split(':')[0] !== this.state.view) {
+      window.scrollTo({ top: 0, behavior: 'auto' });
+    }
+    this.teardown();
+    this.setupMotion();
+  }
+  componentWillUnmount() { this.teardown(); }
+
+  teardown() {
+    this._motionKey = null;
+    clearTimeout(this._safety);
+    clearTimeout(this._refresh);
+    if (window.ScrollTrigger) window.ScrollTrigger.getAll().forEach(t => t.kill());
+    if (this._raf) cancelAnimationFrame(this._raf);
+  }
+
+  root() { return this.el || document; }
+
+  setupMotion() {
+    const key = this.state.view + ':' + this.state.slug;
+    if (this._motionKey === key) return;
+    this._motionKey = key;
+    const root = this.root();
+    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const reveal = (el) => { el.style.opacity = '1'; el.style.transform = 'none'; };
+
+    requestAnimationFrame(() => {
+      const targets = [...root.querySelectorAll('[data-reveal]')];
+      targets.forEach(el => {
+        el.style.transition = 'opacity .8s cubic-bezier(.2,.7,.2,1), transform .8s cubic-bezier(.2,.7,.2,1)';
+        if (!reduce) { el.style.opacity = '0'; el.style.transform = 'translateY(22px)'; }
+      });
+      const countFallback = () => {
+        root.querySelectorAll('[data-count]').forEach(el => {
+          if (el.textContent.replace(/[^0-9]/g, '') === '0') el.textContent = Number(el.dataset.count).toLocaleString('en-US');
+        });
+      };
+      this._safety = setTimeout(() => { targets.forEach(reveal); countFallback(); }, 2600);
+
+      if (reduce) { targets.forEach(reveal); this.wireStatics(); return; }
+
+      const gsap = window.gsap;
+      const ST = window.ScrollTrigger;
+      if (gsap && ST) { try {
+        gsap.registerPlugin(ST);
+
+        gsap.set('[data-hero-line], [data-hero-eyebrow]', { yPercent: 0 });
+        gsap.from(root.querySelectorAll('[data-hero-eyebrow]'), { opacity: 0, y: 16, duration: .8, ease: 'power3.out', delay: .15 });
+        gsap.from(root.querySelectorAll('[data-hero-line]'), { opacity: 0, yPercent: 40, duration: 1.1, ease: 'power4.out', stagger: .12, delay: .25 });
+
+        /* Re-query on every tick: React can replace these nodes after setup,
+           and an element-bound tween would then animate a detached node. */
+        const heroSection = root.querySelector('#home');
+        if (heroSection) {
+          ST.create({
+            trigger: heroSection, start: 'top top', end: 'bottom top', scrub: true,
+            onUpdate: (self) => {
+              const img = root.querySelector('[data-hero-img]');
+              if (img) img.style.transform = 'translate3d(0,' + (self.progress * 10).toFixed(3) + '%,0)';
+            },
+          });
+        }
+
+        root.querySelectorAll('[data-parallax]').forEach((el, i) => {
+          const amount = Number(el.dataset.parallax || 12);
+          const holder = el.parentElement;
+          ST.create({
+            trigger: holder, start: 'top bottom', end: 'bottom top', scrub: true,
+            onUpdate: (self) => {
+              const live = el.isConnected ? el : root.querySelectorAll('[data-parallax]')[i];
+              if (live) live.style.transform = 'translate3d(0,' + (-amount * (self.progress - .5) * 2).toFixed(3) + '%,0)';
+            },
+          });
+        });
+
+        targets.forEach(el => {
+          gsap.to(el, { opacity: 1, y: 0, duration: .9, ease: 'power3.out', scrollTrigger: { trigger: el, start: 'top 88%', once: true } });
+        });
+
+        const tiles = [...root.querySelectorAll('[data-work-tile]')];
+        if (tiles.length) {
+          gsap.from(tiles, {
+            opacity: 0, y: 34, duration: .8, ease: 'power3.out', stagger: { each: .045, from: 'start' },
+            scrollTrigger: { trigger: tiles[0].parentElement, start: 'top 85%', once: true },
+          });
+        }
+
+        root.querySelectorAll('[data-count]').forEach(el => {
+          const target = Number(el.dataset.count);
+          el.textContent = target.toLocaleString('en-US');
+          const obj = { v: 0 };
+          gsap.to(obj, {
+            v: target, duration: 1.8, ease: 'power2.out',
+            onStart: () => { el.textContent = '0'; },
+            onUpdate: () => { el.textContent = Math.round(obj.v).toLocaleString('en-US'); },
+            onComplete: () => { el.textContent = target.toLocaleString('en-US'); },
+            scrollTrigger: { trigger: el, start: 'top 88%', once: true },
+          });
+        });
+
+        const track = root.querySelector('[data-process-track]');
+        const bar = root.querySelector('[data-process-progress]');
+        if (track && bar) {
+          const max = () => Math.max(track.scrollWidth - track.clientWidth, 1);
+          const sync = () => { bar.style.width = (12 + (track.scrollLeft / max()) * 88) + '%'; };
+          track.addEventListener('scroll', sync, { passive: true });
+          sync();
+          gsap.from(root.querySelectorAll('[data-step]'), {
+            opacity: 0, y: 30, duration: .8, ease: 'power3.out', stagger: .08,
+            scrollTrigger: { trigger: track, start: 'top 85%', once: true },
+          });
+        }
+      } catch (err) {
+        console.warn('motion setup skipped', err);
+        targets.forEach(reveal);
+        countFallback();
+      } } else {
+        if ('IntersectionObserver' in window) {
+          const io = new IntersectionObserver((entries) => {
+            entries.forEach((e, i) => { if (e.isIntersecting) { setTimeout(() => reveal(e.target), i * 80); io.unobserve(e.target); } });
+          }, { threshold: .12, rootMargin: '0px 0px -6% 0px' });
+          targets.forEach(t => io.observe(t));
+        } else targets.forEach(reveal);
+        root.querySelectorAll('[data-count]').forEach(el => { el.textContent = Number(el.dataset.count).toLocaleString('en-US'); });
+      }
+
+      this.wireStatics();
+
+      if (window.ScrollTrigger) {
+        requestAnimationFrame(() => {
+          window.ScrollTrigger.refresh();
+          this._refresh = setTimeout(() => window.ScrollTrigger.refresh(), 400);
+        });
+      }
+    });
+  }
+
+  wireStatics() {
+    const root = this.root();
+    const gray = this.props.tileGrayscale ?? true;
+    const rest = gray ? 'saturate(.3) brightness(.72)' : 'saturate(.85) brightness(.9)';
+    root.querySelectorAll('[data-work-tile]').forEach(tile => {
+      const img = tile.querySelector('[data-tile-img]');
+      if (!img) return;
+      img.style.filter = rest;
+      if (tile._wired) return;
+      tile._wired = true;
+      tile.addEventListener('mouseenter', () => { img.style.transform = 'scale(1.07)'; img.style.filter = 'none'; });
+      tile.addEventListener('mouseleave', () => { img.style.transform = ''; img.style.filter = rest; });
+    });
+
+    if ((this.props.heroHeadline ?? 'light') === 'heavy') {
+      root.querySelectorAll('[data-hero-line]').forEach(l => { l.style.fontWeight = '900'; l.style.fontStyle = 'normal'; });
+    }
+
+    const dots = root.querySelector('[data-testi-dots]');
+    const track = root.querySelector('[data-testi-track]');
+    if (dots && track && !dots.childElementCount) {
+      const slides = [...track.children];
+      const buttons = slides.map((slide, i) => {
+        const b = document.createElement('button');
+        b.type = 'button';
+        b.setAttribute('aria-label', 'Testimonial ' + (i + 1));
+        b.style.cssText = 'width:9px;height:9px;padding:0;border:0;border-radius:50%;cursor:pointer;background:rgba(255,255,255,.38);transition:background .25s ease, transform .25s ease';
+        b.addEventListener('click', () => track.scrollTo({ left: slide.offsetLeft - track.offsetLeft, behavior: 'smooth' }));
+        dots.appendChild(b);
+        return b;
+      });
+      const sync = () => {
+        const i = Math.round(track.scrollLeft / Math.max(track.clientWidth, 1));
+        buttons.forEach((b, n) => {
+          b.style.background = n === i ? '#fff' : 'rgba(255,255,255,.38)';
+          b.style.transform = n === i ? 'scale(1.3)' : 'none';
+          b.setAttribute('aria-current', n === i ? 'true' : 'false');
+        });
+      };
+      track.addEventListener('scroll', sync, { passive: true });
+      sync();
+    }
+  }
+
+  renderVals() {
+    const { view, slug, videoPlaying, formSent } = this.state;
+    const activeCase = CASES[slug];
+    const fallbackWork = WORK.find(w => w[0] === slug);
+    const prevSlug = activeCase ? activeCase.prev : 'heineken';
+    const prevWork = WORK.find(w => w[0] === prevSlug);
+
+    return {
+      isHome: view === 'home',
+      isCase: view === 'case',
+      isKnowledge: view === 'knowledge',
+      videoPlaying,
+      videoSrc: videoPlaying ? 'https://www.youtube-nocookie.com/embed/NgliiMV4jzE?autoplay=1&rel=0' : '',
+      formSent,
+      formOpen: !formSent,
+
+      work: WORK.map(([s, title, img]) => ({ slug: s, title, img: M + img, href: '/work/' + s + '/' })),
+      pillars: PILLARS.map(([title, icon, body]) => ({ title, icon, body })),
+      steps: STEPS.map(([num, title, icon, body]) => ({ num, title, icon, body })),
+      capabilities: CAPABILITIES.map(([title, icon, items]) => ({ title, icon, items })),
+      quotes: QUOTES.map(([body, name, title]) => ({ body, name, title })),
+      posts: POSTS.map(([title, href, date, excerpt], i) => ({ title, href, excerpt, date: fmt(date), cover: COVERS[i % COVERS.length] })),
+
+      caseTitle: activeCase ? activeCase.title : (fallbackWork ? fallbackWork[1] : ''),
+      caseBrief: activeCase
+        ? activeCase.brief.map(([label, value]) => ({ label, value }))
+        : [{ label: 'Case study', value: 'Body content for this project lives in src/content/work/' + slug + '.md and renders through this same template.' }],
+      caseImages: activeCase
+        ? activeCase.images.map(([src, alt]) => ({ src, alt }))
+        : (fallbackWork ? [{ src: M + fallbackWork[2], alt: fallbackWork[1] }] : []),
+      casePrevSlug: prevSlug,
+      casePrevHref: '/work/' + prevSlug + '/',
+      casePrevTitle: prevWork ? prevWork[1] : '',
+
+      goHome: (e) => {
+        const href = e.currentTarget.getAttribute('href') || '';
+        const hash = href.includes('#') ? href.slice(href.indexOf('#') + 1) : '';
+        if (this.state.view !== 'home') {
+          e.preventDefault();
+          this.setState({ view: 'home' }, () => {
+            if (hash) requestAnimationFrame(() => {
+              const t = this.root().querySelector('#' + hash);
+              if (t) window.scrollTo({ top: t.getBoundingClientRect().top + window.scrollY - 70, behavior: 'smooth' });
+            });
+          });
+          return;
+        }
+        if (hash) {
+          e.preventDefault();
+          const t = this.root().querySelector('#' + hash);
+          if (t) window.scrollTo({ top: t.getBoundingClientRect().top + window.scrollY - 70, behavior: 'smooth' });
+        }
+      },
+      goKnowledge: (e) => { e.preventDefault(); this.setState({ view: 'knowledge' }); },
+      openCase: (e) => {
+        e.preventDefault();
+        const next = e.currentTarget.dataset.slug;
+        this.setState({ view: 'case', slug: next });
+      },
+      playVideo: () => this.setState({ videoPlaying: true }),
+      stopVideo: () => this.setState({ videoPlaying: false }),
+      submitForm: (e) => { e.preventDefault(); this.setState({ formSent: true }); },
+      resetForm: () => this.setState({ formSent: false }),
+    };
+  }
+}
+
+</script>
+</body>
+</html>
