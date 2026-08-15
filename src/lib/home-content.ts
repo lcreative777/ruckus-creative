@@ -98,6 +98,34 @@ export async function getProcessSteps(): Promise<ProcessStep[]> {
   return steps;
 }
 
+/**
+ * Services the client added after the WordPress migration.
+ *
+ * These are NOT in home.md, and they must not be written back into it — the
+ * migration is re-runnable and would overwrite the file. Applying them here
+ * keeps the parsed source untouched while still rendering the current service
+ * list. `replace` swaps an existing line; `add` appends new ones.
+ */
+const CAPABILITY_UPDATES: Record<string, { replace?: Record<string, string>; add?: string[] }> = {
+  'Online': { add: ['Website Security', 'Website Maintenance'] },
+  'Online Marketing': { replace: { 'SEO': 'SEO / AEO / GEO' } },
+};
+
+function applyCapabilityUpdates(groups: CapabilityGroup[]): CapabilityGroup[] {
+  return groups.map((group) => {
+    const update = CAPABILITY_UPDATES[group.title];
+    if (!update) return group;
+    let items = group.items;
+    if (update.replace) {
+      items = items.map((item) => update.replace![item] ?? item);
+    }
+    if (update.add) {
+      items = [...items, ...update.add.filter((extra) => !items.includes(extra))];
+    }
+    return { ...group, items };
+  });
+}
+
 export interface CapabilityGroup {
   title: string;
   items: string[];
@@ -123,7 +151,7 @@ export async function getCapabilityGroups(): Promise<CapabilityGroup[]> {
   if (groups.length !== 6) {
     throw new Error(`home-content: expected 6 capability groups, found ${groups.length}`);
   }
-  return groups;
+  return applyCapabilityUpdates(groups);
 }
 
 export interface Quote {

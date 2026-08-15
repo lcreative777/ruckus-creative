@@ -18,22 +18,55 @@ const ICONS: Record<string, string> = {
 };
 ---
 <section id="services" class="capabilities">
-  <h2 data-reveal>Capabilities</h2>
-  <div class="grid">
-    {groups.map((g) => (
-      <div class="cell" data-reveal>
-        <span class="icon"><Icon name={ICONS[g.title] ?? 'chart-gear-svgrepo-com'} size={36} /></span>
-        <h4>{g.title}</h4>
-        <div class="items">
-          {g.items.map((item) => <span>– {item}</span>)}
+  <div class="inner">
+    <h2 data-reveal>Capabilities</h2>
+    <div class="grid">
+      {groups.map((g) => (
+        <div class="cell" data-reveal>
+          <span class="icon"><Icon name={ICONS[g.title] ?? 'chart-gear-svgrepo-com'} size={36} /></span>
+          <h4>{g.title}</h4>
+          <div class="items">
+            {g.items.map((item) => <span>– {item}</span>)}
+          </div>
         </div>
-      </div>
-    ))}
+      ))}
+    </div>
+
+    {/* Client-authored line, written to the page's voice. Not migrated copy. */}
+    <p class="coda" data-reveal>
+      Every service here is <em>human-led, AI-accelerated</em>. Anyone can prompt.
+      Damn few can art direct — and that is the difference between noise and a ruckus.
+    </p>
   </div>
 </section>
 
 <style>
   .capabilities { padding: clamp(72px, 9vw, 124px) clamp(24px, 5vw, 72px); }
+  /* Centred with equal left/right margins. Without a max-width the grid grew to
+     fill ultra-wide viewports and the block no longer read as centred. */
+  .capabilities .inner {
+    width: 100%;
+    max-width: var(--container-wide, 1425px);
+    margin-inline: auto;
+  }
+
+  /* Client-authored coda beneath the grid. */
+  .coda {
+    margin: clamp(36px, 4vw, 56px) auto 0;
+    max-width: 62ch;
+    text-align: center;
+    font-family: var(--font-alt);
+    font-weight: 200;
+    font-size: clamp(18px, 1.9vw, 26px);
+    line-height: 1.55;
+    color: #fff;
+    text-wrap: pretty;
+  }
+  .coda em {
+    font-style: italic;
+    color: var(--color-flame, #f6653c);
+    font-weight: 300;
+  }
   .capabilities h2 {
     margin: 0 0 clamp(32px, 4vw, 56px);
     font-family: var(--font-display);
