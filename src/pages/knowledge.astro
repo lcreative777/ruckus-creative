@@ -1,7 +1,11 @@
 ---
-// The live /knowledge/ page is broken: its [blog] shortcode is unregistered, so
-// it prints the raw shortcode text and lists zero posts. This renders the page's
-// real intro copy and then an actual index of the 9 articles.
+// src/pages/knowledge.astro — Cinema knowledge index.
+// Heading and intro paragraph are extracted from src/content/pages/knowledge.md's
+// body rather than retyped, so the copy stays driven by the collection; the
+// "KNOWLEDGE BASE:" prefix / italic-accent split is a presentational wrap of
+// the same static string, not a rewording. Cards use generated gradient
+// covers (no post carries a featured image) and no dates, per the handoff.
+// Hrefs are each entry's `path`, already root-level per the content schema.
 import { getCollection } from 'astro:content';
 import Base from '../layouts/Base.astro';
 import Seo from '../components/Seo.astro';
@@ -9,9 +13,30 @@ import RichText from '../components/RichText.astro';
 
 const entry = (await getCollection('pages')).find(p => p.data.path === '/knowledge/')!;
 const d = entry.data;
+const body = entry.body ?? '';
+
+const headingMatch = /<h2>([\s\S]*?)<\/h2>/.exec(body);
+const heading = headingMatch?.[1] ?? d.title;
+const splitAt = heading.indexOf(': ');
+const headingLead = splitAt === -1 ? heading : heading.slice(0, splitAt + 2);
+const headingAccent = splitAt === -1 ? '' : heading.slice(splitAt + 2);
+
+const introMatch = /<p>[\s\S]*?<\/p>/.exec(body);
+const introHtml = introMatch?.[0] ?? '';
+
 const posts = (await getCollection('knowledge'))
   .sort((a, b) => b.data.pubDate.getTime() - a.data.pubDate.getTime());
-const fmt = (dt: Date) => dt.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+
+// The 6-value rotating gradient palette from the handoff's Knowledge index
+// spec, all 135deg, cycled by card index.
+const COVERS = [
+  'linear-gradient(135deg, #b81e04, #2949e8)',
+  'linear-gradient(135deg, #2949e8, #0f0e0d)',
+  'linear-gradient(135deg, #f6653c, #b81e04)',
+  'linear-gradient(135deg, #1b2f9e, #b81e04)',
+  'linear-gradient(135deg, #b81e04, #1a1a1a)',
+  'linear-gradient(135deg, #2949e8, #f6653c)',
+];
 ---
 <Base>
   <Seo slot="head" title={d.seo.title ?? d.title} description={d.seo.description}
@@ -21,25 +46,116 @@ const fmt = (dt: Date) => dt.toLocaleDateString('en-US', { year: 'numeric', mont
                  hasPart: posts.map(p => ({ '@type': 'Article', headline: p.data.title,
                                             datePublished: p.data.pubDate.toISOString(),
                                             url: new URL(p.data.path, Astro.site!).href })) }} />
-  <article class="container section page-band">
-    <h1 class="visually-hidden">{d.title}</h1>
-    <RichText html={entry.body ?? ''} />
-    <ul class="post-index">
-      {posts.map(p => (
-        <li>
-          <a href={p.data.path}>{p.data.title}</a>
-          <time datetime={p.data.pubDate.toISOString()}>{fmt(p.data.pubDate)}</time>
-        </li>
+
+  <div class="kb">
+    <div class="kb-intro">
+      <div class="wash" aria-hidden="true"></div>
+      <div class="intro-content">
+        <h1>{headingLead}{headingAccent && <span class="accent">{headingAccent}</span>}</h1>
+        <RichText html={introHtml} class="prose kb-lead" />
+      </div>
+    </div>
+
+    <div class="grid">
+      {posts.map((p, i) => (
+        <a href={p.data.path} class="card" data-reveal>
+          <span class="cover" style={`background:${COVERS[i % COVERS.length]}`}>
+            <span class="cover-label">White Paper</span>
+          </span>
+          <span class="body">
+            <span class="title">{p.data.title}</span>
+            <span class="excerpt">{p.data.seo.description}</span>
+            <span class="cta">Read →</span>
+          </span>
+        </a>
       ))}
-    </ul>
-  </article>
+    </div>
+  </div>
 </Base>
 
 <style>
-  .post-index { list-style: none; margin: var(--space-3) 0 0; padding: 0; }
-  .post-index li { padding-block: var(--space-2); border-top: 1px solid var(--color-rule); }
-  .post-index a { display: block; font-family: var(--font-display); font-size: 1.05rem;
-                  color: var(--color-heading); text-decoration: none; }
-  .post-index a:hover { color: var(--color-accent); }
-  .post-index time { display: block; margin-top: 4px; font-size: 0.8rem; color: var(--color-accent); }
+  .kb { padding-top: 76px; }
+
+  .kb-intro {
+    position: relative;
+    padding: clamp(56px, 7vw, 110px) clamp(24px, 5vw, 72px) clamp(32px, 4vw, 56px);
+    overflow: hidden;
+  }
+  .wash {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background:
+      radial-gradient(60% 90% at 88% 10%, rgba(41, 73, 232, .28), transparent 62%),
+      radial-gradient(55% 80% at 4% 90%, rgba(184, 30, 4, .26), transparent 60%);
+  }
+  .intro-content { position: relative; max-width: 70ch; }
+  .intro-content h1 {
+    margin: 0 0 22px;
+    font-family: var(--font-display);
+    font-weight: 100;
+    font-size: clamp(30px, 4.4vw, 62px);
+    line-height: 1.04;
+    letter-spacing: -.03em;
+    color: #fff;
+  }
+  .intro-content h1 .accent { font-weight: 900; font-style: italic; }
+  .kb-lead { color: var(--color-text-body); }
+
+  .grid {
+    padding: 0 clamp(24px, 5vw, 72px) clamp(72px, 9vw, 120px);
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(310px, 1fr));
+    gap: clamp(18px, 2.2vw, 28px);
+  }
+  .card {
+    display: flex;
+    flex-direction: column;
+    text-decoration: none;
+    background: var(--color-surface-raised);
+    border: 1px solid rgba(255, 255, 255, .09);
+    overflow: hidden;
+    transition: border-color .4s ease, transform .5s var(--ease-primary);
+  }
+  .card:hover, .card:focus-visible {
+    border-color: rgba(246, 101, 60, .6);
+    transform: translateY(-5px);
+  }
+  .cover {
+    display: flex;
+    align-items: flex-end;
+    height: 150px;
+    padding: 20px;
+  }
+  .cover-label {
+    font-family: var(--font-display);
+    font-size: 10px;
+    font-weight: 900;
+    letter-spacing: .26em;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, .85);
+  }
+  .body { display: flex; flex-direction: column; gap: 12px; padding: 26px; }
+  .title {
+    font-family: var(--font-display);
+    font-weight: 900;
+    font-size: 19px;
+    line-height: 1.25;
+    letter-spacing: -.005em;
+    color: #fff;
+  }
+  .excerpt { font-size: 14px; line-height: 1.8; color: var(--color-text-body); }
+  .cta {
+    margin-top: 4px;
+    font-family: var(--font-display);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: .22em;
+    text-transform: uppercase;
+    color: var(--color-text-muted);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .card { transition: none; }
+  }
 </style>
