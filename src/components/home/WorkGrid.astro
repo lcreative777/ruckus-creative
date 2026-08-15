@@ -114,6 +114,13 @@ const images = await Promise.all(
     transition: opacity .45s ease;
   }
   .tile:hover .caption, .tile:focus-visible .caption { opacity: 1; }
+  /* Hover doesn't exist on touch, so a hover-only caption would leave every
+     tile's title permanently unreachable there — always show it and drop
+     the desaturation instead, on any device that can't hover. */
+  @media (hover: none) {
+    .tile img { filter: none; }
+    .caption { opacity: 1; }
+  }
   .caption .title {
     font-family: var(--font-display);
     font-weight: 900;
