@@ -23,6 +23,7 @@ import '../styles/tokens.css';
 import '../styles/base.css';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
+import Motion from '../components/Motion.astro';
 import favicon from '../assets/chrome/cropped-FAVICON-192x192.png';
 import appleIcon from '../assets/chrome/cropped-FAVICON-180x180.png';
 ---
@@ -41,6 +42,7 @@ import appleIcon from '../assets/chrome/cropped-FAVICON-180x180.png';
     <Header />
     <main id="main"><slot /></main>
     <Footer />
+    <Motion />
   </body>
 </html>
 
