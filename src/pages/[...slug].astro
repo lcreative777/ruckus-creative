@@ -1,17 +1,28 @@
 ---
 // src/pages/[...slug].astro — Cinema treatment for the 7 standalone pages
 // (About, Capabilities, Process, Results, Contact, Privacy, Terms) and the
-// 9 knowledge posts. The handoff doesn't design these explicitly, so this
-// applies its system: dark canvas (inherited from tokens.css/base.css),
-// the .prose rules already retuned for dark, a sparing ambient wash behind
-// the top of the page, and a 76px top offset to clear the fixed header
-// (see Plan 4 Task 7's "KNOWN ISSUE"). Legal pages skip the wash and get a
-// tighter reading measure instead, per the handoff's "comfortable measure,
-// no ambient washes" instruction.
+// 9 knowledge posts. The handoff doesn't design these explicitly.
+//
+// The 7 pages migrated as flat runs of <p> tags with zero headings — see
+// src/lib/content-page.ts for the classifier that re-marks-up that text
+// (lead / section heading / pull quote / list / CTA / plain body) and
+// src/components/content/{PageHeader,ContentBody}.astro for how it's
+// rendered, extending the homepage's own typographic + hairline-grid
+// conventions. Legal pages skip the ambient wash and get a tighter reading
+// measure, per the handoff's "comfortable measure, no ambient washes"
+// instruction.
+//
+// Knowledge posts are untouched by this pass: RichText body in a span_9
+// column beside the sidebarLinks span_3 aside, a 76px top offset to clear
+// the fixed header (see Plan 4 Task 7's "KNOWN ISSUE"), and a sparing
+// ambient wash behind the top of the page.
 import { getCollection } from 'astro:content';
 import Base from '../layouts/Base.astro';
 import Seo from '../components/Seo.astro';
 import RichText from '../components/RichText.astro';
+import PageHeader from '../components/content/PageHeader.astro';
+import ContentBody from '../components/content/ContentBody.astro';
+import { parseContentBlocks } from '../lib/content-page';
 import { site, sidebarLinks, legalLinks } from '../data/site';
 
 export async function getStaticPaths() {
@@ -41,6 +52,14 @@ const schema = isPost && 'pubDate' in d
   ? { '@type': 'Article', headline: d.title, datePublished: d.pubDate.toISOString(),
       author: { '@id': `${site.url}/#organization` }, publisher: { '@id': `${site.url}/#organization` } }
   : undefined;
+
+// The 7 standalone pages (About, Capabilities, Process, Results, Contact,
+// Privacy, Terms) migrated as flat runs of <p> tags with zero headings.
+// content-page.ts re-marks-up that same text — lead, section heading(s),
+// pull quote, list, CTA, plain body — without editing a single word.
+// Knowledge posts keep their existing RichText + span_9/span_3 sidebar
+// rendering untouched.
+const blocks = !isPost ? parseContentBlocks(entry.body ?? '') : null;
 ---
 <Base>
   <Seo slot="head" title={d.seo.title ?? d.title} description={d.seo.description}
@@ -48,17 +67,14 @@ const schema = isPost && 'pubDate' in d
        type={isPost ? 'article' : 'website'}
        publishedTime={isPost && 'pubDate' in d ? d.pubDate.toISOString() : undefined}
        breadcrumbs={breadcrumbs} schema={schema} />
-  <article class:list={['page', { legal: isLegal }]}>
-    {!isLegal && <div class="wash" aria-hidden="true"></div>}
-    <div class="container page-inner">
-      {/* Legal pages carry a visible title below the header bar. Other standalone
-          pages keep the heading in the DOM but hidden, matching the original —
-          the h1 signal and screen-reader landmark survive either way. */}
-      <h1 class={isPost || isLegal ? undefined : 'visually-hidden'}>{d.title}</h1>
-      {/* No published date on articles — removed at the client's request. The
-          date still ships in the Article JSON-LD and og:published_time above,
-          where it helps search engines without dating the piece to a reader. */}
-      {isPost ? (
+  {isPost ? (
+    <article class="page">
+      <div class="wash" aria-hidden="true"></div>
+      <div class="container page-inner">
+        <h1>{d.title}</h1>
+        {/* No published date on articles — removed at the client's request. The
+            date still ships in the Article JSON-LD and og:published_time above,
+            where it helps search engines without dating the piece to a reader. */}
         <div class="row">
           <div class="col span_9"><RichText html={entry.body ?? ''} /></div>
           <aside class="col span_3 col_last post-sidebar">
@@ -67,14 +83,21 @@ const schema = isPost && 'pubDate' in d
             </nav>
           </aside>
         </div>
-      ) : (
-        <RichText html={entry.body ?? ''} class={isLegal ? 'prose legal-prose' : 'prose'} />
-      )}
-    </div>
-  </article>
+      </div>
+    </article>
+  ) : (
+    <article class:list={['content-page', { legal: isLegal }]}>
+      <PageHeader title={d.title} legal={isLegal} />
+      <div class:list={[isLegal ? 'container' : 'container-wide', 'page-inner']}>
+        <ContentBody blocks={blocks!} legal={isLegal} />
+      </div>
+    </article>
+  )}
 </Base>
 
 <style>
+  /* Knowledge posts: unchanged from before this pass — RichText body in a
+     span_9 column beside the sidebarLinks span_3 aside. */
   .page {
     position: relative;
     padding-top: 76px;
@@ -91,7 +114,11 @@ const schema = isPost && 'pubDate' in d
   }
   .page-inner { position: relative; padding-block: var(--band-pad); }
 
-  .legal :global(.legal-prose) { max-width: 68ch; }
+  /* The 7 standalone pages: PageHeader already carries the 76px fixed-header
+     offset and its own wash/hairline, so the body band here is just the
+     content band beneath it. */
+  .content-page { background: var(--color-page-band); }
+  .content-page .page-inner { padding-block: var(--space-section-block); }
 
   time {
     display: block;

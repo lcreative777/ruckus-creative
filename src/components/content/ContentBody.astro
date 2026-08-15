@@ -1,0 +1,229 @@
+---
+// src/components/content/ContentBody.astro
+// Renders the classified blocks from src/lib/content-page.ts using the
+// Cinema homepage's own typographic roles (handoff § Design Tokens →
+// Typography) and hairline-grid convention (Pillars/Capabilities/Stats):
+//   lead       -> Raleway 200, editorial-lead scale
+//   divider    -> Lato 900 italic uppercase, echoing ProcessRail's own
+//                 "BRAND ALIGNMENT PROCESS™" heading treatment
+//   heading(s) -> Lato 900 uppercase label with the flame accent; 2+
+//                 consecutive headings become a hairline grid of cards
+//   pullquote  -> Raleway 200 quote scale in a raised panel, gradient edge
+//                 (same language as home/WhyUs.astro's panel)
+//   cta        -> Raleway 300 italic closing line, phone already tel:-linked
+//   list/items -> dash bullets kept verbatim (matches home/Capabilities.astro's
+//                 own "– item" convention — nothing added, nothing stripped)
+//   plain      -> standard body copy, inline emphasis/<br> preserved as-is
+import { groupHeadings, type ContentBlock } from '../../lib/content-page';
+
+interface Props { blocks: ContentBlock[]; legal?: boolean }
+const { blocks, legal = false } = Astro.props;
+const items = groupHeadings(blocks);
+---
+<div class:list={['content-body', { legal }]}>
+  {items.map((item) => {
+    if (item.kind === 'group') {
+      return (
+        <div class="heading-grid" data-reveal>
+          {item.blocks.map((b) => (
+            <div class="heading-cell">
+              <h2 class="heading-label" set:html={b.headingHtml} />
+              {b.bodyHtml && <p class="heading-body" set:html={b.bodyHtml} />}
+              {b.items && (
+                <ul class="dash-list">
+                  {b.items.map((li) => <li set:html={li} />)}
+                </ul>
+              )}
+            </div>
+          ))}
+        </div>
+      );
+    }
+
+    const b = item.block;
+    switch (b.kind) {
+      case 'lead':
+        return <p class="lead" data-reveal set:html={b.html} />;
+      case 'divider':
+        return (
+          <div class="divider" data-reveal>
+            <span>{b.html}</span>
+          </div>
+        );
+      case 'pullquote':
+        return (
+          <blockquote class="pullquote" data-reveal>
+            <div class="edge" aria-hidden="true" />
+            <p set:html={b.html} />
+          </blockquote>
+        );
+      case 'cta':
+        return <p class="cta" data-reveal set:html={b.html} />;
+      case 'list':
+        return (
+          <ul class="dash-list standalone" data-reveal>
+            {b.items.map((li) => <li set:html={li} />)}
+          </ul>
+        );
+      case 'heading':
+        return (
+          <div class="heading-single" data-reveal>
+            <h2 class="heading-label" set:html={b.headingHtml} />
+            {b.bodyHtml && <p class="heading-body" set:html={b.bodyHtml} />}
+            {b.items && (
+              <ul class="dash-list">
+                {b.items.map((li) => <li set:html={li} />)}
+              </ul>
+            )}
+          </div>
+        );
+      default:
+        return <p class="plain" data-reveal set:html={b.html} />;
+    }
+  })}
+</div>
+
+<style>
+  .content-body {
+    display: flex;
+    flex-direction: column;
+    gap: var(--p-gap);
+  }
+  /* Legal pages: comfortable reading measure, no grids/panels — every block
+     falls back to plain/heading-single treatment since Privacy/Terms never
+     produce 2+ consecutive headings (see content-page.ts's groupHeadings). */
+  .content-body.legal { max-width: 68ch; gap: 22px; }
+
+  .lead, .plain, .cta, .heading-body {
+    margin: 0;
+    color: var(--color-text-body);
+  }
+  .lead :global(a), .plain :global(a), .cta :global(a), .heading-body :global(a),
+  .dash-list :global(a) {
+    color: var(--color-flame);
+    text-underline-offset: .15em;
+  }
+
+  .lead {
+    max-width: 66ch;
+    font-family: var(--font-alt);
+    font-weight: 200;
+    font-size: var(--type-editorial-lead);
+    line-height: var(--type-editorial-lead-lh);
+    color: var(--color-white);
+    letter-spacing: -.01em;
+  }
+  .lead :global(strong) { font-weight: inherit; }
+
+  .plain { max-width: 72ch; line-height: var(--body-lh); }
+  .plain :global(strong) { color: var(--color-text-bright); font-weight: 700; }
+
+  /* --- Divider: echoes ProcessRail's own process-h2 role, smaller. ------- */
+  .divider {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    margin-block: 6px;
+  }
+  .divider span {
+    font-family: var(--font-display);
+    font-weight: 900;
+    font-style: italic;
+    font-size: clamp(19px, 2.2vw, 28px);
+    letter-spacing: -.02em;
+    text-transform: uppercase;
+    color: var(--color-white);
+    white-space: nowrap;
+  }
+  .divider::after {
+    content: '';
+    flex: 1 1 auto;
+    height: 1px;
+    background: var(--color-hairline-strong);
+  }
+
+  /* --- Headings: single + grouped grid share the label/body/list look. -- */
+  .heading-label {
+    margin: 0 0 10px;
+    font-family: var(--font-display);
+    font-weight: 900;
+    font-size: 18px;
+    letter-spacing: .05em;
+    text-transform: uppercase;
+    color: var(--color-flame);
+  }
+  .heading-body { margin: 0; line-height: var(--body-lh); }
+  .heading-single { max-width: 72ch; }
+  .heading-single + .heading-single { margin-top: 4px; }
+
+  .dash-list {
+    list-style: none;
+    margin: 10px 0 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    font-size: 14px;
+    line-height: 1.7;
+    color: var(--color-text-body);
+  }
+  .dash-list.standalone { max-width: 72ch; font-size: var(--step-body); line-height: var(--body-lh); }
+
+  .heading-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: var(--gap-hairline);
+    background: var(--color-hairline);
+    margin-block: 8px;
+  }
+  .heading-cell {
+    background: var(--color-canvas);
+    padding: clamp(26px, 2.8vw, 36px);
+    transition: background .4s ease;
+  }
+  .heading-cell:hover { background: #1a1917; }
+  .heading-cell .heading-body { max-width: none; }
+
+  /* --- Pull quote: raised panel + gradient edge, home/WhyUs.astro's language. */
+  .pullquote {
+    position: relative;
+    margin: 8px 0;
+    padding: var(--space-card-pad);
+    background: var(--color-surface-card-a86);
+    border: 1px solid var(--color-hairline-strong);
+    overflow: hidden;
+  }
+  .pullquote .edge {
+    position: absolute; left: 0; top: 0; bottom: 0; width: 2px;
+    background: var(--gradient-brand-180);
+  }
+  .pullquote p {
+    margin: 0;
+    font-family: var(--font-alt);
+    font-weight: 200;
+    font-size: var(--type-quote);
+    line-height: var(--type-quote-lh);
+    color: var(--color-white);
+  }
+  .pullquote p :global(strong) { font-weight: inherit; }
+
+  /* --- Closing CTA line. -------------------------------------------------- */
+  .cta {
+    margin-top: 14px;
+    padding-top: 26px;
+    border-top: 1px solid var(--color-hairline-strong);
+    font-family: var(--font-alt);
+    font-style: italic;
+    font-weight: 300;
+    font-size: clamp(17px, 1.7vw, 22px);
+    color: rgba(255, 255, 255, .9);
+    max-width: 72ch;
+  }
+  .cta :global(strong) { font-weight: inherit; }
+  .cta :global(.tel-link), .dash-list :global(.tel-link), .heading-label :global(.tel-link) {
+    color: var(--color-flame);
+    font-style: normal;
+    text-decoration: underline;
+    text-underline-offset: .15em;
+  }
+</style>

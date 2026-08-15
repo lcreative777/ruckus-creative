@@ -1,0 +1,56 @@
+---
+// src/components/content/PageHeader.astro
+// The title band every standalone content page was missing (see the handoff
+// gap: these pages rendered zero headings). Title in the Cinema section-
+// heading scale (Lato 100, matching Capabilities/Process's <h2> on the
+// homepage), over an ambient radial wash, with a hairline rule beneath.
+// Legal pages skip the wash — "comfortable measure, no ambient washes".
+interface Props { title: string; legal?: boolean }
+const { title, legal = false } = Astro.props;
+---
+<header class:list={['page-header', { legal }]}>
+  {!legal && <div class="wash" aria-hidden="true"></div>}
+  <div class="inner">
+    <h1 data-reveal>{title}</h1>
+  </div>
+</header>
+
+<style>
+  .page-header {
+    position: relative;
+    overflow: hidden;
+    background: var(--color-page-band);
+    border-bottom: 1px solid var(--color-hairline-strong);
+    /* 76px clears the fixed header (Header.astro measures 92px, but every
+       section already carries its own top padding — see base.css's #home
+       etc. comment for the same 76px precedent used across the site). */
+    padding: calc(76px + clamp(44px, 6vw, 76px)) clamp(24px, 5vw, 72px) clamp(36px, 5vw, 56px);
+  }
+  .page-header.legal {
+    padding-block-end: clamp(28px, 3.5vw, 40px);
+  }
+  .wash {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background:
+      radial-gradient(55% 65% at 90% 0%, rgba(41, 73, 232, .22), transparent 65%),
+      radial-gradient(50% 60% at 4% 100%, rgba(184, 30, 4, .2), transparent 62%);
+  }
+  .inner {
+    position: relative;
+    width: 100%;
+    max-width: var(--container-wide);
+    margin-inline: auto;
+  }
+  h1 {
+    margin: 0;
+    font-family: var(--font-display);
+    font-weight: 100;
+    font-size: var(--step-h1);
+    line-height: var(--step-h1-lh);
+    letter-spacing: var(--step-h1-ls);
+    color: var(--color-white);
+  }
+  .legal h1 { font-size: clamp(28px, 3.6vw, 48px); }
+</style>
