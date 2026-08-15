@@ -1,15 +1,38 @@
 ---
-// The live site autoloads a YouTube background video, its worst LCP and TBT
-// offender. The poster carries LCP here and the player is fetched only on click.
-// `mode` is reserved so motion can be restored later without a rewrite.
+// src/components/HeroVideo.astro
+//
+// Poster-first video facade, now backed by Mux.
+//
+// The live WordPress site autoloads a YouTube background video, which is its
+// worst LCP and TBT offender. Here the poster carries LCP and NOTHING of the
+// player is fetched until someone clicks — no player script, no third-party
+// connection, no cookies on load.
+//
+// Why a facade rather than an inline player or an autoplaying loop:
+//   - `<mux-player>` is a web component costing ~100KB of JS before anything
+//     paints. It buys controls we do not need until playback starts.
+//   - A muted autoplay background loop would need a progressive MP4. Mux static
+//     renditions are not enabled on this asset (stream.mux.com/<id>/high.mp4
+//     returns 404), so the only source is HLS, which needs hls.js (~100KB) in
+//     every browser except Safari. Not worth it for a hero loop.
+// The poster is downloaded from Mux's thumbnail API and committed, so Astro
+// re-encodes it to AVIF/WebP at build time and it is served from our own origin.
 import { getImage } from 'astro:assets';
 import { resolveMedia } from '../lib/images';
 
-interface Props { videoId: string; poster: string; title?: string; mode?: 'facade' | 'autoplay' }
-const { videoId, poster, title = 'Play video', mode = 'facade' } = Astro.props;
+interface Props {
+  /** Mux public playback ID (the id in player.mux.com/<id>). */
+  playbackId: string;
+  /** Poster filename in src/assets/media/. */
+  poster: string;
+  title?: string;
+  /** Reserved: 'facade' loads on click, 'inline' would embed immediately. */
+  mode?: 'facade' | 'inline';
+}
+const { playbackId, poster, title = 'Play video', mode = 'facade' } = Astro.props;
 
 const img = resolveMedia(poster);
-if (!img) throw new Error(`HeroVideo: poster "${poster}" was not migrated — check src/assets/media/`);
+if (!img) throw new Error(`HeroVideo: poster "${poster}" was not found in src/assets/media/`);
 
 const [avif, webp, fallback] = await Promise.all([
   getImage({ src: img, format: 'avif', widths: [768, 1280, 1920] }),
@@ -17,7 +40,7 @@ const [avif, webp, fallback] = await Promise.all([
   getImage({ src: img, format: 'jpeg', width: 1920 }),
 ]);
 ---
-<div class="hero-video" data-video-id={videoId} data-mode={mode}>
+<div class="hero-video" data-playback-id={playbackId} data-mode={mode}>
   <picture>
     <source type="image/avif" srcset={avif.srcSet.attribute} sizes="100vw" />
     <source type="image/webp" srcset={webp.srcSet.attribute} sizes="100vw" />
@@ -33,17 +56,18 @@ const [avif, webp, fallback] = await Promise.all([
 </div>
 
 <script>
+  // ~600 bytes. Swaps the poster for the Mux player on first click only.
   document.querySelectorAll<HTMLElement>('.hero-video').forEach((el) => {
     const button = el.querySelector('button');
     button?.addEventListener('click', () => {
-      const id = el.dataset.videoId;
+      const id = el.dataset.playbackId;
       if (!id) return;
       const iframe = document.createElement('iframe');
-      iframe.src = `https://www.youtube-nocookie.com/embed/${id}?autoplay=1&rel=0`;
+      iframe.src = `https://player.mux.com/${id}?autoplay=1`;
       iframe.title = button.getAttribute('aria-label') ?? 'Video';
-      iframe.allow = 'accelerometer; autoplay; encrypted-media; picture-in-picture';
+      iframe.allow = 'accelerometer; gyroscope; autoplay; encrypted-media; picture-in-picture';
       iframe.allowFullscreen = true;
-      iframe.loading = 'lazy';
+      iframe.setAttribute('style', 'width:100%;height:100%;border:none;aspect-ratio:16/9');
       el.replaceChildren(iframe);
     }, { once: true });
   });
@@ -52,7 +76,9 @@ const [avif, webp, fallback] = await Promise.all([
 <style>
   .hero-video { position: relative; aspect-ratio: 16 / 9; background: #000; overflow: hidden; }
   .hero-video img, .hero-video :global(iframe) { width: 100%; height: 100%; object-fit: cover; border: 0; }
-  .play { position: absolute; inset: 0; margin: auto; width: 68px; height: 48px;
-          background: none; border: 0; cursor: pointer; padding: 0; }
+  .play {
+    position: absolute; inset: 0; margin: auto; width: 68px; height: 48px;
+    background: none; border: 0; cursor: pointer; padding: 0;
+  }
   .play:hover path:first-child { fill-opacity: 1; }
 </style>

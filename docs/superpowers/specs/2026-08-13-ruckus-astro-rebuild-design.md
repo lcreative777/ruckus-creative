@@ -36,7 +36,7 @@ Measured against the live site on 2026-08-13:
 | CSS | Fully inlined across 8 `<style>` blocks; entire Salient stylesheet regardless of page usage |
 | Fonts | 2 blocking Google Fonts requests, 5 families |
 | Images | 21 JPG + 4 PNG on homepage; no WebP/AVIF, no modern `srcset` |
-| Hero | YouTube background video (`NgliiMV4jzE`) via `iframe_api` |
+| Hero | YouTube background video (`NgliiMV4jzE`) via `iframe_api` — **replaced with Mux, 2026-08-15** |
 
 The YouTube background video is the primary LCP and TBT liability. The inlined full stylesheet is the primary render-blocking liability.
 
@@ -163,7 +163,7 @@ Every jQuery-dependent behavior gets a vanilla replacement, loaded as an island 
 | Nectar testimonial slider | CSS scroll-snap carousel | ~0.5 KB |
 | Superfish menu | `<details>` + CSS | 0 KB |
 | Waypoints + anime.js reveals | IntersectionObserver + CSS transitions | ~0.5 KB |
-| YouTube background video | Poster-first facade | ~1 KB |
+| YouTube background video | Mux, poster-first facade | ~0.6 KB |
 | Gravity Forms + reCAPTCHA | Native form + Turnstile | ~2 KB |
 
 All animation respects `prefers-reduced-motion`.
@@ -173,6 +173,13 @@ All animation respects `prefers-reduced-motion`.
 Renders a poster image as the LCP element. The YouTube player loads only on click.
 
 The component takes a `mode` prop — `'facade'` (built now) or `'autoplay'` (reserved) — so restoring motion later is a prop change rather than a rewrite.
+
+**Update 2026-08-15:** the hero now plays a Mux asset
+(playback `x8Dj7cq01zoZ4SRWJdrvoUWEpwVj7L5g5wBr01vBe40288`) rather than YouTube.
+The facade pattern is unchanged. A muted autoplay loop is not available for this
+asset: Mux static MP4 renditions are disabled (`/high.mp4` 404s), leaving only
+HLS, which needs hls.js (~100KB) outside Safari. Enabling static renditions on
+the Mux asset would make the phase-2 motion option viable.
 
 **Documented phase 2, not built now:** because LCP measures the poster, a muted self-hosted MP4 loop can swap in *after* the page is interactive without affecting the score. Gate on `prefers-reduced-motion`, `navigator.connection.saveData`, and a desktop-width media query. This restores the motion of the current design at effectively zero CWV cost. Deferred so the baseline ships clean and the improvement can be measured against it.
 

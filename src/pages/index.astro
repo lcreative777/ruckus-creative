@@ -12,7 +12,11 @@ const d = entry.data;
   <Seo slot="head" title={d.seo.title ?? d.title} description={d.seo.description} canonical={d.seo.canonical} ogImage={d.seo.ogImage} />
   {/* The migrated body already carries id="home"; a second one here would
       make the /#home nav link ambiguous. */}
-  <section class="hero"><HeroVideo videoId="NgliiMV4jzE" poster="ruckus_vid-1.jpg" title="Play the Ruckus Creative reel" /></section>
+  <section class="hero"><HeroVideo
+    playbackId="x8Dj7cq01zoZ4SRWJdrvoUWEpwVj7L5g5wBr01vBe40288"
+    poster="mux-hero-poster.jpg"
+    title="Play the Ruckus Creative reel"
+  /></section>
   <RichText html={entry.body ?? ''} class="prose container-wide" />
 </Base>
 
