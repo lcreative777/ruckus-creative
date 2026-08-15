@@ -17,7 +17,7 @@ const ICONS: Record<string, string> = {
   'Event Marketing': 'event-svgrepo-com',
 };
 ---
-<section class="capabilities">
+<section id="services" class="capabilities">
   <h2 data-reveal>Capabilities</h2>
   <div class="grid">
     {groups.map((g) => (
@@ -43,11 +43,23 @@ const ICONS: Record<string, string> = {
     letter-spacing: -.03em;
     color: #fff;
   }
+  /* Six capability groups: 3 rows of 2 on mobile, 2 rows of 3 on desktop.
+     Fixed column counts rather than auto-fit, so the row shape is exactly the
+     one asked for at each size instead of depending on the content width. */
   .grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    grid-template-columns: repeat(2, 1fr);
     gap: var(--gap-hairline);
     background: var(--color-hairline);
+  }
+  @media (min-width: 900px) {
+    .grid { grid-template-columns: repeat(3, 1fr); }
+  }
+  /* Two columns are kept all the way down, as specified. Padding and the
+     dashed-list type tighten instead of dropping to a single column. */
+  @media (max-width: 560px) {
+    .cell { padding: 22px 16px; }
+    .cell li { font-size: 13px; }
   }
   .cell {
     background: var(--color-canvas);
