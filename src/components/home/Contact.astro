@@ -82,16 +82,41 @@ const [avif, webp, fallback] = await Promise.all([
     const reset = form.querySelector<HTMLButtonElement>('[data-contact-reset]');
     if (!fields || !success) continue;
 
+    const submit = form.querySelector<HTMLButtonElement>('button[type="submit"]');
+    const defaultError = error?.textContent ?? '';
+
     form.addEventListener('submit', async (e) => {
       e.preventDefault();
       error?.setAttribute('hidden', '');
+      if (submit) submit.disabled = true;
       try {
-        const res = await fetch(form.action, { method: 'POST', body: new FormData(form) });
-        if (!res.ok) throw new Error(`${res.status}`);
+        // `accept: application/json` matters. Without it the endpoint answers
+        // with its no-JS 303 back to /#contact-error, fetch follows that to the
+        // homepage, and the 200 it lands on makes `res.ok` true no matter what
+        // actually happened — so a rejected send reported itself as sent.
+        const res = await fetch(form.action, {
+          method: 'POST',
+          headers: { accept: 'application/json' },
+          body: new FormData(form),
+        });
+        const data = await res.json().catch(() => null);
+        if (!res.ok || !data?.ok) throw new Error(data?.message || `${res.status}`);
         fields.setAttribute('hidden', '');
         success.removeAttribute('hidden');
-      } catch {
-        error?.removeAttribute('hidden');
+      } catch (err) {
+        // Prefer the server's reason ("that verification did not pass") over the
+        // generic line — it tells the visitor whether retrying is worth it.
+        if (error) {
+          error.textContent = err instanceof Error && err.message && !/^\d+$/.test(err.message)
+            ? err.message
+            : defaultError;
+          error.removeAttribute('hidden');
+        }
+        // Turnstile tokens are single-use: without a reset every retry fails as
+        // a duplicate, which looks like the form is simply broken.
+        (window as any).turnstile?.reset?.();
+      } finally {
+        if (submit) submit.disabled = false;
       }
     });
 
