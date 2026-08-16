@@ -8,5 +8,10 @@ dist/
 
 # Credential files kept alongside the project. This repo is public.
 unsplash.txt
+mux.txt
 *.secret
 secrets.txt
+# Mux's dashboard downloads its access token as
+# "mux-access-token-<Environment>.env" — catch that and any other stray .env.
+*.env
+mux-access-token*

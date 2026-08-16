@@ -9,7 +9,9 @@
     "check": "astro check",
     "migrate": "node scripts/migrate.mjs",
     "redirects": "node scripts/emit-redirects.mjs",
-    "fidelity": "node scripts/compare-fidelity.mjs"
+    "fidelity": "node scripts/compare-fidelity.mjs",
+    "mux:status": "node scripts/mux-renditions.mjs --status",
+    "mux:renditions": "node scripts/mux-renditions.mjs"
   },
   "license": "UNLICENSED",
   "type": "module",
