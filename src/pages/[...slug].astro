@@ -31,7 +31,8 @@ export async function getStaticPaths() {
 
   const fromPages = pages
     .filter(p => !['/', '/portfolio-ruckus/', '/knowledge/'].includes(p.data.path))
-    .map(p => ({ params: { slug: slugOf(p.data.path) }, props: { entry: p, kind: 'page' as const } }));
+    // Index the standalone pages so each draws a distinct header photograph.
+    .map((p, i) => ({ params: { slug: slugOf(p.data.path) }, props: { entry: p, kind: 'page' as const, bgIndex: i } }));
 
   const fromPosts = posts
     .map(p => ({ params: { slug: slugOf(p.data.path) }, props: { entry: p, kind: 'post' as const } }));
@@ -39,7 +40,7 @@ export async function getStaticPaths() {
   return [...fromPages, ...fromPosts];
 }
 
-const { entry, kind } = Astro.props;
+const { entry, kind, bgIndex } = Astro.props;
 const d = entry.data;
 const isPost = kind === 'post';
 const isLegal = legalLinks.some(l => l.href === d.path);
@@ -87,7 +88,7 @@ const blocks = !isPost ? parseContentBlocks(entry.body ?? '') : null;
     </article>
   ) : (
     <article class:list={['content-page', { legal: isLegal }]}>
-      <PageHeader title={d.title} legal={isLegal} />
+      <PageHeader title={d.title} legal={isLegal} path={d.path} bgIndex={bgIndex} />
       <div class:list={[isLegal ? 'container' : 'container-wide', 'page-inner']}>
         <ContentBody blocks={blocks!} legal={isLegal} />
       </div>

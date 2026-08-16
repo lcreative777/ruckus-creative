@@ -2,17 +2,54 @@
 // src/components/content/PageHeader.astro
 // The title band every standalone content page was missing (see the handoff
 // gap: these pages rendered zero headings). Title in the Cinema section-
-// heading scale (Lato 100, matching Capabilities/Process's <h2> on the
-// homepage), over an ambient radial wash, with a hairline rule beneath.
-// Legal pages skip the wash — "comfortable measure, no ambient washes".
-interface Props { title: string; legal?: boolean }
-const { title, legal = false } = Astro.props;
+// heading scale (Lato 100), over a full-bleed surf/ocean/mountain photograph
+// darkened to a cinematic base, with a hairline rule beneath.
+//
+// The photograph is chosen deterministically from the page's own path, so each
+// page keeps its own image across builds — see src/lib/backgrounds.ts.
+// Attribution is not optional: the Unsplash API Guidelines require crediting
+// the photographer and linking back to Unsplash wherever a photo is displayed.
+import { getImage } from 'astro:assets';
+import { backgroundFor, unsplashUrl } from '../../lib/backgrounds';
+
+interface Props { title: string; legal?: boolean; path?: string; bgIndex?: number }
+const { title, legal = false, path = title, bgIndex } = Astro.props;
+
+const bg = backgroundFor(path, bgIndex);
+
+const rendered = bg
+  ? await Promise.all([
+      getImage({ src: bg.image, format: 'avif', widths: [768, 1280, 1920, 2400] }),
+      getImage({ src: bg.image, format: 'webp', widths: [768, 1280, 1920, 2400] }),
+      getImage({ src: bg.image, format: 'jpeg', width: 1920 }),
+    ])
+  : null;
 ---
-<header class:list={['page-header', { legal }]}>
+<header class:list={['page-header', { legal, photo: !!rendered }]}>
+  {rendered && (
+    <picture class="bg">
+      <source type="image/avif" srcset={rendered[0].srcSet.attribute} sizes="100vw" />
+      <source type="image/webp" srcset={rendered[1].srcSet.attribute} sizes="100vw" />
+      <img src={rendered[2].src} width={bg!.image.width} height={bg!.image.height}
+           alt="" loading="eager" fetchpriority="high" decoding="async" />
+    </picture>
+  )}
+
+  {/* 75% black, plus the brand wash on top so the band still reads as Cinema
+      rather than a generic darkened stock photo. */}
+  {rendered && <div class="scrim" aria-hidden="true"></div>}
   {!legal && <div class="wash" aria-hidden="true"></div>}
+
   <div class="inner">
     <h1 data-reveal>{title}</h1>
   </div>
+
+  {bg && (
+    <p class="credit">
+      Photo by <a href={bg.meta.photographerUrl} rel="noopener nofollow" target="_blank">{bg.meta.photographer}</a>
+      {' on '}<a href={unsplashUrl} rel="noopener nofollow" target="_blank">Unsplash</a>
+    </p>
+  )}
 </header>
 
 <style>
@@ -21,14 +58,25 @@ const { title, legal = false } = Astro.props;
     overflow: hidden;
     background: var(--color-page-band);
     border-bottom: 1px solid var(--color-hairline-strong);
-    /* 76px clears the fixed header (Header.astro measures 92px, but every
-       section already carries its own top padding — see base.css's #home
-       etc. comment for the same 76px precedent used across the site). */
+    /* 76px clears the fixed header; the rest is the band's own breathing room. */
     padding: calc(76px + clamp(44px, 6vw, 76px)) clamp(24px, 5vw, 72px) clamp(36px, 5vw, 56px);
   }
-  .page-header.legal {
-    padding-block-end: clamp(28px, 3.5vw, 40px);
+  /* A photographic band earns more height than a plain one. */
+  .page-header.photo {
+    padding-block: calc(76px + clamp(64px, 9vw, 128px)) clamp(64px, 9vw, 128px);
   }
+  .page-header.legal { padding-block-end: clamp(28px, 3.5vw, 40px); }
+  .page-header.legal.photo { padding-block: calc(76px + clamp(48px, 6vw, 84px)) clamp(48px, 6vw, 84px); }
+
+  .bg, .bg img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .scrim { position: absolute; inset: 0; background: rgba(0, 0, 0, .75); }
+
   .wash {
     position: absolute;
     inset: 0;
@@ -37,6 +85,7 @@ const { title, legal = false } = Astro.props;
       radial-gradient(55% 65% at 90% 0%, rgba(41, 73, 232, .22), transparent 65%),
       radial-gradient(50% 60% at 4% 100%, rgba(184, 30, 4, .2), transparent 62%);
   }
+
   .inner {
     position: relative;
     width: 100%;
@@ -53,4 +102,21 @@ const { title, legal = false } = Astro.props;
     color: var(--color-white);
   }
   .legal h1 { font-size: clamp(28px, 3.6vw, 48px); }
+
+  /* Required attribution, kept quiet enough not to fight the title. */
+  .credit {
+    position: absolute;
+    right: clamp(16px, 4vw, 32px);
+    bottom: 12px;
+    margin: 0;
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 10px;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, .42);
+  }
+  .credit a { color: rgba(255, 255, 255, .62); text-decoration: none; }
+  .credit a:hover { color: #fff; text-decoration: underline; }
+  @media (max-width: 560px) { .credit { position: static; margin-top: 20px; text-align: left; } }
 </style>
