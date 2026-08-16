@@ -5,3 +5,8 @@ dist/
 .wrangler/
 .dev.vars
 .DS_Store
+
+# Credential files kept alongside the project. This repo is public.
+unsplash.txt
+*.secret
+secrets.txt
