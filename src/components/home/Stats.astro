@@ -7,14 +7,19 @@
 import { getStats } from '../../lib/home-content';
 
 const stats = await getStats();
+
+// Client-specified units. These live OUTSIDE the [data-count] element on
+// purpose: the counter sets textContent on that node, so a suffix inside it
+// would be wiped the moment the animation ran.
+const SUFFIX = [' mil', '+'];
 ---
 <section class="stats">
   <div class="cell blue">
-    <div class="number" data-count={stats[0].value}>{stats[0].value.toLocaleString('en-US')}</div>
+    <div class="number"><span data-count={stats[0].value}>{stats[0].value.toLocaleString('en-US')}</span><span class="suffix">{SUFFIX[0]}</span></div>
     <div class="label">{stats[0].label}</div>
   </div>
   <div class="cell red">
-    <div class="number" data-count={stats[1].value}>{stats[1].value.toLocaleString('en-US')}</div>
+    <div class="number"><span data-count={stats[1].value}>{stats[1].value.toLocaleString('en-US')}</span><span class="suffix">{SUFFIX[1]}</span></div>
     <div class="label">{stats[1].label}</div>
   </div>
   <div class="cell share">
