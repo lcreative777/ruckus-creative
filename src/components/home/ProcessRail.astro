@@ -19,9 +19,28 @@ const icons = [
   <div class="wash" aria-hidden="true"></div>
   <div class="head">
     <h2 data-reveal>BRAND ALIGNMENT PROCESS™</h2>
-    <span class="meta">Five stages</span>
+    <div class="head-right">
+      <span class="meta">Five stages</span>
+      {/* The rail was scrollable but had no affordance: trackpad users could
+          swipe it, mouse-only users could not move it at all. Hidden until the
+          script confirms the content actually overflows. */}
+      <div class="nav" data-process-nav hidden>
+        <button type="button" data-process-prev aria-label="Previous stages" aria-controls="process-rail">
+          <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" fill="none"
+               stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M15 18 9 12l6-6"/>
+          </svg>
+        </button>
+        <button type="button" data-process-next aria-label="Next stages" aria-controls="process-rail">
+          <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" fill="none"
+               stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="m9 18 6-6-6-6"/>
+          </svg>
+        </button>
+      </div>
+    </div>
   </div>
-  <div class="rail" data-process-track>
+  <div class="rail" id="process-rail" data-process-track>
     {steps.map((step, i) => (
       <div class="card" data-reveal data-step>
         <span class="icon"><Icon name={icons[i]} size={36} /></span>
@@ -48,6 +67,61 @@ const icons = [
     update();
     rail.addEventListener('scroll', update, { passive: true });
     addEventListener('resize', update);
+
+    // --- Slider controls -------------------------------------------------
+    const wrap = rail.closest('section');
+    const nav = wrap?.querySelector<HTMLElement>('[data-process-nav]');
+    const prev = wrap?.querySelector<HTMLButtonElement>('[data-process-prev]');
+    const next = wrap?.querySelector<HTMLButtonElement>('[data-process-next]');
+    if (!nav || !prev || !next) continue;
+
+    const overflows = () => rail.scrollWidth - rail.clientWidth > 1;
+
+    /** One card plus its gap, so a click advances exactly one stage. */
+    const step = () => {
+      const card = rail.querySelector<HTMLElement>('[data-step]');
+      if (!card) return rail.clientWidth * 0.8;
+      const gap = parseFloat(getComputedStyle(rail).columnGap || '0') || 0;
+      return card.getBoundingClientRect().width + gap;
+    };
+
+    const syncButtons = () => {
+      // Only offer controls when there is actually something to scroll to.
+      nav.hidden = !overflows();
+      const max = rail.scrollWidth - rail.clientWidth;
+      prev.disabled = rail.scrollLeft <= 1;
+      next.disabled = rail.scrollLeft >= max - 1;
+    };
+
+    const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const nudge = (dir: number) =>
+      rail.scrollBy({ left: dir * step(), behavior: reduced ? 'auto' : 'smooth' });
+
+    prev.addEventListener('click', () => nudge(-1));
+    next.addEventListener('click', () => nudge(1));
+    rail.addEventListener('scroll', syncButtons, { passive: true });
+    addEventListener('resize', syncButtons);
+    syncButtons();
+
+    // Drag to pan, for mouse users who have no horizontal wheel axis.
+    let down = false, startX = 0, startLeft = 0, moved = false;
+    rail.addEventListener('pointerdown', (e) => {
+      if (e.pointerType === 'touch') return;   // native touch scrolling is better
+      down = true; moved = false;
+      startX = e.clientX; startLeft = rail.scrollLeft;
+    });
+    rail.addEventListener('pointermove', (e) => {
+      if (!down) return;
+      const dx = e.clientX - startX;
+      if (Math.abs(dx) > 3) { moved = true; rail.classList.add('dragging'); }
+      rail.scrollLeft = startLeft - dx;
+    });
+    const endDrag = () => { down = false; rail.classList.remove('dragging'); };
+    rail.addEventListener('pointerup', endDrag);
+    rail.addEventListener('pointercancel', endDrag);
+    rail.addEventListener('pointerleave', endDrag);
+    // Suppress the click that follows a drag, so panning never triggers a link.
+    rail.addEventListener('click', (e) => { if (moved) { e.preventDefault(); e.stopPropagation(); } }, true);
   }
 </script>
 
@@ -92,6 +166,39 @@ const icons = [
     letter-spacing: .22em;
     text-transform: uppercase;
     color: var(--color-text-dim);
+  }
+
+  /* Slider controls. The rail always scrolled, but with no affordance a
+     mouse-only visitor had no way to reach the stages past the fold. */
+  .head-right { display: flex; align-items: center; gap: clamp(16px, 2vw, 28px); }
+  .nav { display: flex; gap: 8px; }
+  .nav[hidden] { display: none; }
+  .nav button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 42px;
+    height: 42px;
+    padding: 0;
+    border: 1px solid var(--color-hairline-strong);
+    border-radius: 999px;
+    background: transparent;
+    color: #fff;
+    cursor: pointer;
+    transition: background .25s ease, border-color .25s ease, opacity .25s ease;
+  }
+  .nav button:hover:not(:disabled) {
+    background: var(--color-flame);
+    border-color: var(--color-flame);
+  }
+  .nav button:disabled { opacity: .28; cursor: default; }
+
+  /* Only while a pointer drag is in progress, so the cursor doesn't imply
+     draggability on touch devices where native scrolling already works. */
+  .rail.dragging { cursor: grabbing; user-select: none; }
+
+  @media (prefers-reduced-motion: reduce) {
+    .nav button { transition: none; }
   }
 
   .rail {
