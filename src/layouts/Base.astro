@@ -52,6 +52,51 @@ import appleIcon from '../assets/chrome/cropped-FAVICON-180x180.png';
     )}
     <Footer />
     <Motion />
+
+    <script>
+      // Re-apply the URL's hash once layout has settled.
+      //
+      // Arriving at /#work from another page lands at the top instead of the
+      // section. The browser performs its anchor scroll as soon as the target
+      // is parsed, but at that moment the 100vh hero video, the lazily loaded
+      // work imagery and the GSAP reveals below it have not resolved, so the
+      // section's final offset is not yet known and the scroll is effectively
+      // discarded. Nothing re-applies it afterwards. A reload often appears to
+      // work only because a warm cache wins the race.
+      //
+      // Runs on every page: the homepage owns the section ids, but any page
+      // can be linked to with a hash.
+      {
+        const target = () => {
+          const id = decodeURIComponent(location.hash.slice(1));
+          return id ? document.getElementById(id) : null;
+        };
+
+        if (target()) {
+          // Never yank the page away from someone who started reading or
+          // scrolling while it loaded -- honour their position instead.
+          let userMoved = false;
+          const claim = () => { userMoved = true; };
+          for (const evt of ['wheel', 'touchstart', 'keydown', 'pointerdown'] as const) {
+            addEventListener(evt, claim, { once: true, passive: true });
+          }
+
+          const settle = () => {
+            if (userMoved) return;
+            // scroll-margin-top on the section ids (see src/styles/base.css)
+            // supplies the fixed-header offset, so this needs no extra maths.
+            target()?.scrollIntoView({ block: 'start', behavior: 'auto' });
+          };
+
+          addEventListener('load', () => {
+            settle();
+            // Motion.astro refreshes ScrollTrigger at ~400ms, which can shift
+            // offsets again; re-assert just after that.
+            setTimeout(settle, 500);
+          }, { once: true });
+        }
+      }
+    </script>
   </body>
 </html>
 
