@@ -7,5 +7,21 @@
   // The adapter splits its output into dist/client (static assets) and
   // dist/server (the Worker). Assets must point at dist/client — pointing at
   // dist/ serves the server bundle as if it were a static tree.
-  "assets": { "directory": "./dist/client", "binding": "ASSETS" }
+  "assets": { "directory": "./dist/client", "binding": "ASSETS" },
+
+  // Keep the workers.dev URL alive. Wrangler disables it by default as soon as
+  // any `routes` are declared, which silently took the staging URL offline.
+  "workers_dev": true,
+
+  // Production cutover. Routes -- not `custom_domain: true`: a custom domain
+  // insists on managing the hostname's DNS record itself and refuses while one
+  // already exists (API 100117), which would mean deleting the Flywheel records
+  // before the Worker could take over. A route instead intercepts requests in
+  // front of the existing proxied record, so WordPress stays reachable as the
+  // origin and rolling back is just removing these two entries.
+  // See docs/dns-cutover.md.
+  "routes": [
+    { "pattern": "ruckuscreative.com/*", "zone_name": "ruckuscreative.com" },
+    { "pattern": "www.ruckuscreative.com/*", "zone_name": "ruckuscreative.com" }
+  ]
 }
