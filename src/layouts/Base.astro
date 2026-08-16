@@ -1,4 +1,6 @@
 ---
+interface Props { photoCredit?: { photographer: string; photographerUrl: string } }
+const { photoCredit } = Astro.props;
 import '@fontsource/open-sans/300.css';
 import '@fontsource/open-sans/400.css';
 import '@fontsource/open-sans/600.css';
@@ -41,7 +43,7 @@ import appleIcon from '../assets/chrome/cropped-FAVICON-180x180.png';
     <a href="#main" class="skip-link">Skip to content</a>
     <Header />
     <main id="main"><slot /></main>
-    <Footer />
+    <Footer photoCredit={photoCredit} />
     <Motion />
   </body>
 </html>

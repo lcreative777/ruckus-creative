@@ -24,6 +24,7 @@ import PageHeader from '../components/content/PageHeader.astro';
 import ContentBody from '../components/content/ContentBody.astro';
 import { parseContentBlocks } from '../lib/content-page';
 import { site, sidebarLinks, legalLinks } from '../data/site';
+import { backgroundFor } from '../lib/backgrounds';
 
 export async function getStaticPaths() {
   const [pages, posts] = await Promise.all([getCollection('pages'), getCollection('knowledge')]);
@@ -61,8 +62,15 @@ const schema = isPost && 'pubDate' in d
 // Knowledge posts keep their existing RichText + span_9/span_3 sidebar
 // rendering untouched.
 const blocks = !isPost ? parseContentBlocks(entry.body ?? '') : null;
+
+// The header photo's credit is rendered in the footer, so resolve it here and
+// hand it to both components rather than letting each look it up separately.
+const bg = !isPost ? backgroundFor(d.path, bgIndex) : null;
+const photoCredit = bg
+  ? { photographer: bg.meta.photographer, photographerUrl: bg.meta.photographerUrl }
+  : undefined;
 ---
-<Base>
+<Base photoCredit={photoCredit}>
   <Seo slot="head" title={d.seo.title ?? d.title} description={d.seo.description}
        canonical={d.seo.canonical} ogImage={d.seo.ogImage}
        type={isPost ? 'article' : 'website'}
