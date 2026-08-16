@@ -26,7 +26,7 @@ export const site = {
    * challenge and /api/contact fails closed with a 503 and the phone number,
    * rather than accepting unverified submissions.
    */
-  turnstileSiteKey: '',   // "In business for over 25 years", per the About page
+  turnstileSiteKey: '0x4AAAAAAER_mmbPuTjhndlO',
 } as const;
 
 /**
