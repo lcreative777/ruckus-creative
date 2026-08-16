@@ -129,6 +129,14 @@ const [avif, webp, fallback] = await Promise.all([
 </script>
 
 <style>
+  /* `hidden` hides only through the UA sheet's [hidden] { display: none },
+     which any author display rule outranks -- and .fields and .success below
+     both set display:flex. Without this the success panel rendered permanently
+     under the live form, and submitting never hid the fields, so a successful
+     send looked like nothing had happened. .error escaped it only because it
+     sets no display of its own. */
+  [hidden] { display: none !important; }
+
   .contact { position: relative; overflow: hidden; }
   .bg, .bg img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
   .tint {
