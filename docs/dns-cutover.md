@@ -73,9 +73,24 @@ them, and neither should a rollback.
 | `ruckuscreative.com` | MX | Google Workspace ×5 (`aspmx.l.google.com`, `alt1`–`alt4`) |
 | `ruckuscreative.com` | TXT | `v=spf1 a mx include:_spf.google.com  ~all` |
 | `ruckuscreative.com` | TXT | `google-site-verification=u_sWu2GOHMw7hBemRAhH32lVkFuq78X_j0JMalw1lQk` |
-| `send.ruckuscreative.com` | MX | `feedback-smtp.us-east-1.amazonses.com` (Resend bounces) |
-| `send.ruckuscreative.com` | TXT | `v=spf1 include:amazonses.com ~all` |
-| `resend._domainkey.send` | TXT | Resend DKIM |
+| `send.send.ruckuscreative.com` | MX | `feedback-smtp.us-east-1.amazonses.com` (Resend bounces) |
+| `send.send.ruckuscreative.com` | TXT | `v=spf1 include:amazonses.com ~all` |
+| `resend._domainkey.send.ruckuscreative.com` | TXT | Resend DKIM |
+
+### The doubled `send.send` is correct — do not "fix" it
+
+The domain registered in Resend is **`send.ruckuscreative.com`**, not the apex. Resend's
+dashboard shows record names *relative to the registered domain*, so the row it labels
+`send` means `send.` + `send.ruckuscreative.com` — that is, `send.send.ruckuscreative.com`.
+It is the MAIL FROM subdomain used for bounce handling, and Amazon SES derives it by
+prefixing `send.` to whatever domain was registered.
+
+The DKIM record is the giveaway: it sits at `resend._domainkey.send.ruckuscreative.com`,
+which only makes sense if the registered domain is `send.ruckuscreative.com`.
+
+This looks like a typo and was "corrected" to `send.ruckuscreative.com` once, which broke
+verification. If the apex-level `send.ruckuscreative.com` ever has an MX or SPF TXT on it,
+that is the mistake — not the doubled label.
 | `flywheel-domain-verification` | TXT | Flywheel — keep while WordPress is the rollback path |
 
 `*.ruckuscreative.com A 151.101.66.159 (proxied)` stays in place, pointing every other
