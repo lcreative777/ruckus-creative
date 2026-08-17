@@ -1,11 +1,48 @@
 ---
 // src/components/Seo.astro
+import { getImage } from 'astro:assets';
 import { site, services } from '../data/site';
 // Referenced by the organization's logo/image in the JSON-LD below. Imported
-// as an asset rather than hardcoded so the URL follows the hashed build output.
+// as assets rather than hardcoded so the URLs follow the hashed build output.
 import logo from '../assets/chrome/ruckus_logo_light.png';
+import poster from '../assets/media/ruckus_vid-1.jpg';
 
 const logoSrc = logo.src;
+
+// Google's structured-data guidance asks for a high-resolution `image` in at
+// least 1200px, and prefers being offered 16:9, 4:3 and 1:1 so it can pick the
+// crop that fits a given surface. Supplying only one is what left "Missing
+// field image" in the Rich Results Test.
+//
+// Source is the hero video's poster: the R mark sits centred in a 1676x944
+// frame, so a centre cover-crop keeps the whole mark inside every ratio —
+// checked against the narrowest case, the 944x944 square.
+//
+// getImage output is content-hashed per unique parameter set, so these three
+// files are emitted once for the whole site rather than per page.
+// Sizes are derived from the source rather than hardcoded. Asking for a
+// 1200x1200 square silently produced 1200x944 -- Astro will not upscale, and
+// the frame is only 944px tall -- which left the JSON-LD advertising
+// dimensions the file did not have. Computing the largest crop each ratio can
+// actually yield keeps the declaration honest whatever the source becomes.
+const MAX_EDGE = 1200; // Google's recommended minimum width
+const POSTER_RATIOS = [16 / 9, 4 / 3, 1].map((ratio) => {
+  const width = Math.min(poster.width, Math.floor(poster.height * ratio), MAX_EDGE);
+  return { width, height: Math.round(width / ratio) };
+});
+
+const posterImages = await Promise.all(
+  POSTER_RATIOS.map((r) =>
+    getImage({
+      src: poster,
+      format: 'jpeg',
+      width: r.width,
+      height: r.height,
+      fit: 'cover',
+      position: 'center',
+    }),
+  ),
+);
 
 interface Props {
   title: string;
@@ -55,7 +92,17 @@ const organization = {
     '@id': `${site.url}/#logo`,
     url: new URL(logoSrc, site.url).href,
   },
-  image: { '@id': `${site.url}/#logo` },
+  // Three crops of the same frame, not three different pictures — `image`
+  // takes a list and Google chooses per surface. The logo stays separate
+  // above: `logo` is the brand mark, `image` is what represents the business.
+  image: posterImages.map((img, i) => ({
+    '@type': 'ImageObject',
+    url: new URL(img.src, site.url).href,
+    width: POSTER_RATIOS[i].width,
+    height: POSTER_RATIOS[i].height,
+  })),
+  // Client-supplied (2026-08-16): typical engagement range, not a rate card.
+  priceRange: '$5,000 - $100,000',
   address: {
     '@type': 'PostalAddress',
     streetAddress: site.address.street,
