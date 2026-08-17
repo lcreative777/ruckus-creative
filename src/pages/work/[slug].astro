@@ -110,12 +110,23 @@ const prevTitle = prevSlug ? (titleBySlug.get(prevSlug) ?? prevSlug) : null;
   }
 
   .brief {
-    position: sticky;
-    top: 104px;
     display: flex;
     flex-direction: column;
     gap: 22px;
     max-width: 44ch;
+  }
+
+  /* Sticky only once the grid above actually has two columns to work with.
+     `repeat(auto-fit, minmax(300px, 1fr))` collapses to a single column below
+     roughly 680px (2x300 + the 32px gap + 2x24px padding), at which point the
+     brief and the images are stacked -- and a sticky brief pinned itself to
+     the top of the viewport while the case images scrolled up underneath it.
+     760px leaves margin over that 680px threshold so the two never overlap. */
+  @media (min-width: 760px) {
+    .brief {
+      position: sticky;
+      top: 104px;   /* clears the 92px fixed header */
+    }
   }
   .brief :global(.brief-fields) {
     display: flex;
