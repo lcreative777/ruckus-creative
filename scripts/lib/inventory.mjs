@@ -91,6 +91,14 @@ export function resolveInternalPath(path) {
 export const CONTENT_CORRECTIONS = [
   { find: /27525 Puerta Real,\s*Suite 100-173/g, replace: '27525 Puerta Real, Suite 300-173' },
   { find: /27525 Puerta Real,\s*Suite 300-1733/g, replace: '27525 Puerta Real, Suite 300-173' },
+  // Missing space after the full stop in the Capabilities CTA. Deliberately
+  // anchored on this exact sentence pair rather than a general /\.(?=[A-Z])/
+  // rule: the content is full of legitimate full-stop-then-capital sequences
+  // (initials, "U.S.", abbreviations) that such a rule would wreck.
+  {
+    find: /questions or comments\.We are here/g,
+    replace: 'questions or comments. We are here',
+  },
 ];
 
 /** Apply every correction to a block of cleaned HTML. */
