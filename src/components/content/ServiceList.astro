@@ -1,0 +1,85 @@
+---
+// src/components/content/ServiceList.astro
+// The canonical service list, rendered from src/data/site.ts — the same array
+// that produces the OfferCatalog in Seo.astro. Rendering both from one source
+// is the point: a visitor and a crawler read the identical list, and the page
+// copy cannot quietly drift out of step with the structured data.
+//
+// The acronym-led entries carry their expansion because "AEO" and "GEO" mean
+// nothing on their own to a first-time reader or to an answer engine trying to
+// match a query for "answer engine optimization".
+import { services } from '../../data/site';
+---
+<section class="services" aria-labelledby="services-heading">
+  <h2 id="services-heading">Services</h2>
+  <dl>
+    {services.map((s) => (
+      <div class="row">
+        <dt>
+          {s.name}
+          {s.name !== s.alternateName && <span class="full">{s.alternateName}</span>}
+        </dt>
+        <dd>{s.description}</dd>
+      </div>
+    ))}
+  </dl>
+</section>
+
+<style>
+  .services {
+    margin-top: clamp(48px, 6vw, 84px);
+    padding-top: clamp(36px, 4vw, 56px);
+    border-top: 1px solid var(--color-hairline-strong);
+  }
+  .services h2 {
+    margin: 0 0 clamp(28px, 3.5vw, 44px);
+    font-family: var(--font-display);
+    font-weight: 100;
+    font-size: clamp(30px, 4vw, 54px);
+    line-height: 1;
+    letter-spacing: -.03em;
+    color: var(--color-white);
+  }
+
+  dl { margin: 0; display: flex; flex-direction: column; }
+  /* Hairline between entries rather than around them, matching the grid rules
+     the rest of the Cinema pages use. */
+  .row {
+    display: grid;
+    gap: 6px 32px;
+    padding: clamp(18px, 2.2vw, 26px) 0;
+    border-bottom: 1px solid var(--color-hairline);
+  }
+  .row:first-child { border-top: 1px solid var(--color-hairline); }
+
+  @media (min-width: 760px) {
+    .row { grid-template-columns: minmax(0, 22ch) minmax(0, 1fr); align-items: baseline; }
+  }
+
+  dt {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    font-family: var(--font-display);
+    font-weight: 900;
+    font-size: 15px;
+    letter-spacing: .05em;
+    text-transform: uppercase;
+    color: var(--color-white);
+  }
+  /* The expansion, set quieter than the name it belongs to. */
+  .full {
+    font-weight: 400;
+    font-size: 11px;
+    letter-spacing: .14em;
+    color: var(--color-flame);
+  }
+
+  dd {
+    margin: 0;
+    font-size: 15px;
+    line-height: 1.85;
+    color: var(--color-text-dim, #b9b5ad);
+    text-wrap: pretty;
+  }
+</style>

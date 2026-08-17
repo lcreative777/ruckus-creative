@@ -22,6 +22,7 @@ import Seo from '../components/Seo.astro';
 import RichText from '../components/RichText.astro';
 import PageHeader from '../components/content/PageHeader.astro';
 import ContentBody from '../components/content/ContentBody.astro';
+import ServiceList from '../components/content/ServiceList.astro';
 import { parseContentBlocks } from '../lib/content-page';
 import { site, sidebarLinks, legalLinks } from '../data/site';
 import { backgroundFor } from '../lib/backgrounds';
@@ -99,6 +100,11 @@ const photoCredit = bg
       <PageHeader title={d.title} legal={isLegal} path={d.path} bgIndex={bgIndex} />
       <div class:list={[isLegal ? 'container' : 'container-wide', 'page-inner']}>
         <ContentBody blocks={blocks!} legal={isLegal} />
+        {/* Capabilities is the page that names what the agency sells, so it
+            carries the canonical service list — rendered from src/data/site.ts,
+            the same array behind the OfferCatalog in Seo.astro, so the visible
+            copy and the structured data cannot disagree. */}
+        {d.path === '/strategic-creative-capabilities/' && <ServiceList />}
       </div>
     </article>
   )}

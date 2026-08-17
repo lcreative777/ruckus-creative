@@ -30,6 +30,10 @@ seo:
 – Social Media set up and implement<br>
 – Photography<br>
 – Video</p>
+<p><strong>ONLINE MARKETING:</strong><br>
+– Social Media set up and implement<br>
+– SEO / AEO / GEO<br>
+– SEM &amp; Advertising</p>
 	</div> 
 
 	<div class="col no-extra-padding">

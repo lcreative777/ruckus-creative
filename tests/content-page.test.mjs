@@ -48,7 +48,10 @@ function renderedTextOf(blocks) {
 
 const PAGES = {
   'about.md': { lead: 1, pullquote: 1, cta: 1 },
-  'strategic-creative-capabilities.md': { lead: 1, cta: 1, headingWithList: 4 },
+  // 5 category lists: Online, Online Marketing, Print, Presentations, Brand
+  // Development. Online Marketing was added 2026-08-16 — the homepage already
+  // carried that group and this page had been missing it.
+  'strategic-creative-capabilities.md': { lead: 1, cta: 1, headingWithList: 5 },
   'process-ruckus-creative.md': { lead: 1, divider: 2, cta: 1, heading: 12 },
   'results-based-advertising-branding.md': { lead: 1, pullquote: 2, cta: 1 },
   'contact-ruckus-creative.md': { heading: 2 },
@@ -87,7 +90,9 @@ describe('content-page classifier', () => {
     const capBlocks = parseContentBlocks(bodyOf('strategic-creative-capabilities.md'));
     const capGroups = groupHeadings(capBlocks).filter((r) => r.kind === 'group');
     expect(capGroups).toHaveLength(1);
-    expect(capGroups[0].blocks).toHaveLength(4);
+    // All five category lists stay in a single grid — adding Online Marketing
+    // must not split the run into two groups.
+    expect(capGroups[0].blocks).toHaveLength(5);
 
     const termsBlocks = parseContentBlocks(bodyOf('terms-and-conditions.md'));
     const termsGroups = groupHeadings(termsBlocks).filter((r) => r.kind === 'group');
