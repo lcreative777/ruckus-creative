@@ -1,6 +1,11 @@
 ---
 // src/components/Seo.astro
-import { site } from '../data/site';
+import { site, services } from '../data/site';
+// Referenced by the organization's logo/image in the JSON-LD below. Imported
+// as an asset rather than hardcoded so the URL follows the hashed build output.
+import logo from '../assets/chrome/ruckus_logo_light.png';
+
+const logoSrc = logo.src;
 
 interface Props {
   title: string;
@@ -22,14 +27,35 @@ const desc = description ?? site.description;
 const image = ogImage ?? undefined;
 
 // The current site has no structured data at all, so all of this is a net gain.
+//
+// Typed AdvertisingAgency (a schema.org subtype of LocalBusiness, so it keeps
+// every address/telephone property while stating the actual line of business)
+// and ProfessionalService, which is how a full-service agency is usually
+// modelled. Both inherit from Organization, so the @id below still resolves
+// for the Article author/publisher references on the knowledge posts.
+//
+// Nothing here is invented: every value traces to src/data/site.ts. Properties
+// that would require guessing — priceRange, geo coordinates, sameAs social
+// profiles, opening hours — are omitted rather than filled with plausible
+// fiction, which is worse than absent for a business listing.
 const organization = {
-  '@type': 'LocalBusiness',
+  '@type': ['AdvertisingAgency', 'ProfessionalService'],
   '@id': `${site.url}/#organization`,
   name: site.name,
   legalName: site.legalName,
+  alternateName: 'Ruckus Creative Agency',
   url: site.url,
+  description: site.description,
+  slogan: 'Business results through strategic creative',
+  foundingDate: site.founded,
   telephone: site.phone,
   email: site.email,
+  logo: {
+    '@type': 'ImageObject',
+    '@id': `${site.url}/#logo`,
+    url: new URL(logoSrc, site.url).href,
+  },
+  image: { '@id': `${site.url}/#logo` },
   address: {
     '@type': 'PostalAddress',
     streetAddress: site.address.street,
@@ -37,6 +63,47 @@ const organization = {
     addressRegion: site.address.region,
     postalCode: site.address.postalCode,
     addressCountry: site.address.country,
+  },
+  areaServed: { '@type': 'Country', name: site.areaServed },
+  // Topical expertise. Distinct from the offer catalogue below: knowsAbout
+  // describes what the agency understands, hasOfferCatalog what it sells.
+  knowsAbout: [
+    'Brand Strategy',
+    'Brand Development',
+    'Search Engine Optimization',
+    'Answer Engine Optimization',
+    'Generative Engine Optimization',
+    'Web Design',
+    'Web Development',
+    'Website Maintenance',
+    'Application Development',
+    'Advertising',
+    'Marketing Strategy',
+  ],
+  hasOfferCatalog: {
+    '@type': 'OfferCatalog',
+    '@id': `${site.url}/#services`,
+    name: `${site.name} Services`,
+    itemListElement: services.map((s, i) => ({
+      '@type': 'Offer',
+      position: i + 1,
+      itemOffered: {
+        '@type': 'Service',
+        name: s.name,
+        alternateName: s.alternateName,
+        description: s.description,
+        serviceType: s.alternateName,
+        provider: { '@id': `${site.url}/#organization` },
+      },
+    })),
+  },
+  contactPoint: {
+    '@type': 'ContactPoint',
+    contactType: 'sales',
+    telephone: site.phoneE164,
+    email: site.email,
+    areaServed: site.areaServed,
+    availableLanguage: 'English',
   },
 };
 

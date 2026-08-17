@@ -8,7 +8,7 @@ seo:
   canonical: "https://ruckuscreative.com/clarity-create-an-unforgettable-brand/"
   ogImage: null
 pubDate: "2012-08-21T17:39:10"
-updatedDate: "2012-08-22T21:25:38"
+updatedDate: "2026-08-16"
 ---
 <p>You can’t hammer a nail in sideways – you have to have a point, and the sharper the better. Focusing on the main one or two reasons people should buy from you helps create a powerful brand and makes it easy to know what you stand for. Further, whatever your brand’s core value, it must jump off your ads, brochures and web. People might have time to read one unique selling proposition; they won’t have time to read ten. If you’re lucky, they might even remember one, they certainly won’t remember ten.</p>
 <p>Most companies want to jam their ad full of as many messages as possible because they want value from their advertising budget. However, more frequently, they end up creating an overly cluttered message and no clear take-away point. When there are so many messages crammed on the page, your viewer will pass by the ad in favor of something easier to decipher. Selling one point is easier than selling ten. Two is better than five.</p>

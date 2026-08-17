@@ -8,7 +8,7 @@ seo:
   canonical: "https://ruckuscreative.com/ask-and-ye-shall-receive-get-a-response/"
   ogImage: null
 pubDate: "2012-08-01T18:04:00"
-updatedDate: "2012-08-22T21:28:15"
+updatedDate: "2026-08-16"
 ---
 <p>Owning a restaurant does not make you money. Owning a law firm does not make you money. Owning a manufacturing plant does not make you money. However, when you effectively communicate the benefits that make your company valuable and motivate your market to react by making the call or placing an order – you make money.</p>
 <p>Communication is a two-way street; it’s a dialogue, not a monologue. When creating a brochure, ad campaign, website or other communication you need to define your objectives by asking what it is you want the customer to do. After reading your materials, should they become more aware of your brand; call for more information; call to place an order; come into the store, to take a test drive, order online? For smaller ticket items your goal is usually to get an order, which is why you ask your customer to “call now and get an additional bonus gift FREE!” For bigger ticket items ($1,000 to $100,000+) your initial goal is to have the prospect commit at least to the next step of the sales process – “call Susan at 1-800-555-1212 for more information…”</p>

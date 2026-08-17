@@ -8,7 +8,7 @@ seo:
   canonical: "https://ruckuscreative.com/differentiate-for-higher-profits-create-a-monopoly-and-raise-your-prices/"
   ogImage: null
 pubDate: "2012-08-22T06:18:33"
-updatedDate: "2012-08-22T21:21:06"
+updatedDate: "2026-08-16"
 ---
 <p>Most companies sell the same thing as their competitor. Usually there is not that much difference in what you offer, as compared to your competition. But you can’t sell “the same thing” as some other company and be profitable. You need to communicate why you are different, unique, valuable, and why the market should buy from you and no one else.</p>
 <p>When 2 companies overtly advertise the same thing, the only way to be competitive is to lower prices, undercut the competition and lower profits – not the healthiest way to run a business.<br>

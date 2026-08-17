@@ -8,7 +8,7 @@ seo:
   canonical: "https://ruckuscreative.com/print-is-expensive-dont-let-your-sales-team-waste-it-qualify-qualify-qualify/"
   ogImage: null
 pubDate: "2012-07-20T18:12:12"
-updatedDate: "2012-08-22T21:30:09"
+updatedDate: "2026-08-16"
 ---
 <p>Although creating brochures and catalogs is what we do, and we’ll sell more if our clients are sending out more, we know that most prospects will not take the time to call and ask for a brochure or catalog unless they have a specific need in mind. Unfortunately, many companies waste money by sending out brochures to unqualified sales leads too early in the sales process.<br>
 Rather than throwing away the cost of the brochure, the sale should develop once you have identified the prospect’s unique needs and you are able to demonstrate the value of what you offer in response to these needs. Once this has been established, mail the prospect a brochure to reiterate your company’s message and build trust in what you offer. By mailing generic information too early in the sales cycle, you risk squandering your investment of time and money and the prospective client viewing your product or service as the same as the competition.</p>

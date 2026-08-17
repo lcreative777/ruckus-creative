@@ -8,7 +8,7 @@ seo:
   canonical: "https://ruckuscreative.com/advertising-is-for-profits/"
   ogImage: null
 pubDate: "2012-07-22T18:09:39"
-updatedDate: "2012-08-22T21:29:20"
+updatedDate: "2026-08-16"
 ---
 <p>Once you’ve successfully launched into your market with a PR blitz (see white paper: <a href="/3-2-1-using-pr-for-lift-off-and-lift/">3-2-1… Using PR for lift-off and lift</a>) you need to support and defend the position you’ve created. At the point where you have introduced a new product or established a new market segment and launched it through a PR campaign, you own 100% of that market, that is, until others start to knock off your product. This is the moment when you need to advertise to defend your market ownership. When the “newness” buzz has worn off your story, your placement in relevant publications will eventually start to fade. This is where advertising shows its strength: guaranteed viewers and impressions; it keeps your product or service in front of the market and motivates viewers to buy when your salespersons are not present to do it for you.</p>
 <p>Advertising is a controlled way to build your brand, influence perceptions and tell the market why they should buy from you and not your competitor. It can also be the best way to blast into a new market and create instant awareness and demand. Advertising is often compared to a rocket launch: you spend 90% of your fuel just leaving the atmosphere. In terms of branding, you spend the majority of your dollars blasting into your market, making a statement and creating a brand, and then you can slow down your investment and advertise consistently to defend the position you’ve created.</p>

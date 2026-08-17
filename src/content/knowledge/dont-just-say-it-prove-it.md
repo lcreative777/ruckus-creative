@@ -8,7 +8,7 @@ seo:
   canonical: "https://ruckuscreative.com/dont-just-say-it-prove-it/"
   ogImage: null
 pubDate: "2012-08-06T18:00:41"
-updatedDate: "2012-08-22T21:27:47"
+updatedDate: "2026-08-16"
 ---
 <p><strong>Trust is the first step to any sale, or relationship.</strong> You will not make a single sale without building trust (a solid brand), and the only way to do that is to prove what you say. Skepticism is at an all time high. Kids are taught in elementary school to see through lies – they’re taught in kindergarten how Joe Camel is aimed at children, or that hidden words like “sex” are placed in ice cubes in alcohol ads, etc. Unfortunately, since so many advertisers have lied to the public for so long, the mere fact that you’re advertising starts you off with a negative trust factor. You can’t just say it any more, you have to prove it.</p>
 <p><strong>Brand = trust:</strong> your brand is the amount of trust you’ve created. Your brand is not your logo / tagline, your market positioning, what you say or what you sell. Your brand resides in only one place, in your customer’s minds – it is what they trust they will receive from you, and that you’ll make good on your promises. If they trust they’ll receive value from you, they’ll buy and be your customers. If they trust they’ll receive no value, and do not trust your claims they won’t buy from you.</p>

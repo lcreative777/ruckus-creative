@@ -8,7 +8,7 @@ seo:
   canonical: "https://ruckuscreative.com/whats-your-point-let-your-prospects-say-no-as-long-as-they-know-what-you-offer/"
   ogImage: null
 pubDate: "2012-07-19T18:17:33"
-updatedDate: "2012-08-22T21:30:58"
+updatedDate: "2026-08-16"
 ---
 <p>Clearly, you should let your prospects say “no” because they don’t need what you offer. But never let them say “no” because they don’t understand what you’re offering. Too many ads, brochures, mailers and websites are obscure and weak on communicating what they sell and why people should buy it. Ads and collateral that do not differentiate, create value, offer proof and ask for the sale, only waste time and money. And unless your communications are clear, concise and quickly communicate their point, they simply will not help grow sales.</p>
 <p>We’ve all heard about the over-bombardment of ads and the media. There are too many messages and too much information attacking people’s attention for your communications not to be clear and concise. Target Marketing® magazine reported that a weekday version of the NY Times® contains more information than an average person in the 1700s would be exposed to in their lifetime! People just don’t have time to listen to marketing messages anymore. Most of us don’t even seem to have time for vacation – you’ve probably known people (maybe even ourselves?) that leave for vacation and spend 7-10 days packing as much as they can in, and when they come back from vacation they’re more tired than when they left.</p>

@@ -27,7 +27,68 @@ export const site = {
    * rather than accepting unverified submissions.
    */
   turnstileSiteKey: '0x4AAAAAAER_mmbPuTjhndlO',
+  /**
+   * Geographic scope asserted in the LocalBusiness/AdvertisingAgency schema.
+   * ASSUMPTION — the site makes no geographic claim anywhere in its copy, so
+   * this is inferred from the Mission Viejo address rather than sourced.
+   * Narrow it (e.g. 'California') or widen it if that is wrong.
+   */
+  areaServed: 'United States',
 } as const;
+
+/**
+ * Service catalogue, emitted as schema.org OfferCatalog from Seo.astro and
+ * available to any page that wants to render the same list.
+ *
+ * `name` is the term a person would search for; `alternateName` carries the
+ * expansion so the acronym-led entries (AEO, GEO) are still machine-readable.
+ * Kept here rather than inline in the JSON-LD so the marketing copy and the
+ * structured data cannot drift apart.
+ */
+export const services = [
+  {
+    name: 'Branding',
+    alternateName: 'Brand Development and Strategy',
+    description:
+      'Brand positioning, identity and messaging built to differentiate and drive business results.',
+  },
+  {
+    name: 'SEO',
+    alternateName: 'Search Engine Optimization',
+    description:
+      'Technical and content search optimization that earns durable organic visibility and qualified traffic.',
+  },
+  {
+    name: 'AEO',
+    alternateName: 'Answer Engine Optimization',
+    description:
+      'Structuring content and entities so answer engines and featured results surface the brand directly.',
+  },
+  {
+    name: 'GEO',
+    alternateName: 'Generative Engine Optimization',
+    description:
+      'Positioning a brand to be cited and recommended by generative AI assistants and LLM-powered search.',
+  },
+  {
+    name: 'Web Design',
+    alternateName: 'Website Design and Development',
+    description:
+      'Fast, accessible, conversion-focused websites designed around Core Web Vitals and search performance.',
+  },
+  {
+    name: 'Website Maintenance',
+    alternateName: 'Website Support and Security',
+    description:
+      'Ongoing updates, security hardening, monitoring and performance care that keep a site healthy.',
+  },
+  {
+    name: 'Application Development',
+    alternateName: 'Custom Web Application Development',
+    description:
+      'Custom web applications and integrations built to fit how a business actually operates.',
+  },
+] as const;
 
 /**
  * Main navigation. The first six items target homepage sections; Knowledge

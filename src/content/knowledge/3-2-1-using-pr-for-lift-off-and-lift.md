@@ -8,7 +8,7 @@ seo:
   canonical: "https://ruckuscreative.com/3-2-1-using-pr-for-lift-off-and-lift/"
   ogImage: null
 pubDate: "2012-07-27T18:06:38"
-updatedDate: "2012-08-22T21:28:49"
+updatedDate: "2026-08-16"
 ---
 <p>Some of the most successful brands have been built without spending much on advertising. A strategic public relations campaign is one of the most cost-effective and credible ways to create demand and awareness in the marketplace. The power of this approach is most powerfully applied when launching an innovative and unique new product or service or when your product is entering a new market; gaining strategic story placement and generating buzz are easiest when you are first to offer something new, exciting and differentiated. And although “first” gets big results, PR should be an on-going element of any marketing plan.</p>
 <p>One of the greatest assets of PR is the value of trusted, 3rd party endorsements. The credibility factor is high when your brand is perceived to have “objective” 3rd parties talking about your great new product or service. When you pay to place an ad, the market assumes your claims are exaggerated. However, when an industry or consumer media source prints a story as an objective 3rd party, your brand’s honest association with the media endorsement is more believable.</p>

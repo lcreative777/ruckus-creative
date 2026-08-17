@@ -8,7 +8,7 @@ seo:
   canonical: "https://ruckuscreative.com/three-strikes-youre-out-three-overused-taglines-to-avoid-at-all-costs/"
   ogImage: null
 pubDate: "2012-08-12T17:54:05"
-updatedDate: "2012-08-22T21:26:14"
+updatedDate: "2026-08-16"
 ---
 <p>Doing research on our local market (Orange County California) I have logged onto hundreds of websites in a wide variety of industries to search out how companies are creating value and selling their brand. But instead of creating differentiaion, virtually every company was echoing the exact same three “competitive advantages.”This kind of “me too” branding is a diluted and ineffective way to position yourself in the market, and results in you having to compete by lowering your price and lowering your profits.</p>
 <p>Here are three value propositions that (just about) every single company, in every single industry is saying:</p>
