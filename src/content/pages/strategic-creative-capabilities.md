@@ -27,7 +27,6 @@ seo:
 – Mircrosites<br>
 – MP3 download sites<br>
 – Sweeps Entry sites<br>
-– Social Media set up and implement<br>
 – Photography<br>
 – Video</p>
 <p><strong>ONLINE MARKETING:</strong><br>
