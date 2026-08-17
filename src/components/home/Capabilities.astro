@@ -81,15 +81,24 @@ const ICONS: Record<string, string> = {
   /* Six capability groups: 3 rows of 2 on mobile, 2 rows of 3 on desktop.
      Fixed column counts rather than auto-fit, so the row shape is exactly the
      one asked for at each size instead of depending on the content width. */
+  /* minmax(0, 1fr), not 1fr. A bare `1fr` is minmax(auto, 1fr), and that auto
+     floor is min-content: the tracks refuse to shrink below their widest
+     unbreakable content and burst the container instead. On a 375px phone that
+     pushed these cells to 214px each -- 442px total -- and the whole document
+     scrolled sideways, which is what HubSpot's grader was reading as "not
+     responsive". minmax(0, …) lets the tracks actually take their share. */
   .grid {
     display: grid;
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: var(--gap-hairline);
     background: var(--color-hairline);
   }
   @media (min-width: 900px) {
-    .grid { grid-template-columns: repeat(3, 1fr); }
+    .grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
   }
+  /* Flex/grid children default to min-width:auto too — same floor, same bug. */
+  .cell { min-width: 0; }
+  .cell h4, .cell .items span { overflow-wrap: anywhere; }
   /* Two columns are kept all the way down, as specified. Padding and the
      dashed-list type tighten instead of dropping to a single column. */
   @media (max-width: 560px) {

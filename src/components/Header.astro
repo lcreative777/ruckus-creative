@@ -12,7 +12,12 @@ const navLinks = nav.filter((item) => item.label !== 'Contact');
 <header class="site-header">
   <div class="bar">
     <a href="/#home" class="logo" aria-label={`${site.name} home`}>
-      <Image src={logoLight} alt={site.name} height={55} widths={[263, 526, 669]} sizes="263px" loading="eager" />
+      {/* `sizes` tracks the clamp on .logo img below: the mark renders about
+          197px wide once the height scales down under ~500px, so telling the
+          browser a flat 263px there would have it fetch a larger candidate
+          than it draws. */}
+      <Image src={logoLight} alt={site.name} height={55} widths={[197, 263, 526, 669]}
+             sizes="(max-width: 500px) 197px, 263px" loading="eager" />
     </a>
 
     <nav class="desktop-nav" aria-label="Main">
@@ -51,8 +56,14 @@ const navLinks = nav.filter((item) => item.label !== 'Contact');
     border-bottom: 1px solid var(--color-hairline);
   }
   .bar { display: flex; align-items: center; gap: var(--space-3); }
-  .logo { display: inline-flex; margin-right: auto; }
-  .logo :global(img) { height: 55px; width: auto; }
+  .logo { display: inline-flex; margin-right: auto; min-width: 0; }
+  /* Height-driven width. At a flat 55px the logo renders 263px wide, which on
+     a 375px screen leaves 335px of content box to hold 263 + gap + a 56px
+     menu button -- about 8px short. Nothing clipped the excess, so the whole
+     document widened to 442px and the page scrolled sideways on every phone.
+     11vw keeps 55px on anything from ~500px up, so desktop is untouched, and
+     scales the mark down below that. The 38px floor protects 320px screens. */
+  .logo :global(img) { height: clamp(38px, 11vw, 55px); width: auto; }
 
   .desktop-nav ul, .panel ul { list-style: none; margin: 0; padding: 0; }
   .desktop-nav ul { display: flex; gap: clamp(1rem, 2vw, 1.75rem); }
