@@ -64,7 +64,7 @@ const organization = {
     postalCode: site.address.postalCode,
     addressCountry: site.address.country,
   },
-  areaServed: { '@type': 'Country', name: site.areaServed },
+  areaServed: site.areaServed.map((a) => ({ '@type': a.type, name: a.name })),
   // Topical expertise. Distinct from the offer catalogue below: knowsAbout
   // describes what the agency understands, hasOfferCatalog what it sells.
   knowsAbout: [
@@ -102,7 +102,7 @@ const organization = {
     contactType: 'sales',
     telephone: site.phoneE164,
     email: site.email,
-    areaServed: site.areaServed,
+    areaServed: site.areaServed.map((a) => a.name),
     availableLanguage: 'English',
   },
 };

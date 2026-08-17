@@ -28,12 +28,16 @@ export const site = {
    */
   turnstileSiteKey: '0x4AAAAAAER_mmbPuTjhndlO',
   /**
-   * Geographic scope asserted in the LocalBusiness/AdvertisingAgency schema.
-   * ASSUMPTION — the site makes no geographic claim anywhere in its copy, so
-   * this is inferred from the Mission Viejo address rather than sourced.
-   * Narrow it (e.g. 'California') or widen it if that is wrong.
+   * Geographic scope asserted in the AdvertisingAgency/LocalBusiness schema.
+   * Client-confirmed (2026-08-16): California as the home market, with
+   * nationwide US reach. schema.org takes areaServed as a list, so both are
+   * stated — the narrower entry supports local/regional intent without
+   * capping the business at the state line.
    */
-  areaServed: 'United States',
+  areaServed: [
+    { type: 'State', name: 'California' },
+    { type: 'Country', name: 'United States' },
+  ],
 } as const;
 
 /**
