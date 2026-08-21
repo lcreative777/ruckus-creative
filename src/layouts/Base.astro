@@ -1,26 +1,37 @@
 ---
 interface Props { photoCredit?: { photographer: string; photographerUrl: string } }
 const { photoCredit } = Astro.props;
-import '@fontsource/open-sans/300.css';
-import '@fontsource/open-sans/400.css';
-import '@fontsource/open-sans/600.css';
-import '@fontsource/open-sans/700.css';
-// Lato: 100 for the thin display headings, 300 for lighter meta, 700 for
-// uppercase labels/meta, 900 (+ 900 italic) for titles and the italic
-// accent words ("strategic creative", section-heading "work", etc.).
-import '@fontsource/lato/100.css';
-import '@fontsource/lato/100-italic.css';
-import '@fontsource/lato/300.css';
-import '@fontsource/lato/300-italic.css';
-import '@fontsource/lato/700.css';
-import '@fontsource/lato/900.css';
-import '@fontsource/lato/900-italic.css';
-// Raleway: 200 for editorial leads/quotes, 300 italic for the CTA sub-line;
-// 400 stays loaded for migrated prose blockquotes that don't set a weight.
-import '@fontsource/raleway/200.css';
-import '@fontsource/raleway/300.css';
-import '@fontsource/raleway/300-italic.css';
-import '@fontsource/raleway/400.css';
+// Fonts: latin subsets only, and only the weights the pages actually render.
+//
+// The bare '@fontsource/<family>/<weight>.css' entries declare every subset the
+// family ships -- latin, latin-ext, cyrillic, greek, vietnamese, and for Open
+// Sans also math and symbols. Those last two were really downloading: 29.6KB
+// across 2 requests for glyph ranges this site never uses. The 'latin-' files
+// declare one subset, so the others cannot be requested at all.
+//
+// Weights below were measured, not guessed: computed styles were collected
+// across the homepage, a content page, a case study, the knowledge index and a
+// legal page, and only the combinations that actually appear are imported.
+// Dropped as unrendered: Open Sans 300 and 600, Lato 100-italic, Raleway 400.
+//
+// Lato 300 / 300-italic stay despite nothing asking for 300 directly: a handful
+// of elements compute Lato 400, and CSS font matching resolves that down to 300.
+// Removing them would silently promote that text to 700.
+import '@fontsource/open-sans/latin-400.css';
+import '@fontsource/open-sans/latin-700.css';
+import '@fontsource/lato/latin-100.css';
+import '@fontsource/lato/latin-300.css';
+import '@fontsource/lato/latin-300-italic.css';
+import '@fontsource/lato/latin-700.css';
+import '@fontsource/lato/latin-900.css';
+import '@fontsource/lato/latin-900-italic.css';
+import '@fontsource/raleway/latin-200.css';
+import '@fontsource/raleway/latin-300.css';
+import '@fontsource/raleway/latin-300-italic.css';
+// Preloaded below. Imported as assets so the hashed build URLs are used.
+import openSans400 from '@fontsource/open-sans/files/open-sans-latin-400-normal.woff2';
+import lato700 from '@fontsource/lato/files/lato-latin-700-normal.woff2';
+import lato900 from '@fontsource/lato/files/lato-latin-900-normal.woff2';
 import '../styles/tokens.css';
 import '../styles/base.css';
 import Header from '../components/Header.astro';
@@ -37,6 +48,14 @@ import appleIcon from '../assets/chrome/cropped-FAVICON-180x180.png';
     <meta name="theme-color" content="#121110" />
     <link rel="icon" type="image/png" href={favicon.src} />
     <link rel="apple-touch-icon" href={appleIcon.src} />
+    {/* The three faces that carry almost all rendered text -- Open Sans 400 for
+        body copy, Lato 700 and 900 for headings and labels. Without these the
+        browser cannot discover any font until it has parsed the stylesheet,
+        which delayed every font request to ~370ms. Only three: preloading
+        more competes with the CSS and hero image for early bandwidth. */}
+    <link rel="preload" href={openSans400} as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href={lato700} as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href={lato900} as="font" type="font/woff2" crossorigin />
     <slot name="head" />
   </head>
   <body>
