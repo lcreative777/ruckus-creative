@@ -36,6 +36,18 @@ const [avif, webp, fallback] = await Promise.all([
         <strong>We are always available to answer any question you might have, or even offer a bit of off-the-cuff advice.</strong> Please feel free to reach out with any questions or comments at any time. We will get back with you immediately.
       </p>
       <a href={`mailto:${site.email}`} class="email">{site.email}</a>
+      {/* Rendered from site.socials — the same list behind sameAs in the
+          JSON-LD, so a visible link and the structured-data claim can never
+          disagree, and anything added there appears here automatically. The
+          two-way link is the point: sameAs asserts the profile is ours, and
+          linking to it from the page is the corroboration. */}
+      {site.socials.length > 0 && (
+        <ul class="socials">
+          {site.socials.map((s) => (
+            <li><a href={s.url} target="_blank" rel="noopener me">{s.name}</a></li>
+          ))}
+        </ul>
+      )}
     </div>
 
     <form class="form" data-contact-form action="/api/contact/" method="post">
@@ -183,6 +195,30 @@ const [avif, webp, fallback] = await Promise.all([
     border-bottom: 1px solid rgba(246, 101, 60, .5);
   }
   .info .email:hover { color: #fff; border-color: #fff; }
+
+  /* A list, not a bare link: this holds one profile today but is driven by
+     site.socials, so it has to read correctly the moment a second is added. */
+  .socials {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px 18px;
+  }
+  /* Deliberately quieter than the email above it — a supporting link, not a
+     second call to action competing with the phone number and the form. */
+  .socials a {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 11px;
+    letter-spacing: .18em;
+    text-transform: uppercase;
+    color: var(--color-text-muted);
+    text-decoration: none;
+    transition: color .2s ease;
+  }
+  .socials a:hover { color: #fff; }
 
   .form {
     position: relative;
