@@ -57,6 +57,15 @@ export default defineConfig({
     }),
   ],
   trailingSlash: 'always', // matches every existing WordPress URL
-  build: { format: 'directory' },
+  build: {
+    format: 'directory',
+    // Inline the stylesheets instead of linking them. Both are ~5.7KB over the
+    // wire and Lighthouse measured them blocking first render for 680ms, on a
+    // site whose pages are mostly first-touch entries from search -- so the
+    // round trip costs more than the cross-page caching it buys back. Astro's
+    // 'auto' leaves them external because they sit just above its ~4KB
+    // threshold.
+    inlineStylesheets: 'always',
+  },
   redirects,
 });

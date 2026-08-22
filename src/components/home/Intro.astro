@@ -8,10 +8,19 @@ import { resolveMedia } from '../../lib/images';
 const img = resolveMedia('imac.jpg');
 if (!img) throw new Error('Intro: "imac.jpg" was not found in src/assets/media/');
 
+// The source is 950x931, so the old 1280 candidate was silently clamped to 950
+// and the ladder really only offered two useful steps. Finer steps let a phone
+// pick something near what it draws instead of jumping to the largest file --
+// Lighthouse measured 56.8KB delivered for a 452x443 display box.
+//
+// Quality is dropped for the same reason: this is a decorative, lazily loaded,
+// below-the-fold graphic behind a fade (see .art-fade), not detail anyone
+// inspects, so the default quality was spending bytes nobody can see.
+const WIDTHS = [380, 520, 700, 950];
 const [avif, webp, fallback] = await Promise.all([
-  getImage({ src: img, format: 'avif', widths: [640, 960, 1280] }),
-  getImage({ src: img, format: 'webp', widths: [640, 960, 1280] }),
-  getImage({ src: img, format: 'jpeg', width: 1280 }),
+  getImage({ src: img, format: 'avif', widths: WIDTHS, quality: 38 }),
+  getImage({ src: img, format: 'webp', widths: WIDTHS, quality: 55 }),
+  getImage({ src: img, format: 'jpeg', width: 950, quality: 62 }),
 ]);
 ---
 <section id="intro" class="intro">
@@ -28,8 +37,8 @@ const [avif, webp, fallback] = await Promise.all([
   </div>
   <div class="art" data-parallax="18">
     <picture>
-      <source type="image/avif" srcset={avif.srcSet.attribute} sizes="(max-width: 900px) 100vw, 50vw" />
-      <source type="image/webp" srcset={webp.srcSet.attribute} sizes="(max-width: 900px) 100vw, 50vw" />
+      <source type="image/avif" srcset={avif.srcSet.attribute} sizes="(max-width: 719px) 100vw, 50vw" />
+      <source type="image/webp" srcset={webp.srcSet.attribute} sizes="(max-width: 719px) 100vw, 50vw" />
       <img src={fallback.src} width={img.width} height={img.height} alt="" loading="lazy" decoding="async" />
     </picture>
     <div class="art-fade" aria-hidden="true"></div>
