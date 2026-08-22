@@ -46,7 +46,11 @@ export const site = {
    * wrong profile damages entity resolution rather than helping it.
    */
   socials: [
-    { name: 'LinkedIn', url: 'https://www.linkedin.com/in/ruckuscreative/' },
+    // The /company/ page, not the /in/ personal profile. sameAs asserts "this
+    // is the same entity", and this node is typed AdvertisingAgency — pointing
+    // it at a person's profile would claim the agency and that person are one
+    // and the same, which is the confusion sameAs exists to prevent.
+    { name: 'LinkedIn', url: 'https://www.linkedin.com/company/ruckus-creative' },
   ],
 } as const;
 
