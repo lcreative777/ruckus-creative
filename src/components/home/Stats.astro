@@ -5,6 +5,7 @@
 // GSAP counter, which zeroes and re-counts only on its own trigger — a
 // stale/missing trigger must never leave a visible "0").
 import { getStats } from '../../lib/home-content';
+import { site } from '../../data/site';
 
 const stats = await getStats();
 
@@ -12,6 +13,20 @@ const stats = await getStats();
 // purpose: the counter sets textContent on that node, so a suffix inside it
 // would be wiped the moment the animation ran.
 const SUFFIX = [' mil', '+'];
+// Share intents for the homepage share row. These were migrated as four
+// href="/" placeholders -- the WordPress sharing widget's markup without its
+// JavaScript -- so every one of them reloaded the homepage.
+//
+// Built from site.url rather than the current location because this row only
+// ever appears on the homepage, and a static href needs no client JS.
+const SHARE_URL = encodeURIComponent(site.url);
+const SHARE_TEXT = encodeURIComponent(`${site.name} — ${site.description}`);
+const SHARE = [
+  { label: 'Facebook',  href: `https://www.facebook.com/sharer/sharer.php?u=${SHARE_URL}` },
+  { label: 'X',         href: `https://twitter.com/intent/tweet?url=${SHARE_URL}&text=${SHARE_TEXT}` },
+  { label: 'LinkedIn',  href: `https://www.linkedin.com/sharing/share-offsite/?url=${SHARE_URL}` },
+  { label: 'Pinterest', href: `https://pinterest.com/pin/create/button/?url=${SHARE_URL}&description=${SHARE_TEXT}` },
+];
 ---
 <section class="stats">
   <div class="cell blue">
@@ -24,10 +39,9 @@ const SUFFIX = [' mil', '+'];
   </div>
   <div class="cell share">
     <span>Share</span>
-    <a href="/">Facebook</a>
-    <a href="/">X</a>
-    <a href="/">LinkedIn</a>
-    <a href="/">Pinterest</a>
+    {SHARE.map((s) => (
+      <a href={s.href} target="_blank" rel="noopener noreferrer">{s.label}</a>
+    ))}
   </div>
 </section>
 

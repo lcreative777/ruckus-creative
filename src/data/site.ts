@@ -38,6 +38,16 @@ export const site = {
     { type: 'State', name: 'California' },
     { type: 'Country', name: 'United States' },
   ],
+  /**
+   * Profiles emitted as schema.org sameAs. This is the strongest signal tying
+   * the site to a verifiable entity, which is what answer and generative
+   * engines lean on when deciding whether a brand is real and what it does.
+   * Only add URLs that genuinely resolve — a sameAs pointing at a dead or
+   * wrong profile damages entity resolution rather than helping it.
+   */
+  socials: [
+    { name: 'LinkedIn', url: 'https://www.linkedin.com/in/ruckuscreative/' },
+  ],
 } as const;
 
 /**
