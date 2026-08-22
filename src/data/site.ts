@@ -51,6 +51,7 @@ export const site = {
     // it at a person's profile would claim the agency and that person are one
     // and the same, which is the confusion sameAs exists to prevent.
     { name: 'LinkedIn', url: 'https://www.linkedin.com/company/ruckus-creative' },
+    { name: 'Instagram', url: 'https://www.instagram.com/ruckuscreative/' },
   ],
 } as const;
 
